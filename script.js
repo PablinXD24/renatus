@@ -100,8 +100,11 @@ function navigateTo(sectionId) {
     
     elements.navbarLinks.classList.remove('active');
     
-    if (sectionId === 'meus-agendamentos') carregarMeusAgendamentos();
-    else if (sectionId === 'dashboard') carregarDashboard();
+    if (sectionId === 'meus-agendamentos') {
+        carregarMeusAgendamentos();
+    } else if (sectionId === 'dashboard') {
+        carregarDashboard();
+    }
     
     window.scrollTo(0, 0);
 }
@@ -246,6 +249,9 @@ auth.onAuthStateChanged(user => {
                         elements.dashboardLink.classList.add('hidden');
                     }
                 }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados do usuário:', error);
             });
     } else {
         elements.loginBtn.classList.remove('hidden');
@@ -299,7 +305,8 @@ function handleAgendamento(e) {
     };
     
     db.collection('agendamentos').add(agendamento)
-        .then(() => {
+        .then((docRef) => {
+            console.log('Agendamento criado com ID:', docRef.id);
             elements.agendamentoForm.reset();
             showAlert('success', 'Agendamento realizado!');
             
@@ -312,13 +319,13 @@ function handleAgendamento(e) {
             `;
             showModal(elements.confirmModal);
             
-            if (document.getElementById('meus-agendamentos').classList.contains('hidden')) {
-                navigateTo('meus-agendamentos');
-            } else {
+            // Atualiza a lista de agendamentos imediatamente
+            if (!elements.meusAgendamentosSection.classList.contains('hidden')) {
                 carregarMeusAgendamentos();
             }
         })
         .catch(error => {
+            console.error('Erro ao criar agendamento:', error);
             showAlert('error', 'Erro ao agendar: ' + error.message);
         });
 }
@@ -358,12 +365,14 @@ function carregarHorariosDisponiveis() {
             elements.horaSelect.disabled = false;
         })
         .catch(error => {
-            console.error('Erro ao carregar horários: ', error);
+            console.error('Erro ao carregar horários:', error);
             showAlert('error', 'Erro ao carregar horários disponíveis');
         });
 }
 
 function carregarMeusAgendamentos() {
+    console.log('Carregando agendamentos para o usuário:', currentUser ? currentUser.uid : 'N/A');
+    
     if (!currentUser) {
         elements.agendamentosList.innerHTML = '<p class="empty-message">Faça login para ver seus agendamentos</p>';
         return;
@@ -373,10 +382,12 @@ function carregarMeusAgendamentos() {
     
     db.collection('agendamentos')
         .where('userId', '==', currentUser.uid)
-        .orderBy('data')
+        .orderBy('data', 'desc')
         .orderBy('hora')
         .get()
         .then(querySnapshot => {
+            console.log('Número de agendamentos encontrados:', querySnapshot.size);
+            
             if (querySnapshot.empty) {
                 elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos. <a href="#agendar">Agende agora!</a></p>';
                 return;
@@ -404,8 +415,13 @@ function carregarMeusAgendamentos() {
             });
         })
         .catch(error => {
+            console.error('Erro ao carregar agendamentos:', error);
             elements.agendamentosList.innerHTML = '<p class="empty-message">Erro ao carregar agendamentos. Tente novamente.</p>';
-            console.error('Erro ao carregar agendamentos: ', error);
+            
+            // Verifica se é erro de índice faltante
+            if (error.code === 'failed-precondition') {
+                showAlert('error', 'Estamos atualizando o sistema. Tente novamente em alguns instantes.');
+            }
         });
 }
 
@@ -472,7 +488,7 @@ function carregarDashboard() {
             carregarGraficoAgendamentos();
         })
         .catch(error => {
-            console.error('Erro ao verificar permissões: ', error);
+            console.error('Erro ao verificar permissões:', error);
         });
 }
 
@@ -487,7 +503,7 @@ function carregarAgendamentosHoje() {
             elements.agendamentosHoje.textContent = querySnapshot.size;
         })
         .catch(error => {
-            console.error('Erro ao carregar agendamentos de hoje: ', error);
+            console.error('Erro ao carregar agendamentos de hoje:', error);
         });
 }
 
@@ -508,7 +524,7 @@ function carregarAgendamentosSemana() {
             elements.agendamentosSemana.textContent = querySnapshot.size;
         })
         .catch(error => {
-            console.error('Erro ao carregar agendamentos da semana: ', error);
+            console.error('Erro ao carregar agendamentos da semana:', error);
         });
 }
 
@@ -559,7 +575,7 @@ function carregarGraficoServicos() {
             });
         })
         .catch(error => {
-            console.error('Erro ao carregar gráfico de serviços: ', error);
+            console.error('Erro ao carregar gráfico de serviços:', error);
         });
 }
 
@@ -629,7 +645,7 @@ function carregarGraficoAgendamentos() {
             });
         })
         .catch(error => {
-            console.error('Erro ao carregar gráfico de agendamentos: ', error);
+            console.error('Erro ao carregar gráfico de agendamentos:', error);
         });
 }
 
