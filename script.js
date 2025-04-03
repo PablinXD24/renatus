@@ -1,12 +1,12 @@
 // Firebase Configuration
- const firebaseConfig = {
+const firebaseConfig = {
     apiKey: "AIzaSyBTAsZ3AoaqZ-_o4LeAdqtxIr8F_Du0NKg",
     authDomain: "renatus-16ae9.firebaseapp.com",
     projectId: "renatus-16ae9",
-    storageBucket: "renatus-16ae9.firebasestorage.app",
+    storageBucket: "renatus-16ae9.appspot.com",
     messagingSenderId: "792013371623",
     appId: "1:792013371623:web:ca8ce17514aab06fc44a42"
-  };
+};
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -380,46 +380,76 @@ function carregarMeusAgendamentos() {
     
     elements.agendamentosList.innerHTML = '<p class="empty-message">Carregando agendamentos...</p>';
     
-    db.collection('agendamentos')
-        .where('userId', '==', currentUser.uid)
-        .orderBy('data', 'desc')
-        .orderBy('hora')
-        .get()
-        .then(querySnapshot => {
-            console.log('Número de agendamentos encontrados:', querySnapshot.size);
+    // Primeiro, carregamos os dados do usuário para verificar se é admin
+    db.collection('users').doc(currentUser.uid).get()
+        .then(userDoc => {
+            const userData = userDoc.data();
+            const isAdmin = userData && (userData.isAdmin || userData.email === ADMIN_EMAIL);
             
-            if (querySnapshot.empty) {
-                elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos. <a href="#agendar">Agende agora!</a></p>';
-                return;
+            let query = db.collection('agendamentos')
+                .where('userId', '==', currentUser.uid);
+            
+            // Se for admin, mostra todos os agendamentos (não apenas os do usuário)
+            if (isAdmin) {
+                query = db.collection('agendamentos');
             }
             
-            elements.agendamentosList.innerHTML = '';
-            
-            querySnapshot.forEach(doc => {
-                const agendamento = doc.data();
-                const agendamentoCard = document.createElement('div');
-                agendamentoCard.className = 'agendamento-card';
-                agendamentoCard.innerHTML = `
-                    <div class="agendamento-info">
-                        <h3>${agendamento.servico}${agendamento.preco ? ` - R$ ${agendamento.preco}` : ''}</h3>
-                        <p><strong>Profissional:</strong> ${agendamento.barbeiro}</p>
-                        <p><strong>Data:</strong> ${formatarData(agendamento.data)} às ${agendamento.hora}</p>
-                        ${agendamento.observacoes ? `<p><strong>Observações:</strong> ${agendamento.observacoes}</p>` : ''}
-                        <p><strong>Status:</strong> <span class="status-${agendamento.status}">${agendamento.status}</span></p>
-                    </div>
-                    <div class="agendamento-actions">
-                        ${agendamento.status === 'confirmado' ? `<button class="btn danger-btn" onclick="cancelarAgendamento('${doc.id}')">Cancelar</button>` : ''}
-                    </div>
-                `;
-                elements.agendamentosList.appendChild(agendamentoCard);
-            });
+            return query
+                .orderBy('data', 'desc')
+                .orderBy('hora')
+                .get()
+                .then(querySnapshot => {
+                    console.log('Número de agendamentos encontrados:', querySnapshot.size);
+                    
+                    if (querySnapshot.empty) {
+                        elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos. <a href="#agendar">Agende agora!</a></p>';
+                        return;
+                    }
+                    
+                    elements.agendamentosList.innerHTML = '';
+                    
+                    querySnapshot.forEach(doc => {
+                        const agendamento = doc.data();
+                        // Pula agendamentos cancelados
+                        if (agendamento.status === 'cancelado') return;
+                        
+                        const agendamentoCard = document.createElement('div');
+                        agendamentoCard.className = 'agendamento-card';
+                        agendamentoCard.innerHTML = `
+                            <div class="agendamento-info">
+                                <h3>${agendamento.servico}${agendamento.preco ? ` - R$ ${agendamento.preco}` : ''}</h3>
+                                ${isAdmin ? `<p><strong>Cliente:</strong> ${agendamento.userEmail || 'N/A'}</p>` : ''}
+                                <p><strong>Profissional:</strong> ${agendamento.barbeiro}</p>
+                                <p><strong>Data:</strong> ${formatarData(agendamento.data)} às ${agendamento.hora}</p>
+                                ${agendamento.observacoes ? `<p><strong>Observações:</strong> ${agendamento.observacoes}</p>` : ''}
+                                <p><strong>Status:</strong> <span class="status-${agendamento.status}">${agendamento.status}</span></p>
+                            </div>
+                            <div class="agendamento-actions">
+                                ${agendamento.status === 'confirmado' ? 
+                                    `<button class="btn danger-btn" onclick="cancelarAgendamento('${doc.id}')">Cancelar</button>` : ''}
+                            </div>
+                        `;
+                        elements.agendamentosList.appendChild(agendamentoCard);
+                    });
+                    
+                    // Se não houve nenhum agendamento válido (todos cancelados)
+                    if (elements.agendamentosList.children.length === 0) {
+                        elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos ativos. <a href="#agendar">Agende agora!</a></p>';
+                    }
+                });
         })
         .catch(error => {
             console.error('Erro ao carregar agendamentos:', error);
-            elements.agendamentosList.innerHTML = '<p class="empty-message">Erro ao carregar agendamentos. Tente novamente.</p>';
             
-            // Verifica se é erro de índice faltante
+            let errorMessage = 'Erro ao carregar agendamentos. Tente novamente.';
             if (error.code === 'failed-precondition') {
+                errorMessage = 'Estamos atualizando o sistema. Tente novamente em alguns instantes.';
+            }
+            
+            elements.agendamentosList.innerHTML = `<p class="empty-message">${errorMessage}</p>`;
+            
+            if (error.code === 'failed-precondition') {
+                // Mostra alerta adicional para erros de índice
                 showAlert('error', 'Estamos atualizando o sistema. Tente novamente em alguns instantes.');
             }
         });
