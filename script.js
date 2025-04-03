@@ -1,12 +1,12 @@
 // Firebase Configuration
-const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_PROJETO.firebaseapp.com",
-    projectId: "SEU_PROJETO",
-    storageBucket: "SEU_PROJETO.appspot.com",
-    messagingSenderId: "SEU_SENDER_ID",
-    appId: "SEU_APP_ID"
-};
+ const firebaseConfig = {
+    apiKey: "AIzaSyBTAsZ3AoaqZ-_o4LeAdqtxIr8F_Du0NKg",
+    authDomain: "renatus-16ae9.firebaseapp.com",
+    projectId: "renatus-16ae9",
+    storageBucket: "renatus-16ae9.firebasestorage.app",
+    messagingSenderId: "792013371623",
+    appId: "1:792013371623:web:ca8ce17514aab06fc44a42"
+  };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
