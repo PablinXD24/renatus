@@ -383,15 +383,22 @@ function carregarMeusAgendamentos() {
     // Primeiro, carregamos os dados do usuário para verificar se é admin
     db.collection('users').doc(currentUser.uid).get()
         .then(userDoc => {
+            if (!userDoc.exists) {
+                elements.agendamentosList.innerHTML = '<p class="empty-message">Erro ao carregar dados do usuário</p>';
+                return;
+            }
+
             const userData = userDoc.data();
             const isAdmin = userData && (userData.isAdmin || userData.email === ADMIN_EMAIL);
             
             let query = db.collection('agendamentos')
-                .where('userId', '==', currentUser.uid);
+                .where('userId', '==', currentUser.uid)
+                .where('status', '==', 'confirmado');
             
-            // Se for admin, mostra todos os agendamentos (não apenas os do usuário)
+            // Se for admin, mostra todos os agendamentos confirmados
             if (isAdmin) {
-                query = db.collection('agendamentos');
+                query = db.collection('agendamentos')
+                    .where('status', '==', 'confirmado');
             }
             
             return query
@@ -402,7 +409,7 @@ function carregarMeusAgendamentos() {
                     console.log('Número de agendamentos encontrados:', querySnapshot.size);
                     
                     if (querySnapshot.empty) {
-                        elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos. <a href="#agendar">Agende agora!</a></p>';
+                        elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos ativos. <a href="#agendar">Agende agora!</a></p>';
                         return;
                     }
                     
@@ -410,9 +417,6 @@ function carregarMeusAgendamentos() {
                     
                     querySnapshot.forEach(doc => {
                         const agendamento = doc.data();
-                        // Pula agendamentos cancelados
-                        if (agendamento.status === 'cancelado') return;
-                        
                         const agendamentoCard = document.createElement('div');
                         agendamentoCard.className = 'agendamento-card';
                         agendamentoCard.innerHTML = `
@@ -425,17 +429,11 @@ function carregarMeusAgendamentos() {
                                 <p><strong>Status:</strong> <span class="status-${agendamento.status}">${agendamento.status}</span></p>
                             </div>
                             <div class="agendamento-actions">
-                                ${agendamento.status === 'confirmado' ? 
-                                    `<button class="btn danger-btn" onclick="cancelarAgendamento('${doc.id}')">Cancelar</button>` : ''}
+                                <button class="btn danger-btn" onclick="cancelarAgendamento('${doc.id}')">Cancelar</button>
                             </div>
                         `;
                         elements.agendamentosList.appendChild(agendamentoCard);
                     });
-                    
-                    // Se não houve nenhum agendamento válido (todos cancelados)
-                    if (elements.agendamentosList.children.length === 0) {
-                        elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos ativos. <a href="#agendar">Agende agora!</a></p>';
-                    }
                 });
         })
         .catch(error => {
@@ -449,7 +447,6 @@ function carregarMeusAgendamentos() {
             elements.agendamentosList.innerHTML = `<p class="empty-message">${errorMessage}</p>`;
             
             if (error.code === 'failed-precondition') {
-                // Mostra alerta adicional para erros de índice
                 showAlert('error', 'Estamos atualizando o sistema. Tente novamente em alguns instantes.');
             }
         });
