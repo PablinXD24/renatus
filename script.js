@@ -240,7 +240,7 @@ auth.onAuthStateChanged(user => {
                         elements.userAvatar.src = `https://ui-avatars.com/api/?name=${initials}&background=6d4aff&color=fff&size=128`;
                     }
                     
-                    if (userData.isAdmin) {
+                    if (userData.isAdmin || userData.email === ADMIN_EMAIL) {
                         elements.dashboardLink.classList.remove('hidden');
                     } else {
                         elements.dashboardLink.classList.add('hidden');
@@ -286,6 +286,7 @@ function handleAgendamento(e) {
     
     const agendamento = {
         userId: currentUser.uid,
+        userEmail: currentUser.email,
         servico: servico.split(' - ')[0],
         barbeiro,
         data,
@@ -293,7 +294,8 @@ function handleAgendamento(e) {
         preco,
         observacoes,
         status: 'confirmado',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        adminEmail: ADMIN_EMAIL
     };
     
     db.collection('agendamentos').add(agendamento)
@@ -362,7 +364,10 @@ function carregarHorariosDisponiveis() {
 }
 
 function carregarMeusAgendamentos() {
-    if (!currentUser) return;
+    if (!currentUser) {
+        elements.agendamentosList.innerHTML = '<p class="empty-message">Faça login para ver seus agendamentos</p>';
+        return;
+    }
     
     elements.agendamentosList.innerHTML = '<p class="empty-message">Carregando agendamentos...</p>';
     
@@ -425,15 +430,44 @@ function carregarDashboard() {
     
     db.collection('users').doc(currentUser.uid).get()
         .then(doc => {
-            if (!doc.exists || !doc.data().isAdmin) {
+            const userData = doc.data();
+            const isAdmin = userData && (userData.isAdmin || userData.email === ADMIN_EMAIL);
+            
+            if (!isAdmin) {
                 showAlert('error', 'Acesso restrito a administradores');
                 navigateTo('home');
                 return;
             }
             
+            // Carrega todos os agendamentos para o admin
+            db.collection('agendamentos')
+                .orderBy('createdAt', 'desc')
+                .limit(50)
+                .get()
+                .then(querySnapshot => {
+                    if (querySnapshot.empty) {
+                        elements.ultimosAgendamentos.innerHTML = '<tr><td colspan="5">Nenhum agendamento recente</td></tr>';
+                        return;
+                    }
+                    
+                    elements.ultimosAgendamentos.innerHTML = '';
+                    
+                    querySnapshot.forEach(doc => {
+                        const agendamento = doc.data();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${agendamento.userEmail || 'N/A'}</td>
+                            <td>${agendamento.servico}</td>
+                            <td>${agendamento.barbeiro}</td>
+                            <td>${formatarData(agendamento.data)}</td>
+                            <td>${agendamento.hora}</td>
+                        `;
+                        elements.ultimosAgendamentos.appendChild(row);
+                    });
+                });
+            
             carregarAgendamentosHoje();
             carregarAgendamentosSemana();
-            carregarUltimosAgendamentos();
             carregarGraficoServicos();
             carregarGraficoAgendamentos();
         })
@@ -475,48 +509,6 @@ function carregarAgendamentosSemana() {
         })
         .catch(error => {
             console.error('Erro ao carregar agendamentos da semana: ', error);
-        });
-}
-
-function carregarUltimosAgendamentos() {
-    elements.ultimosAgendamentos.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
-    
-    db.collection('agendamentos')
-        .orderBy('createdAt', 'desc')
-        .limit(10)
-        .get()
-        .then(querySnapshot => {
-            if (querySnapshot.empty) {
-                elements.ultimosAgendamentos.innerHTML = '<tr><td colspan="5">Nenhum agendamento recente</td></tr>';
-                return;
-            }
-            
-            elements.ultimosAgendamentos.innerHTML = '';
-            
-            const promises = querySnapshot.docs.map(doc => {
-                const agendamento = doc.data();
-                
-                return db.collection('users').doc(agendamento.userId).get()
-                    .then(userDoc => {
-                        const cliente = userDoc.exists ? userDoc.data().nome : 'Cliente não encontrado';
-                        
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${cliente}</td>
-                            <td>${agendamento.servico}</td>
-                            <td>${agendamento.barbeiro}</td>
-                            <td>${formatarData(agendamento.data)}</td>
-                            <td>${agendamento.hora}</td>
-                        `;
-                        elements.ultimosAgendamentos.appendChild(row);
-                    });
-            });
-            
-            return Promise.all(promises);
-        })
-        .catch(error => {
-            elements.ultimosAgendamentos.innerHTML = '<tr><td colspan="5">Erro ao carregar agendamentos</td></tr>';
-            console.error('Erro ao carregar últimos agendamentos: ', error);
         });
 }
 
@@ -730,10 +722,4 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         navigateTo('home');
     }
-
-    // Test Firebase connection
-    console.log("Testing Firebase connection...");
-    firebase.auth().onAuthStateChanged(user => {
-        console.log("Auth state:", user ? "Logged in" : "Logged out");
-    });
 });
