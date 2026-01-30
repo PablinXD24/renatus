@@ -1,253 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agendamento de Cortes | Corte & Estilo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>Renatus Barbearia | Agendamento</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="#" class="logo">
-                <i class="fas fa-scissors"></i>
-                <span>Renatu's</span>
-            </a>
-            <div class="navbar-links">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="#agendar" class="nav-link">Agendar</a>
-                <a href="#meus-agendamentos" class="nav-link">Meus Agendamentos</a>
-                <a href="#dashboard" class="nav-link dashboard-link">Dashboard</a>
-                <div class="auth-buttons">
-                    <button id="login-btn" class="btn auth-btn">Login</button>
-                    <button id="register-btn" class="btn auth-btn">Registrar</button>
-                    <div id="user-profile" class="user-profile hidden">
-                        <img id="user-avatar" src="" alt="Avatar">
-                        <span id="user-name"></span>
-                        <button id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
 
-    <section id="home" class="section hero">
-        <div class="hero-content">
-            <h1>Corte de Cabelo Profissional para o Homem Moderno</h1>
-            <p>Agende seu horário com os melhores profissionais da região com apenas alguns cliques.</p>
-            <button id="hero-agendar-btn" class="btn btn-primary btn-lg">Agendar Agora</button>
-        </div>
-        <div class="hero-image">
-            <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Barbearia">
-        </div>
-    </section>
-
-    <section id="agendar" class="section hidden">
-        <div class="container">
-            <div class="section-header">
-                <h2>Agende seu Horário</h2>
-                <p>Escolha o serviço, profissional e horário de sua preferência.</p>
-            </div>
-            <div class="booking-container">
-                <form id="agendamento-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="servico">Serviço</label>
-                            <select id="servico" required>
-                                <option value="">Selecione um serviço</option>
-                                <option value="Corte Masculino - R$ 40">Corte Masculino - R$ 40</option>
-                                <option value="Barba - R$ 30">Barba - R$ 30</option>
-                                <option value="Corte e Barba - R$ 60">Corte e Barba - R$ 60</option>
-                                <option value="Cabelo, Barba e Sobrancelha - R$ 70">Cabelo, Barba e Sobrancelha - R$ 70</option>
-                                <option value="Pezinho - R$ 15">Pezinho - R$ 15</option>
-                                <option value="Luzes/Platinado - R$ 80">Luzes/Platinado - R$ 80</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="barbeiro">Profissional</label>
-                            <select id="barbeiro" required>
-                                <option value="">Selecione um profissional</option>
-                                <option value="Renato">Renato</option>
-                                <option value="Carlos">Carlos</option>
-                                <option value="Marcos">Marcos</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="data">Data</label>
-                            <input type="date" id="data" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="hora">Horário</label>
-                            <select id="hora" required>
-                                <option value="">Selecione um horário</option>
-                                </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="observacoes">Observações (Opcional)</label>
-                        <textarea id="observacoes" rows="3" placeholder="Alguma preferência ou detalhe especial?"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">Confirmar Agendamento</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <section id="meus-agendamentos" class="section hidden">
-        <div class="container">
-            <div class="section-header">
-                <h2>Meus Agendamentos</h2>
-                <p>Confira seus próximos cortes agendados.</p>
-            </div>
-            <div id="agendamentos-list" class="agendamentos-list">
-                </div>
-        </div>
-    </section>
-
-    <section id="dashboard" class="section hidden">
-        <div class="container">
-            <div class="section-header">
-                <h2>Painel Administrativo</h2>
-                <p>Gestão completa da barbearia.</p>
-            </div>
-            <div class="dashboard-stats">
-                <div class="stat-card">
-                    <i class="fas fa-calendar-check"></i>
-                    <div class="stat-info">
-                        <h3 id="agendamentos-hoje">0</h3>
-                        <p>Hoje</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <div class="stat-info">
-                        <h3 id="agendamentos-semana">0</h3>
-                        <p>Esta Semana</p>
-                    </div>
-                </div>
-            </div>
-            <div class="dashboard-table-container">
-                <h3>Próximos Agendamentos</h3>
-                <table id="ultimos-agendamentos">
-                    <thead>
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Serviço</th>
-                            <th>Profissional</th>
-                            <th>Data</th>
-                            <th>Hora</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <div id="login-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Bem-vindo de volta</h2>
-            <form id="login-form">
-                <div class="form-group">
-                    <input type="email" id="login-email" placeholder="E-mail" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="login-password" placeholder="Senha" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Entrar</button>
-            </form>
-            <div class="auth-divider"><span>ou entre com</span></div>
-            <div class="social-auth">
-                <button id="google-login" class="btn-social btn-google"><i class="fab fa-google"></i></button>
-                <button id="facebook-login" class="btn-social btn-facebook"><i class="fab fa-facebook-f"></i></button>
-            </div>
-            <p class="auth-switch">Não tem uma conta? <a href="#" id="switch-to-register">Registre-se</a></p>
+    <div id="auth-container" class="container">
+        <div class="card">
+            <h2>Renatus Barbearia</h2>
+            <p>Entre para agendar seu horário</p>
+            
+            <input type="email" id="email" placeholder="E-mail">
+            <input type="password" id="password" placeholder="Senha">
+            
+            <button onclick="loginEmail()" class="btn-primary">Entrar</button>
+            <button onclick="loginGoogle()" class="btn-google">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+                Entrar com Google
+            </button>
+            <p class="toggle-auth">Não tem conta? <span onclick="registerEmail()">Cadastre-se</span></p>
         </div>
     </div>
 
-    <div id="register-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Criar Conta</h2>
-            <form id="register-form">
-                <div class="form-group">
-                    <input type="text" id="register-name" placeholder="Nome Completo" required>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="register-email" placeholder="E-mail" required>
-                </div>
-                <div class="form-group">
-                    <input type="tel" id="register-phone" placeholder="Celular" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="register-password" placeholder="Senha (mín. 6 caracteres)" required minlength="6">
-                </div>
-                <div class="form-group">
-                    <input type="password" id="register-confirm-password" placeholder="Confirmar Senha" required minlength="6">
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Registrar</button>
-            </form>
-            <div class="auth-divider"><span>ou registre-se com</span></div>
-            <div class="social-auth">
-                <button id="google-register" class="btn-social btn-google"><i class="fab fa-google"></i></button>
-                <button id="facebook-register" class="btn-social btn-facebook"><i class="fab fa-facebook-f"></i></button>
+    <div id="app-container" class="container hidden">
+        <header>
+            <span id="user-name">Olá, Cliente</span>
+            <button onclick="logout()" class="btn-outline">Sair</button>
+        </header>
+
+        <main class="card">
+            <h3>Novo Agendamento</h3>
+            <div class="form-group">
+                <label>Escolha o Serviço:</label>
+                <select id="service">
+                    <option value="cabelo">Cabelo - R$ 40</option>
+                    <option value="barba">Barba - R$ 30</option>
+                    <option value="completo">Completo - R$ 65</option>
+                </select>
             </div>
-            <p class="auth-switch">Já tem uma conta? <a href="#" id="switch-to-login">Faça Login</a></p>
-        </div>
+
+            <div class="form-group">
+                <label>Data:</label>
+                <input type="date" id="date">
+            </div>
+
+            <div class="form-group">
+                <label>Horário:</label>
+                <input type="time" id="time">
+            </div>
+
+            <button onclick="saveAppointment()" class="btn-primary">Confirmar Agendamento</button>
+        </main>
+
+        <section class="appointments">
+            <h3>Meus Horários</h3>
+            <ul id="appointment-list"></ul>
+        </section>
     </div>
 
-    <div id="confirm-modal" class="modal">
-        <div class="modal-content text-center">
-            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-            <h2>Agendamento Realizado!</h2>
-            <div id="confirm-content" class="confirm-content"></div>
-            <button class="btn btn-primary" onclick="navigateTo('meus-agendamentos')">Ver Meus Agendamentos</button>
-        </div>
-    </div>
-
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>Renatu's Corte</h3>
-                <p>Excelência em barbearia desde 2015. Onde seu estilo é nossa prioridade.</p>
-                <div class="social-links">
-                    <a href="https://www.instagram.com/renatuducorte?igsh=NTVnMHIkNGRsMWNq"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://wa.me/5511973133931"><i class="fab fa-whatsapp"></i></a>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h3>Contato</h3>
-                <p><i class="fas fa-phone"></i> (11) 97313-3931</p>
-                <p><i class="fas fa-envelope"></i> renatuscortes@gmail.com</p>
-                <p><i class="fas fa-map-marker-alt"></i> Rua Turvolandia, 145 - Guarulhos, SP</p>
-            </div>
-            <div class="footer-section">
-                <h3>Horário</h3>
-                <p>Seg-Sex: 9:00 - 19:00</p>
-                <p>Sábado: 9:00 - 15:00</p>
-                <p>Domingo: Fechado</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2023 Corte & Estilo. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
