@@ -1,12 +1,12 @@
-// Firebase Configuration
+// Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyBTAsZ3AoaqZ-_o4LeAdqtxIr8F_Du0NKg",
-    authDomain: "renatus-16ae9.firebaseapp.com",
-    databaseURL: "https://renatus-16ae9-default-rtdb.firebaseio.com",
-    projectId: "renatus-16ae9",
-    storageBucket: "renatus-16ae9.appspot.com",
-    messagingSenderId: "792013371623",
-    appId: "1:792013371623:web:ca8ce17514aab06fc44a42"
+  apiKey: "AIzaSyBQdw7hIkhoby8n_4pl41zwjEqHYNtQDRw",
+  authDomain: "ecommerce-jj.firebaseapp.com",
+  databaseURL: "https://ecommerce-jj-default-rtdb.firebaseio.com",
+  projectId: "ecommerce-jj",
+  storageBucket: "ecommerce-jj.firebasestorage.app",
+  messagingSenderId: "773988929532",
+  appId: "1:773988929532:web:6bff6f6ad3968436edac79"
 };
 
 // Initialize Firebase
