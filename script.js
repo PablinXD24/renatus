@@ -2,6 +2,7 @@
 const firebaseConfig = {
     apiKey: "AIzaSyBTAsZ3AoaqZ-_o4LeAdqtxIr8F_Du0NKg",
     authDomain: "renatus-16ae9.firebaseapp.com",
+    databaseURL: "https://renatus-16ae9-default-rtdb.firebaseio.com",
     projectId: "renatus-16ae9",
     storageBucket: "renatus-16ae9.appspot.com",
     messagingSenderId: "792013371623",
@@ -11,7 +12,7 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.firestore();
+const db = firebase.database(); // Alterado para database()
 const providerGoogle = new firebase.auth.GoogleAuthProvider();
 const providerFacebook = new firebase.auth.FacebookAuthProvider();
 
@@ -81,9 +82,15 @@ function hideModal(modal) {
     modal.style.display = 'none';
 }
 
-function toggleModal(modal) {
-    document.querySelectorAll('.modal').forEach(m => hideModal(m));
-    showModal(modal);
+function switchAuthModal(e) {
+    e.preventDefault();
+    if (elements.loginModal.classList.contains('show')) {
+        hideModal(elements.loginModal);
+        showModal(elements.registerModal);
+    } else {
+        hideModal(elements.registerModal);
+        showModal(elements.loginModal);
+    }
 }
 
 // Navigation
@@ -109,31 +116,18 @@ function navigateTo(sectionId) {
     window.scrollTo(0, 0);
 }
 
-// Toggle mobile navbar
 function toggleNavbar() {
     elements.navbarLinks.classList.toggle('active');
 }
 
-// Switch between auth modals
-function switchAuthModal(e) {
-    e.preventDefault();
-    if (elements.loginModal.classList.contains('show')) {
-        hideModal(elements.loginModal);
-        showModal(elements.registerModal);
-    } else {
-        hideModal(elements.registerModal);
-        showModal(elements.loginModal);
-    }
-}
-
-// Social login
+// Auth Functions
 function loginWithProvider(provider) {
     let providerName = provider.providerId === 'google.com' ? 'Google' : 'Facebook';
     
     auth.signInWithPopup(provider)
         .then((result) => {
             if (result.additionalUserInfo.isNewUser) {
-                return db.collection('users').doc(result.user.uid).set({
+                return db.ref('users/' + result.user.uid).set({
                     nome: result.user.displayName || 'Usuário',
                     email: result.user.email,
                     telefone: result.user.phoneNumber || '',
@@ -153,7 +147,6 @@ function loginWithProvider(provider) {
         });
 }
 
-// Email/password authentication
 function handleLogin(e) {
     e.preventDefault();
     const email = elements.loginEmail.value;
@@ -179,18 +172,13 @@ function handleRegister(e) {
     const confirmPassword = elements.registerConfirmPassword.value;
     
     if (password !== confirmPassword) {
-        showAlert('error', 'As senhas não coincidem');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showAlert('error', 'A senha deve ter pelo menos 6 caracteres');
+        showAlert('error', 'As senhas não coincidem!');
         return;
     }
     
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            return db.collection('users').doc(userCredential.user.uid).set({
+            return db.ref('users/' + userCredential.user.uid).set({
                 nome: name,
                 email: email,
                 telefone: phone,
@@ -201,7 +189,7 @@ function handleRegister(e) {
         .then(() => {
             hideModal(elements.registerModal);
             elements.registerForm.reset();
-            showAlert('success', 'Registro realizado com sucesso!');
+            showAlert('success', 'Conta criada com sucesso!');
         })
         .catch(error => {
             showAlert('error', 'Erro no registro: ' + error.message);
@@ -212,14 +200,11 @@ function logout() {
     auth.signOut()
         .then(() => {
             navigateTo('home');
-            showAlert('success', 'Logout realizado com sucesso');
-        })
-        .catch(error => {
-            showAlert('error', 'Erro ao fazer logout: ' + error.message);
+            showAlert('success', 'Sessão encerrada com sucesso');
         });
 }
 
-// Auth state observer
+// Observer
 auth.onAuthStateChanged(user => {
     currentUser = user;
     
@@ -228,10 +213,10 @@ auth.onAuthStateChanged(user => {
         elements.registerBtn.classList.add('hidden');
         elements.userProfile.classList.remove('hidden');
         
-        db.collection('users').doc(user.uid).get()
-            .then(doc => {
-                if (doc.exists) {
-                    const userData = doc.data();
+        db.ref('users/' + user.uid).once('value')
+            .then(snapshot => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
                     elements.userName.textContent = userData.nome;
                     
                     if (user.photoURL) {
@@ -249,9 +234,6 @@ auth.onAuthStateChanged(user => {
                         elements.dashboardLink.classList.add('hidden');
                     }
                 }
-            })
-            .catch(error => {
-                console.error('Erro ao carregar dados do usuário:', error);
             });
     } else {
         elements.loginBtn.classList.remove('hidden');
@@ -266,12 +248,12 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-// Scheduling functions
+// Scheduling Functions
 function handleAgendamento(e) {
     e.preventDefault();
     
     if (!currentUser) {
-        showAlert('error', 'Você precisa estar logado para agendar');
+        showAlert('warning', 'Você precisa estar logado para agendar');
         showModal(elements.loginModal);
         return;
     }
@@ -281,11 +263,6 @@ function handleAgendamento(e) {
     const data = elements.dataInput.value;
     const hora = elements.horaSelect.value;
     const observacoes = elements.observacoes.value;
-    
-    if (!servico || !barbeiro || !data || !hora) {
-        showAlert('error', 'Preencha todos os campos obrigatórios');
-        return;
-    }
     
     const precoMatch = servico.match(/R\$ (\d+)/);
     const preco = precoMatch ? parseInt(precoMatch[1]) : 0;
@@ -300,32 +277,24 @@ function handleAgendamento(e) {
         preco,
         observacoes,
         status: 'confirmado',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        adminEmail: ADMIN_EMAIL
+        createdAt: firebase.database.ServerValue.TIMESTAMP
     };
     
-    db.collection('agendamentos').add(agendamento)
-        .then((docRef) => {
-            console.log('Agendamento criado com ID:', docRef.id);
+    const newRef = db.ref('agendamentos').push();
+    newRef.set(agendamento)
+        .then(() => {
             elements.agendamentoForm.reset();
-            showAlert('success', 'Agendamento realizado!');
+            showAlert('success', 'Agendamento realizado com sucesso!');
             
             elements.confirmContent.innerHTML = `
-                <p><strong>Serviço:</strong> ${servico.split(' - ')[0]}</p>
-                <p><strong>Profissional:</strong> ${barbeiro}</p>
+                <p><strong>Serviço:</strong> ${agendamento.servico}</p>
+                <p><strong>Profissional:</strong> ${agendamento.barbeiro}</p>
                 <p><strong>Data:</strong> ${formatarData(data)} às ${hora}</p>
                 <p><strong>Preço:</strong> R$ ${preco}</p>
-                ${observacoes ? `<p><strong>Observações:</strong> ${observacoes}</p>` : ''}
             `;
             showModal(elements.confirmModal);
-            
-            // Atualiza a lista de agendamentos imediatamente
-            if (!elements.meusAgendamentosSection.classList.contains('hidden')) {
-                carregarMeusAgendamentos();
-            }
         })
         .catch(error => {
-            console.error('Erro ao criar agendamento:', error);
             showAlert('error', 'Erro ao agendar: ' + error.message);
         });
 }
@@ -336,361 +305,138 @@ function carregarHorariosDisponiveis() {
     
     if (!dataSelecionada || !barbeiroSelecionado) return;
     
-    elements.horaSelect.innerHTML = '<option value="">Selecione um horário</option>';
-    elements.horaSelect.disabled = true;
-    
-    db.collection('agendamentos')
-        .where('barbeiro', '==', barbeiroSelecionado)
-        .where('data', '==', dataSelecionada)
-        .where('status', '==', 'confirmado')
-        .get()
-        .then(querySnapshot => {
-            const horariosOcupados = querySnapshot.docs.map(doc => doc.data().hora);
-            const todosHorarios = [];
+    db.ref('agendamentos')
+        .orderByChild('data')
+        .equalTo(dataSelecionada)
+        .once('value', snapshot => {
+            const horariosOcupados = [];
+            snapshot.forEach(child => {
+                const ag = child.val();
+                if (ag.barbeiro === barbeiroSelecionado && ag.status === 'confirmado') {
+                    horariosOcupados.push(ag.hora);
+                }
+            });
             
+            const todosHorarios = [];
             for (let i = 9; i <= 18; i++) {
                 todosHorarios.push(`${i}:00`);
                 if (i < 18) todosHorarios.push(`${i}:30`);
             }
             
-            const horariosDisponiveis = todosHorarios.filter(hora => !horariosOcupados.includes(hora));
-            
-            horariosDisponiveis.forEach(hora => {
-                const option = document.createElement('option');
-                option.value = hora;
-                option.textContent = hora;
-                elements.horaSelect.appendChild(option);
+            elements.horaSelect.innerHTML = '<option value="">Selecione um horário</option>';
+            todosHorarios.forEach(h => {
+                if (!horariosOcupados.includes(h)) {
+                    const option = document.createElement('option');
+                    option.value = h;
+                    option.textContent = h;
+                    elements.horaSelect.appendChild(option);
+                }
             });
-            
-            elements.horaSelect.disabled = false;
-        })
-        .catch(error => {
-            console.error('Erro ao carregar horários:', error);
-            showAlert('error', 'Erro ao carregar horários disponíveis');
         });
 }
 
 function carregarMeusAgendamentos() {
-    console.log('Carregando agendamentos para o usuário:', currentUser ? currentUser.uid : 'N/A');
-    
-    if (!currentUser) {
-        elements.agendamentosList.innerHTML = '<p class="empty-message">Faça login para ver seus agendamentos</p>';
-        return;
-    }
-    
-    elements.agendamentosList.innerHTML = '<p class="empty-message">Carregando agendamentos...</p>';
-    
-    // Primeiro, carregamos os dados do usuário para verificar se é admin
-    db.collection('users').doc(currentUser.uid).get()
-        .then(userDoc => {
-            if (!userDoc.exists) {
-                elements.agendamentosList.innerHTML = '<p class="empty-message">Erro ao carregar dados do usuário</p>';
-                return;
-            }
-
-            const userData = userDoc.data();
-            const isAdmin = userData && (userData.isAdmin || userData.email === ADMIN_EMAIL);
-            
-            let query = db.collection('agendamentos')
-                .where('userId', '==', currentUser.uid)
-                .where('status', '==', 'confirmado');
-            
-            // Se for admin, mostra todos os agendamentos confirmados
-            if (isAdmin) {
-                query = db.collection('agendamentos')
-                    .where('status', '==', 'confirmado');
-            }
-            
-            return query
-                .orderBy('data', 'desc')
-                .orderBy('hora')
-                .get()
-                .then(querySnapshot => {
-                    console.log('Número de agendamentos encontrados:', querySnapshot.size);
-                    
-                    if (querySnapshot.empty) {
-                        elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos ativos. <a href="#agendar">Agende agora!</a></p>';
-                        return;
-                    }
-                    
-                    elements.agendamentosList.innerHTML = '';
-                    
-                    querySnapshot.forEach(doc => {
-                        const agendamento = doc.data();
-                        const agendamentoCard = document.createElement('div');
-                        agendamentoCard.className = 'agendamento-card';
-                        agendamentoCard.innerHTML = `
-                            <div class="agendamento-info">
-                                <h3>${agendamento.servico}${agendamento.preco ? ` - R$ ${agendamento.preco}` : ''}</h3>
-                                ${isAdmin ? `<p><strong>Cliente:</strong> ${agendamento.userEmail || 'N/A'}</p>` : ''}
-                                <p><strong>Profissional:</strong> ${agendamento.barbeiro}</p>
-                                <p><strong>Data:</strong> ${formatarData(agendamento.data)} às ${agendamento.hora}</p>
-                                ${agendamento.observacoes ? `<p><strong>Observações:</strong> ${agendamento.observacoes}</p>` : ''}
-                                <p><strong>Status:</strong> <span class="status-${agendamento.status}">${agendamento.status}</span></p>
-                            </div>
-                            <div class="agendamento-actions">
-                                <button class="btn danger-btn" onclick="cancelarAgendamento('${doc.id}')">Cancelar</button>
-                            </div>
-                        `;
-                        elements.agendamentosList.appendChild(agendamentoCard);
-                    });
-                });
-        })
-        .catch(error => {
-            console.error('Erro ao carregar agendamentos:', error);
-            
-            let errorMessage = 'Erro ao carregar agendamentos. Tente novamente.';
-            if (error.code === 'failed-precondition') {
-                errorMessage = 'Estamos atualizando o sistema. Tente novamente em alguns instantes.';
-            }
-            
-            elements.agendamentosList.innerHTML = `<p class="empty-message">${errorMessage}</p>`;
-            
-            if (error.code === 'failed-precondition') {
-                showAlert('error', 'Estamos atualizando o sistema. Tente novamente em alguns instantes.');
-            }
-        });
-}
-
-function cancelarAgendamento(agendamentoId) {
-    if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
-        db.collection('agendamentos').doc(agendamentoId).update({
-            status: 'cancelado'
-        })
-        .then(() => {
-            showAlert('success', 'Agendamento cancelado com sucesso');
-            carregarMeusAgendamentos();
-        })
-        .catch(error => {
-            showAlert('error', 'Erro ao cancelar agendamento: ' + error.message);
-        });
-    }
-}
-
-// Dashboard functions
-function carregarDashboard() {
     if (!currentUser) return;
     
-    db.collection('users').doc(currentUser.uid).get()
-        .then(doc => {
-            const userData = doc.data();
-            const isAdmin = userData && (userData.isAdmin || userData.email === ADMIN_EMAIL);
-            
-            if (!isAdmin) {
-                showAlert('error', 'Acesso restrito a administradores');
-                navigateTo('home');
-                return;
+    db.ref('agendamentos')
+        .orderByChild('userId')
+        .equalTo(currentUser.uid)
+        .once('value', snapshot => {
+            elements.agendamentosList.innerHTML = '';
+            let hasAgendamentos = false;
+
+            const agendamentos = [];
+            snapshot.forEach(child => {
+                agendamentos.push({ id: child.key, ...child.val() });
+            });
+
+            // Inverter para mostrar os mais recentes primeiro
+            agendamentos.reverse().forEach(ag => {
+                if (ag.status === 'confirmado') {
+                    hasAgendamentos = true;
+                    const card = document.createElement('div');
+                    card.className = 'agendamento-card';
+                    card.innerHTML = `
+                        <div class="agendamento-info">
+                            <h3>${ag.servico} - R$ ${ag.preco}</h3>
+                            <p><strong>Profissional:</strong> ${ag.barbeiro}</p>
+                            <p><strong>Data:</strong> ${formatarData(ag.data)} às ${ag.hora}</p>
+                        </div>
+                        <div class="agendamento-actions">
+                            <button class="btn danger-btn" onclick="cancelarAgendamento('${ag.id}')">Cancelar</button>
+                        </div>
+                    `;
+                    elements.agendamentosList.appendChild(card);
+                }
+            });
+
+            if (!hasAgendamentos) {
+                elements.agendamentosList.innerHTML = '<p class="empty-message">Você não possui agendamentos ativos.</p>';
             }
-            
-            // Carrega todos os agendamentos para o admin
-            db.collection('agendamentos')
-                .orderBy('createdAt', 'desc')
-                .limit(50)
-                .get()
-                .then(querySnapshot => {
-                    if (querySnapshot.empty) {
-                        elements.ultimosAgendamentos.innerHTML = '<tr><td colspan="5">Nenhum agendamento recente</td></tr>';
-                        return;
-                    }
-                    
-                    elements.ultimosAgendamentos.innerHTML = '';
-                    
-                    querySnapshot.forEach(doc => {
-                        const agendamento = doc.data();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${agendamento.userEmail || 'N/A'}</td>
-                            <td>${agendamento.servico}</td>
-                            <td>${agendamento.barbeiro}</td>
-                            <td>${formatarData(agendamento.data)}</td>
-                            <td>${agendamento.hora}</td>
-                        `;
-                        elements.ultimosAgendamentos.appendChild(row);
-                    });
-                });
-            
-            carregarAgendamentosHoje();
-            carregarAgendamentosSemana();
-            carregarGraficoServicos();
-            carregarGraficoAgendamentos();
-        })
-        .catch(error => {
-            console.error('Erro ao verificar permissões:', error);
         });
 }
 
-function carregarAgendamentosHoje() {
-    const hoje = new Date().toISOString().split('T')[0];
-    
-    db.collection('agendamentos')
-        .where('data', '==', hoje)
-        .where('status', '==', 'confirmado')
-        .get()
-        .then(querySnapshot => {
-            elements.agendamentosHoje.textContent = querySnapshot.size;
-        })
-        .catch(error => {
-            console.error('Erro ao carregar agendamentos de hoje:', error);
-        });
+function cancelarAgendamento(id) {
+    if (confirm('Tem certeza que deseja cancelar este agendamento?')) {
+        db.ref('agendamentos/' + id).update({ status: 'cancelado' })
+            .then(() => {
+                showAlert('success', 'Agendamento cancelado com sucesso');
+                carregarMeusAgendamentos();
+            })
+            .catch(error => showAlert('error', 'Erro ao cancelar: ' + error.message));
+    }
 }
 
-function carregarAgendamentosSemana() {
-    const hoje = new Date();
-    const inicioSemana = new Date(hoje.setDate(hoje.getDate() - hoje.getDay()));
-    const fimSemana = new Date(hoje.setDate(hoje.getDate() + 6));
-    
-    const inicioSemanaStr = inicioSemana.toISOString().split('T')[0];
-    const fimSemanaStr = fimSemana.toISOString().split('T')[0];
-    
-    db.collection('agendamentos')
-        .where('data', '>=', inicioSemanaStr)
-        .where('data', '<=', fimSemanaStr)
-        .where('status', '==', 'confirmado')
-        .get()
-        .then(querySnapshot => {
-            elements.agendamentosSemana.textContent = querySnapshot.size;
-        })
-        .catch(error => {
-            console.error('Erro ao carregar agendamentos da semana:', error);
-        });
-}
-
-function carregarGraficoServicos() {
-    db.collection('agendamentos')
-        .where('status', '==', 'confirmado')
-        .get()
-        .then(querySnapshot => {
-            const servicosCount = {};
-            
-            querySnapshot.forEach(doc => {
-                const servico = doc.data().servico;
-                servicosCount[servico] = (servicosCount[servico] || 0) + 1;
-            });
-            
-            const servicos = Object.keys(servicosCount);
-            const quantidades = Object.values(servicosCount);
-            
-            const backgroundColors = [
-                'rgba(109, 74, 255, 0.7)',
-                'rgba(255, 107, 107, 0.7)',
-                'rgba(40, 167, 69, 0.7)',
-                'rgba(255, 193, 7, 0.7)',
-                'rgba(23, 162, 184, 0.7)',
-                'rgba(108, 117, 125, 0.7)'
-            ];
-            
-            const ctx = document.getElementById('servicos-chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: servicos,
-                    datasets: [{
-                        label: 'Serviços Mais Populares',
-                        data: quantidades,
-                        backgroundColor: backgroundColors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                        }
-                    }
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Erro ao carregar gráfico de serviços:', error);
-        });
-}
-
-function carregarGraficoAgendamentos() {
-    const seisMesesAtras = new Date();
-    seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 5);
-    seisMesesAtras.setDate(1);
-    
-    db.collection('agendamentos')
-        .where('createdAt', '>=', seisMesesAtras)
-        .where('status', '==', 'confirmado')
-        .get()
-        .then(querySnapshot => {
-            const agendamentosPorMes = {};
-            const meses = [];
-            const nomesMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-            
-            for (let i = 0; i < 6; i++) {
-                const date = new Date();
-                date.setMonth(date.getMonth() - i);
-                const mesAno = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                const nomeMes = nomesMeses[date.getMonth()];
-                agendamentosPorMes[mesAno] = 0;
-                meses.unshift(`${nomeMes}/${date.getFullYear()}`);
+// Dashboard Admin
+function carregarDashboard() {
+    db.ref('agendamentos').once('value', snapshot => {
+        let hojeCount = 0;
+        let semanaCount = 0;
+        const hoje = new Date().toISOString().split('T')[0];
+        
+        elements.ultimosAgendamentos.innerHTML = '';
+        const agendamentos = [];
+        
+        snapshot.forEach(child => {
+            const ag = child.val();
+            if (ag.status === 'confirmado') {
+                if (ag.data === hoje) hojeCount++;
+                semanaCount++; // Simplificação para total ativos
+                agendamentos.push(ag);
             }
-            
-            querySnapshot.forEach(doc => {
-                const data = doc.data().createdAt.toDate();
-                const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
-                
-                if (agendamentosPorMes[mesAno] !== undefined) {
-                    agendamentosPorMes[mesAno]++;
-                }
-            });
-            
-            const quantidades = Object.values(agendamentosPorMes);
-            
-            const ctx = document.getElementById('agendamentos-chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: meses,
-                    datasets: [{
-                        label: 'Agendamentos por Mês',
-                        data: quantidades,
-                        backgroundColor: 'rgba(109, 74, 255, 0.2)',
-                        borderColor: 'rgba(109, 74, 255, 1)',
-                        borderWidth: 2,
-                        tension: 0.1,
-                        fill: true,
-                        pointBackgroundColor: 'rgba(109, 74, 255, 1)',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            }
-                        }
-                    }
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Erro ao carregar gráfico de agendamentos:', error);
         });
+
+        elements.agendamentosHoje.textContent = hojeCount;
+        elements.agendamentosSemana.textContent = semanaCount;
+
+        agendamentos.slice(-10).reverse().forEach(ag => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${ag.userEmail}</td>
+                <td>${ag.servico}</td>
+                <td>${ag.barbeiro}</td>
+                <td>${formatarData(ag.data)}</td>
+                <td>${ag.hora}</td>
+            `;
+            elements.ultimosAgendamentos.appendChild(row);
+        });
+    });
 }
 
-// Utility functions
+// Helpers
 function formatarData(dataStr) {
-    const options = { day: '2-digit', month: 'long', year: 'numeric' };
-    return new Date(dataStr).toLocaleDateString('pt-BR', options);
+    const data = new Date(dataStr + 'T00:00:00');
+    return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 }
 
 function showAlert(type, message) {
     const alert = document.createElement('div');
     alert.className = `alert alert-${type}`;
-    
-    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-    alert.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
-    
+    alert.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
     document.body.appendChild(alert);
-    
     setTimeout(() => {
         alert.classList.add('fade-out');
         setTimeout(() => alert.remove(), 500);
@@ -700,13 +446,11 @@ function showAlert(type, message) {
 // Event Listeners
 function setupEventListeners() {
     elements.hamburger.addEventListener('click', toggleNavbar);
-    
     elements.loginBtn.addEventListener('click', () => showModal(elements.loginModal));
     elements.registerBtn.addEventListener('click', () => showModal(elements.registerModal));
     elements.logoutBtn.addEventListener('click', logout);
     elements.switchToRegister.addEventListener('click', switchAuthModal);
     elements.switchToLogin.addEventListener('click', switchAuthModal);
-    
     elements.googleLogin.addEventListener('click', () => loginWithProvider(providerGoogle));
     elements.facebookLogin.addEventListener('click', () => loginWithProvider(providerFacebook));
     elements.googleRegister.addEventListener('click', () => loginWithProvider(providerGoogle));
@@ -714,10 +458,12 @@ function setupEventListeners() {
     
     elements.closeModals.forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.modal').forEach(modal => hideModal(modal));
+            hideModal(elements.loginModal);
+            hideModal(elements.registerModal);
+            hideModal(elements.confirmModal);
         });
     });
-    
+
     elements.loginForm.addEventListener('submit', handleLogin);
     elements.registerForm.addEventListener('submit', handleRegister);
     elements.agendamentoForm.addEventListener('submit', handleAgendamento);
@@ -730,39 +476,26 @@ function setupEventListeners() {
     });
     
     elements.heroAgendarBtn.addEventListener('click', () => navigateTo('agendar'));
-    
     elements.dataInput.addEventListener('change', carregarHorariosDisponiveis);
     elements.barbeiroSelect.addEventListener('change', carregarHorariosDisponiveis);
     
     window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-            hideModal(e.target);
-        }
+        if (e.target.classList.contains('modal')) hideModal(e.target);
     });
 
-    // Phone number mask
-    elements.registerPhone.addEventListener('input', function(e) {
-        const value = e.target.value.replace(/\D/g, '');
-        let formattedValue = '';
-        
-        if (value.length > 0) formattedValue = '(' + value.substring(0, 2);
-        if (value.length > 2) formattedValue += ') ' + value.substring(2, 7);
-        if (value.length > 7) formattedValue += '-' + value.substring(7, 11);
-        
-        e.target.value = formattedValue;
+    // Mascara telefone
+    elements.registerPhone.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 0) v = '(' + v;
+        if (v.length > 3) v = v.substring(0, 3) + ') ' + v.substring(3);
+        if (v.length > 10) v = v.substring(0, 10) + '-' + v.substring(10, 14);
+        e.target.value = v;
     });
 }
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
-    
     const today = new Date().toISOString().split('T')[0];
     elements.dataInput.setAttribute('min', today);
-    
-    if (window.location.hash) {
-        navigateTo(window.location.hash.substring(1));
-    } else {
-        navigateTo('home');
-    }
+    if (window.location.hash) navigateTo(window.location.hash.substring(1));
 });
