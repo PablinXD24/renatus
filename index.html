@@ -3,63 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renatus Barbearia | Agendamento</title>
+    <title>Renatus Barbearia | Agendamento LiquidGlass</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div id="auth-container" class="container">
-        <div class="card">
-            <h2>Renatus Barbearia</h2>
-            <p>Entre para agendar seu horário</p>
-            
-            <input type="email" id="email" placeholder="E-mail">
-            <input type="password" id="password" placeholder="Senha">
-            
-            <button onclick="loginEmail()" class="btn-primary">Entrar</button>
-            <button onclick="loginGoogle()" class="btn-google">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
-                Entrar com Google
-            </button>
-            <p class="toggle-auth">Não tem conta? <span onclick="registerEmail()">Cadastre-se</span></p>
-        </div>
+    <div class="background-elements">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
     </div>
 
-    <div id="app-container" class="container hidden">
-        <header>
-            <span id="user-name">Olá, Cliente</span>
-            <button onclick="logout()" class="btn-outline">Sair</button>
+    <div id="auth-container" class="glass-card main-card active">
+        <h2 class="title">Bem-vindo à Renatus</h2>
+        <p class="subtitle">Faça login ou cadastre-se para agendar seu horário.</p>
+        
+        <div class="input-group">
+            <input type="email" id="auth-email" placeholder="E-mail">
+            <input type="password" id="auth-password" placeholder="Senha">
+        </div>
+        
+        <button onclick="loginEmail()" class="btn-liquid">Entrar</button>
+        <button onclick="loginGoogle()" class="btn-liquid btn-google">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+            Entrar com Google
+        </button>
+        <p class="toggle-auth">Não tem conta? <span onclick="toggleAuthMode()">Cadastre-se</span></p>
+    </div>
+
+    <div id="app-container" class="main-card hidden">
+        <header class="glass-header">
+            <span id="user-display-name">Olá, Cliente</span>
+            <button onclick="logout()" class="btn-liquid btn-outline">Sair</button>
         </header>
 
-        <main class="card">
-            <h3>Novo Agendamento</h3>
-            <div class="form-group">
-                <label>Escolha o Serviço:</label>
-                <select id="service">
-                    <option value="cabelo">Cabelo - R$ 40</option>
-                    <option value="barba">Barba - R$ 30</option>
-                    <option value="completo">Completo - R$ 65</option>
-                </select>
+        <div id="step-service" class="glass-card step-card active">
+            <h3 class="step-title">1. Escolha o Serviço</h3>
+            <div class="service-grid">
+                <div class="service-card" data-service="cabelo" data-price="40">
+                    <h4>Corte de Cabelo</h4>
+                    <p>R$ 40,00</p>
+                    <span>Moderno ou Clássico</span>
+                </div>
+                <div class="service-card" data-service="barba" data-price="30">
+                    <h4>Barba Modelada</h4>
+                    <p>R$ 30,00</p>
+                    <span>Toalha quente e finalização</span>
+                </div>
+                <div class="service-card" data-service="completo" data-price="65">
+                    <h4>Cabelo e Barba</h4>
+                    <p>R$ 65,00</p>
+                    <span>Combo completo</span>
+                </div>
+                <div class="service-card" data-service="platinado" data-price="120">
+                    <h4>Platinado</h4>
+                    <p>R$ 120,00</p>
+                    <span>Descoloração e tonalização</span>
+                </div>
             </div>
+            <button onclick="nextStep('step-datetime')" class="btn-liquid mt-20">Próximo</button>
+        </div>
 
-            <div class="form-group">
-                <label>Data:</label>
-                <input type="date" id="date">
+        <div id="step-datetime" class="glass-card step-card hidden">
+            <h3 class="step-title">2. Selecione Data e Hora</h3>
+            <p>Serviço selecionado: <strong id="selected-service-display"></strong></p>
+            <div class="input-group">
+                <label for="date-input">Data:</label>
+                <input type="date" id="date-input">
             </div>
-
-            <div class="form-group">
-                <label>Horário:</label>
-                <input type="time" id="time">
+            <div class="input-group">
+                <label for="time-input">Horário:</label>
+                <input type="time" id="time-input" min="09:00" max="18:00">
             </div>
+            <div class="step-navigation">
+                <button onclick="prevStep('step-service')" class="btn-liquid btn-outline">Voltar</button>
+                <button onclick="nextStep('step-confirm')" class="btn-liquid">Revisar</button>
+            </div>
+        </div>
 
-            <button onclick="saveAppointment()" class="btn-primary">Confirmar Agendamento</button>
-        </main>
+        <div id="step-confirm" class="glass-card step-card hidden">
+            <h3 class="step-title">3. Confirme seu Agendamento</h3>
+            <p>Serviço: <strong id="confirm-service"></strong></p>
+            <p>Data: <strong id="confirm-date"></strong></p>
+            <p>Horário: <strong id="confirm-time"></strong></p>
+            <p>Preço Total: <strong id="confirm-price"></strong></p>
+            <div class="step-navigation">
+                <button onclick="prevStep('step-datetime')" class="btn-liquid btn-outline">Voltar</button>
+                <button onclick="saveAppointment()" class="btn-liquid btn-confirm">Confirmar Agendamento</button>
+            </div>
+        </div>
 
-        <section class="appointments">
-            <h3>Meus Horários</h3>
-            <ul id="appointment-list"></ul>
-        </section>
+        <div id="step-my-appointments" class="glass-card step-card hidden">
+            <h3 class="step-title">Meus Próximos Agendamentos</h3>
+            <ul id="appointment-list" class="appointment-list">
+                </ul>
+            <button onclick="goToHome()" class="btn-liquid btn-outline">Novo Agendamento</button>
+        </div>
+
     </div>
 
     <script type="module" src="script.js"></script>
