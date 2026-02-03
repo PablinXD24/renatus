@@ -59,6 +59,7 @@
         .float-btn { position: fixed; width: 50px; height: 50px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(15px); z-index: 1500; border: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; color: white; }
         #cart-btn-floating { bottom: 20px; left: 20px; display: none; }
         #admin-btn { bottom: 20px; right: 20px; background: var(--barber-blue-main); border: none; display: none; }
+        #dash-btn { bottom: 80px; right: 20px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); display: none; }
         #cart-badge { position: absolute; top: -5px; right: -5px; background: white; color: var(--barber-blue-main); font-size: 9px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
         @media (max-width: 768px) { .modal { align-items: flex-end; padding: 0; } .modal-content { border-radius: 20px 20px 0 0; } body { cursor: auto; } #custom-cursor { display: none; } }
@@ -84,6 +85,7 @@
     <main class="content-wrapper" id="main-content"></main>
 
     <button id="cart-btn-floating" class="float-btn" onclick="openCartModal()">📅 <div id="cart-badge">0</div></button>
+    <button id="dash-btn" class="float-btn" onclick="window.location.href='dash.html'">📊</button>
     <button id="admin-btn" class="float-btn" onclick="openAdminModal()">+</button>
 
     <div id="details-modal" class="modal">
@@ -110,7 +112,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO FIREBASE RENATUS
         const firebaseConfig = {
             apiKey: "AIzaSyAEG84kLya9LIK7TwAjsAxbP_FxcW4TGO4",
             authDomain: "renatus-4ecbf.firebaseapp.com",
@@ -137,12 +138,17 @@
         auth.onAuthStateChanged(user => {
             const ui = document.getElementById('auth-ui');
             const adminBtn = document.getElementById('admin-btn');
+            const dashBtn = document.getElementById('dash-btn');
             if(user) {
                 ui.innerHTML = `<span style="font-size:0.6rem; font-weight:700">${user.displayName.split(' ')[0]}</span> <button class="cat-filter-btn" onclick="auth.signOut()" style="padding:4px 10px; font-size:0.5rem; margin-left:5px">Sair</button>`;
-                if(user.email === ADM_EMAIL) adminBtn.style.display = 'flex';
+                if(user.email === ADM_EMAIL) {
+                    adminBtn.style.display = 'flex';
+                    dashBtn.style.display = 'flex';
+                }
             } else {
                 ui.innerHTML = `<button class="cat-filter-btn" onclick="auth.signInWithPopup(provider)">ENTRAR</button>`;
                 adminBtn.style.display = 'none';
+                dashBtn.style.display = 'none';
             }
         });
 
@@ -200,7 +206,6 @@
 
             const slotBtns = s.slots.split(',').map(slot => `<div class="slot-btn" onclick="selectSlot(this, '${slot.trim()}')">${slot.trim()}</div>`).join('');
             
-            // Layout condicional para ADM (Editável) ou Cliente
             body.innerHTML = `
                 <div class="img-sculpt-frame" style="height: 100%"><img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png" style="max-width: 60%"></div>
                 <div>
