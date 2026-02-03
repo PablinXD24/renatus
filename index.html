@@ -140,7 +140,12 @@
             const adminBtn = document.getElementById('admin-btn');
             const dashBtn = document.getElementById('dash-btn');
             if(user) {
-                ui.innerHTML = `<span style="font-size:0.6rem; font-weight:700">${user.displayName.split(' ')[0]}</span> <button class="cat-filter-btn" onclick="auth.signOut()" style="padding:4px 10px; font-size:0.5rem; margin-left:5px">Sair</button>`;
+                ui.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button class="cat-filter-btn" onclick="openUserBookings()" style="padding:4px 10px; font-size:0.5rem; background:rgba(0,123,255,0.2)">MIS AGENDAS</button>
+                        <span style="font-size:0.6rem; font-weight:700">${user.displayName.split(' ')[0]}</span> 
+                        <button class="cat-filter-btn" onclick="auth.signOut()" style="padding:4px 10px; font-size:0.5rem">Sair</button>
+                    </div>`;
                 if(user.email === ADM_EMAIL) {
                     adminBtn.style.display = 'flex';
                     dashBtn.style.display = 'flex';
@@ -150,7 +155,7 @@
                 adminBtn.style.display = 'none';
                 dashBtn.style.display = 'none';
             }
-            updateBadge(); // Atualiza visibilidade da aba de agendado ao mudar estado de login
+            updateBadge();
         });
 
         function listenToServices() {
@@ -260,7 +265,6 @@
         }
 
         function addToCart() {
-            // Regra: Só pode agendar se estiver logado
             if(!auth.currentUser) {
                 alert("Você precisa entrar na sua conta para confirmar um agendamento.");
                 auth.signInWithPopup(provider);
@@ -272,7 +276,8 @@
                 name: currentService.name, 
                 barber: document.getElementById('u-barber').value, 
                 time: selectedSlot, 
-                price: parseFloat(currentService.price) 
+                price: parseFloat(currentService.price),
+                date: new Date().toLocaleDateString()
             });
             localStorage.setItem('renatus_cart', JSON.stringify(cart));
             updateBadge();
@@ -283,7 +288,6 @@
             const b = document.getElementById('cart-badge');
             const f = document.getElementById('cart-btn-floating');
             b.innerText = cart.length;
-            // Aba de agendado só aparece se tiver algo E estiver logado
             f.style.display = (cart.length > 0 && auth.currentUser) ? 'flex' : 'none';
         }
 
@@ -311,17 +315,60 @@
             const name = document.getElementById('client-name').value;
             if(!name) return alert("Digite seu nome!");
             
-            let msg = `💈 *RENATUS BARBER - AGENDAMENTO* 💈\n\n👤 *Cliente:* ${name}\n\n`;
-            cart.forEach(i => {
-                msg += `🔹 *${i.name}*\n   📅 Horário: ${i.time}\n   ✂️ Barbeiro: ${i.barber}\n\n`;
+            const uid = auth.currentUser.uid;
+            const bookingData = {
+                client: name,
+                items: cart,
+                total: total,
+                timestamp: Date.now(),
+                status: "Pendente"
+            };
+
+            // Salva no Firebase para persistência do usuário
+            database.ref('users_bookings/' + uid).push(bookingData).then(() => {
+                let msg = `💈 *RENATUS BARBER - AGENDAMENTO* 💈\n\n👤 *Cliente:* ${name}\n\n`;
+                cart.forEach(i => {
+                    msg += `🔹 *${i.name}*\n   📅 Horário: ${i.time}\n   ✂️ Barbeiro: ${i.barber}\n\n`;
+                });
+                msg += `💰 *Total: R$ ${total.toFixed(2)}*\n\n_Aguardo confirmação!_`;
+                
+                window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
+                cart = [];
+                localStorage.setItem('renatus_cart', JSON.stringify(cart));
+                updateBadge();
+                closeModals();
             });
-            msg += `💰 *Total: R$ ${total.toFixed(2)}*\n\n_Aguardo confirmação!_`;
+        }
+
+        function openUserBookings() {
+            if(!auth.currentUser) return;
+            const body = document.getElementById('details-body');
+            body.style.display = "block";
+            body.innerHTML = `<p style="text-align:center; opacity:0.5">Carregando seus agendamentos...</p>`;
             
-            window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
-            cart = [];
-            localStorage.setItem('renatus_cart', JSON.stringify(cart));
-            updateBadge();
-            closeModals();
+            database.ref('users_bookings/' + auth.currentUser.uid).once('value', snap => {
+                const data = snap.val();
+                if(!data) {
+                    body.innerHTML = `<h3 style="margin-bottom:12px;">Meus Agendamentos</h3><p style="text-align:center; opacity:0.5; padding:20px;">Você ainda não possui agendamentos finalizados.</p>`;
+                } else {
+                    let html = `<h3 style="margin-bottom:12px;">Meus Agendamentos</h3>`;
+                    Object.values(data).reverse().forEach(b => {
+                        html += `
+                        <div style="padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 15px; margin-bottom: 10px;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.55rem; color:var(--barber-blue-main); margin-bottom:5px;">
+                                <span>${new Date(b.timestamp).toLocaleDateString()}</span>
+                                <span style="font-weight:700">${b.status}</span>
+                            </div>
+                            ${b.items.map(i => `<div style="font-size:0.65rem;">• ${i.name} (${i.time})</div>`).join('')}
+                            <div style="text-align:right; font-size:0.65rem; font-weight:700; margin-top:5px;">Total: R$ ${b.total.toFixed(2)}</div>
+                        </div>`;
+                    });
+                    body.innerHTML = html;
+                }
+            });
+
+            document.getElementById('details-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
         }
 
         function saveServiceToFirebase() {
