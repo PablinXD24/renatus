@@ -58,6 +58,7 @@
 
         .float-btn { position: fixed; width: 50px; height: 50px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(15px); z-index: 1500; border: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; color: white; }
         #cart-btn-floating { bottom: 20px; left: 20px; display: none; }
+        #history-btn-floating { bottom: 80px; left: 20px; display: none; }
         #admin-btn { bottom: 20px; right: 20px; background: var(--barber-blue-main); border: none; display: none; }
         #dash-btn { bottom: 80px; right: 20px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); display: none; }
         #cart-badge { position: absolute; top: -5px; right: -5px; background: white; color: var(--barber-blue-main); font-size: 9px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -84,6 +85,7 @@
     
     <main class="content-wrapper" id="main-content"></main>
 
+    <button id="history-btn-floating" class="float-btn" onclick="openHistoryModal()">⌛</button>
     <button id="cart-btn-floating" class="float-btn" onclick="openCartModal()">📅 <div id="cart-badge">0</div></button>
     <button id="dash-btn" class="float-btn" onclick="window.location.href='dash.html'">📊</button>
     <button id="admin-btn" class="float-btn" onclick="openAdminModal()">+</button>
@@ -130,10 +132,11 @@
 
         let services = [];
         let cart = JSON.parse(localStorage.getItem('renatus_cart')) || [];
+        let history = JSON.parse(localStorage.getItem('renatus_history')) || [];
         let currentService = null;
         let selectedSlot = "";
 
-        window.onload = () => { listenToServices(); updateBadge(); };
+        window.onload = () => { listenToServices(); updateInterfaceVisibility(); };
 
         auth.onAuthStateChanged(user => {
             const ui = document.getElementById('auth-ui');
@@ -146,11 +149,30 @@
                     dashBtn.style.display = 'flex';
                 }
             } else {
-                ui.innerHTML = `<button class="cat-filter-btn" onclick="auth.signInWithPopup(provider)">ENTRAR</button>`;
+                ui.innerHTML = `<button class="cat-filter-btn" onclick="handleLogin()">ENTRAR</button>`;
                 adminBtn.style.display = 'none';
                 dashBtn.style.display = 'none';
             }
         });
+
+        function handleLogin() {
+            return auth.signInWithPopup(provider);
+        }
+
+        function generateToken() {
+            const num = Math.floor(1000 + Math.random() * 9000);
+            return `rb${num}`;
+        }
+
+        function updateInterfaceVisibility() {
+            const historyBtn = document.getElementById('history-btn-floating');
+            const cartBtn = document.getElementById('cart-btn-floating');
+            const badge = document.getElementById('cart-badge');
+            
+            historyBtn.style.display = history.length > 0 ? 'flex' : 'none';
+            cartBtn.style.display = cart.length > 0 ? 'flex' : 'none';
+            badge.innerText = cart.length;
+        }
 
         function listenToServices() {
             database.ref('renatus_services').on('value', snap => {
@@ -236,6 +258,91 @@
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
         }
 
+        async function addToCart() {
+            if(!auth.currentUser) {
+                alert("Para agendar, você precisa estar logado!");
+                await handleLogin();
+                return;
+            }
+
+            if(!selectedSlot) return alert("Selecione um horário!");
+            
+            cart.push({ 
+                token: generateToken(),
+                name: currentService.name, 
+                barber: document.getElementById('u-barber').value, 
+                time: selectedSlot, 
+                price: parseFloat(currentService.price) 
+            });
+            localStorage.setItem('renatus_cart', JSON.stringify(cart));
+            updateInterfaceVisibility();
+            closeModals();
+        }
+
+        function openCartModal() {
+            const body = document.getElementById('details-body');
+            body.style.display = "block";
+            let total = 0;
+            let list = cart.map((i, idx) => {
+                total += i.price;
+                return `<div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.65rem; position: relative;"><b>${i.name}</b> <small style="color:var(--barber-blue-main)">#${i.token}</small><br><span style="opacity:0.5">${i.barber} • ${i.time}</span><button onclick="removeItem(${idx})" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ff4d4d; cursor: pointer;">&times;</button></div>`;
+            }).join('');
+
+            body.innerHTML = `
+                <h3 style="margin-bottom:12px;">Seus Agendamentos</h3>
+                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Nenhum serviço selecionado.</p>'}</div>
+                <div style="background: var(--barber-blue-main); color: white; padding: 12px; border-radius: 12px; text-align: right; font-weight: 700; margin-bottom:15px">Total: R$ ${total.toFixed(2)}</div>
+                <input type="text" id="client-name" class="user-input" value="${auth.currentUser?.displayName || ''}" placeholder="Seu Nome">
+                <button class="card-btn-fix" onclick="finishBooking(${total})">FINALIZAR E ENVIAR WHATSAPP</button>
+            `;
+            document.getElementById('details-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
+        }
+
+        function openHistoryModal() {
+            const body = document.getElementById('details-body');
+            body.style.display = "block";
+            let list = history.map((i) => {
+                return `<div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.65rem;"><b>${i.name}</b> <span style="color:var(--barber-blue-main); float:right">#${i.token}</span><br><span style="opacity:0.5">${i.barber} • ${i.time}</span><br><small style="color:#00ff88">Agendado em: ${i.date}</small></div>`;
+            }).join('');
+
+            body.innerHTML = `
+                <h3 style="margin-bottom:12px;">Histórico (Agendados)</h3>
+                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Nenhum agendamento realizado ainda.</p>'}</div>
+                <button class="card-btn-fix" style="background:transparent; border:1px solid var(--glass-border)" onclick="closeModals()">FECHAR</button>
+            `;
+            document.getElementById('details-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
+        }
+
+        function finishBooking(total) {
+            const name = document.getElementById('client-name').value;
+            if(!name) return alert("Digite seu nome!");
+            
+            let msg = `💈 *RENATUS BARBER - AGENDAMENTO* 💈\n\n👤 *Cliente:* ${name}\n\n`;
+            const dateStr = new Date().toLocaleDateString('pt-BR');
+
+            cart.forEach(i => {
+                msg += `🔹 *${i.name}* (#${i.token})\n   📅 Horário: ${i.time}\n   ✂️ Barbeiro: ${i.barber}\n\n`;
+                history.unshift({...i, date: dateStr});
+            });
+            msg += `💰 *Total: R$ ${total.toFixed(2)}*\n\n_Aguardo confirmação!_`;
+            
+            localStorage.setItem('renatus_history', JSON.stringify(history));
+            window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
+            
+            cart = [];
+            localStorage.setItem('renatus_cart', JSON.stringify(cart));
+            updateInterfaceVisibility();
+            closeModals();
+        }
+
+        function selectSlot(el, slot) {
+            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedSlot = slot;
+        }
+
         function updateServiceAll(id) {
             const upd = {
                 category: document.getElementById('e-cat').value,
@@ -250,69 +357,6 @@
                 alert("Serviço atualizado!");
                 closeModals();
             }).catch(err => alert("Erro ao salvar: " + err.message));
-        }
-
-        function selectSlot(el, slot) {
-            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedSlot = slot;
-        }
-
-        function addToCart() {
-            if(!selectedSlot) return alert("Selecione um horário!");
-            cart.push({ 
-                name: currentService.name, 
-                barber: document.getElementById('u-barber').value, 
-                time: selectedSlot, 
-                price: parseFloat(currentService.price) 
-            });
-            localStorage.setItem('renatus_cart', JSON.stringify(cart));
-            updateBadge();
-            closeModals();
-        }
-
-        function updateBadge() {
-            const b = document.getElementById('cart-badge');
-            const f = document.getElementById('cart-btn-floating');
-            b.innerText = cart.length;
-            f.style.display = cart.length > 0 ? 'flex' : 'none';
-        }
-
-        function openCartModal() {
-            const body = document.getElementById('details-body');
-            body.style.display = "block";
-            let total = 0;
-            let list = cart.map((i, idx) => {
-                total += i.price;
-                return `<div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.65rem; position: relative;"><b>${i.name}</b><br><span style="opacity:0.5">${i.barber} • ${i.time}</span><button onclick="removeItem(${idx})" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ff4d4d; cursor: pointer;">&times;</button></div>`;
-            }).join('');
-
-            body.innerHTML = `
-                <h3 style="margin-bottom:12px;">Seus Agendamentos</h3>
-                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Nenhum serviço selecionado.</p>'}</div>
-                <div style="background: var(--barber-blue-main); color: white; padding: 12px; border-radius: 12px; text-align: right; font-weight: 700; margin-bottom:15px">Total: R$ ${total.toFixed(2)}</div>
-                <input type="text" id="client-name" class="user-input" placeholder="Seu Nome">
-                <button class="card-btn-fix" onclick="finishBooking(${total})">FINALIZAR E ENVIAR WHATSAPP</button>
-            `;
-            document.getElementById('details-modal').style.display = 'flex';
-            setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
-        }
-
-        function finishBooking(total) {
-            const name = document.getElementById('client-name').value;
-            if(!name) return alert("Digite seu nome!");
-            
-            let msg = `💈 *RENATUS BARBER - AGENDAMENTO* 💈\n\n👤 *Cliente:* ${name}\n\n`;
-            cart.forEach(i => {
-                msg += `🔹 *${i.name}*\n   📅 Horário: ${i.time}\n   ✂️ Barbeiro: ${i.barber}\n\n`;
-            });
-            msg += `💰 *Total: R$ ${total.toFixed(2)}*\n\n_Aguardo confirmação!_`;
-            
-            window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
-            cart = [];
-            localStorage.setItem('renatus_cart', JSON.stringify(cart));
-            updateBadge();
-            closeModals();
         }
 
         function saveServiceToFirebase() {
@@ -353,7 +397,7 @@
             });
         }
 
-        function removeItem(idx) { cart.splice(idx, 1); updateBadge(); openCartModal(); }
+        function removeItem(idx) { cart.splice(idx, 1); updateInterfaceVisibility(); openCartModal(); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => { m.classList.remove('active'); setTimeout(()=>m.style.display='none', 300); }); }
         function openAdminModal() { document.getElementById('admin-modal').style.display='flex'; setTimeout(()=>document.getElementById('admin-modal').classList.add('active'), 10); }
 
