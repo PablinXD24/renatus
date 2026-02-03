@@ -326,7 +326,6 @@
             const bookingToken = generateToken();
             const timestamp = new Date().toISOString();
 
-            // Salva no Firebase vinculado ao usuário
             const bookingData = {
                 clientName: name,
                 clientId: user.uid,
@@ -351,6 +350,9 @@
                 updateBadge();
                 closeModals();
                 alert("Agendamento realizado! Token: " + bookingToken);
+            }).catch(err => {
+                console.error(err);
+                alert("Erro de permissão: Certifique-se de que as Rules do Firebase foram atualizadas para permitir gravação em 'renatus_bookings'.");
             });
         }
 
