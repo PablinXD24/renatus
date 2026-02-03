@@ -55,6 +55,7 @@
         .slot-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; }
         .slot-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; padding: 8px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; transition: 0.3s; text-align: center; }
         .slot-btn.selected { background: var(--barber-blue-main); border-color: var(--barber-blue-main); }
+        .slot-btn.occupied { opacity: 0.3; cursor: not-allowed; background: #333; }
 
         .float-btn { position: fixed; width: 50px; height: 50px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(15px); z-index: 1500; border: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; color: white; }
         #cart-btn-floating { bottom: 20px; left: 20px; display: none; }
@@ -134,11 +135,12 @@
         const WPP_NUM = "5511998937643";
 
         let services = [];
+        let allBookings = [];
         let cart = JSON.parse(localStorage.getItem('renatus_cart')) || [];
         let currentService = null;
         let selectedSlot = "";
 
-        window.onload = () => { listenToServices(); updateBadge(); };
+        window.onload = () => { listenToServices(); listenToBookings(); updateBadge(); };
 
         auth.onAuthStateChanged(user => {
             const ui = document.getElementById('auth-ui');
@@ -166,6 +168,14 @@
             database.ref('renatus_services').on('value', snap => {
                 const data = snap.val();
                 services = data ? Object.values(data) : [];
+                renderServices();
+            });
+        }
+
+        function listenToBookings() {
+            database.ref('renatus_bookings').on('value', snap => {
+                const data = snap.val();
+                allBookings = data ? Object.entries(data).map(([id, val]) => ({...val, bookingId: id})) : [];
                 renderServices();
             });
         }
@@ -204,6 +214,10 @@
             });
         }
 
+        function isSlotOccupied(serviceName, slot) {
+            return allBookings.some(b => b.items.some(i => i.name === serviceName && i.time === slot));
+        }
+
         function openServiceDetails(s) {
             currentService = s;
             selectedSlot = "";
@@ -214,7 +228,11 @@
             body.style.gridTemplateColumns = window.innerWidth <= 768 ? "1fr" : "1fr 1fr";
             body.style.gap = "20px";
 
-            const slotBtns = s.slots.split(',').map(slot => `<div class="slot-btn" onclick="selectSlot(this, '${slot.trim()}')">${slot.trim()}</div>`).join('');
+            const slotBtns = s.slots.split(',').map(slot => {
+                const cleanSlot = slot.trim();
+                const occupied = isSlotOccupied(s.name, cleanSlot);
+                return `<div class="slot-btn ${occupied ? 'occupied' : ''}" onclick="${occupied ? '' : `selectSlot(this, '${cleanSlot}')`}">${cleanSlot}</div>`;
+            }).join('');
             
             body.innerHTML = `
                 <div class="img-sculpt-frame" style="height: 100%"><img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png" style="max-width: 60%"></div>
@@ -276,6 +294,11 @@
             }
 
             if(!selectedSlot) return alert("Selecione um horário!");
+            
+            if(isSlotOccupied(currentService.name, selectedSlot)) {
+                return alert("Este horário acabou de ser reservado por outra pessoa.");
+            }
+
             cart.push({ 
                 name: currentService.name, 
                 barber: document.getElementById('u-barber').value, 
@@ -350,10 +373,16 @@
                 updateBadge();
                 closeModals();
                 alert("Agendamento realizado! Token: " + bookingToken);
-            }).catch(err => {
-                console.error(err);
-                alert("Erro de permissão: Certifique-se de que as Rules do Firebase foram atualizadas para permitir gravação em 'renatus_bookings'.");
             });
+        }
+
+        function cancelBooking(bookingId) {
+            if(confirm("Tem certeza que deseja cancelar este agendamento? O horário ficará livre para outros clientes.")) {
+                database.ref(`renatus_bookings/${bookingId}`).remove().then(() => {
+                    alert("Agendamento cancelado com sucesso.");
+                    openMyBookingsModal();
+                });
+            }
         }
 
         function openMyBookingsModal() {
@@ -373,7 +402,7 @@
                 }
                 
                 let html = "";
-                Object.values(data).reverse().forEach(b => {
+                Object.entries(data).reverse().forEach(([id, b]) => {
                     const dateObj = new Date(b.date);
                     const formattedDate = dateObj.toLocaleDateString('pt-BR');
                     html += `
@@ -384,7 +413,10 @@
                                     <div style="font-size:0.6rem; opacity:0.5">${formattedDate} • ${b.items[0].time}</div>
                                     <div class="token-tag">TOKEN: ${b.token}</div>
                                 </div>
-                                <div style="font-size:0.7rem; font-weight:700">R$ ${b.total.toFixed(2)}</div>
+                                <div style="text-align:right">
+                                    <div style="font-size:0.7rem; font-weight:700">R$ ${b.total.toFixed(2)}</div>
+                                    <button onclick="cancelBooking('${id}')" style="background:none; border:none; color:#ff4d4d; font-size:0.55rem; font-weight:700; cursor:pointer; margin-top:10px; text-transform:uppercase">Cancelar</button>
+                                </div>
                             </div>
                         </div>
                     `;
