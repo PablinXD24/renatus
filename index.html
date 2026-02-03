@@ -2,107 +2,218 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renatus Barbearia | Agendamento LiquidGlass</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Barber Pro | Admin Slots Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --barber-blue-main: #007bff;
+            --barber-bg: #1a1c1e;
+            --barber-text: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --font-sans: 'Montserrat', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--barber-bg); font-family: var(--font-sans); color: var(--barber-text); overflow-x: hidden; cursor: none; display: flex; flex-direction: column; min-height: 100vh; }
+
+        #custom-cursor { position: fixed; width: 32px; height: 32px; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.05s ease-out; filter: drop-shadow(0 0 5px var(--barber-blue-main)); }
+
+        .main-nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; background: rgba(26, 28, 30, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
+        .logo-text { font-weight: 800; font-size: 1.2rem; color: var(--barber-blue-main); letter-spacing: 2px; }
+
+        .category-nav { display: flex; gap: 10px; overflow-x: auto; padding: 15px 5%; scrollbar-width: none; background: transparent; position: sticky; top: 70px; z-index: 90; }
+        .cat-filter-btn { padding: 8px 18px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--glass-bg); backdrop-filter: blur(10px); font-size: 0.65rem; font-weight: 700; color: #ccc; cursor: pointer; white-space: nowrap; text-transform: uppercase; transition: 0.4s; }
+        .cat-filter-btn.active { background: var(--barber-blue-main); color: white; border-color: var(--barber-blue-main); }
+
+        .content-wrapper { padding: 30px 0 100px 0; flex: 1; }
+        .category-title { margin-left: 5%; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; color: var(--barber-blue-main); }
+        .carousel-container { display: flex; gap: 20px; overflow-x: auto; padding: 15px 5% 35px 5%; scrollbar-width: none; }
+
+        .product-card { flex: 0 0 240px; background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+        .product-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.08); border-color: var(--barber-blue-main); }
+        
+        .img-sculpt-frame { background: rgba(0,0,0,0.2); height: 100px; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-bottom: 12px; overflow: hidden; border: 1px solid var(--glass-border); }
+        .img-sculpt-frame img { max-width: 50%; max-height: 50%; opacity: 0.6; filter: invert(1); }
+
+        .card-btn-fix { background: var(--barber-blue-main); color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 0.6rem; cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 10px; width: 100%; }
+
+        .modal { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); }
+        .modal-content { background: rgba(30, 32, 34, 0.85); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); width: 100%; max-width: 600px; border-radius: 30px; position: relative; z-index: 2100; padding: 30px; max-height: 90vh; overflow-y: auto; color: white; }
+        .close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: white; }
+
+        .user-input, .edit-field { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 10px; border-radius: 10px; margin-bottom: 10px; outline: none; font-family: inherit; color: white; font-size: 0.75rem; }
+
+        .slot-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; }
+        .slot-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; padding: 8px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; transition: 0.3s; text-align: center; }
+        .slot-btn.selected { background: var(--barber-blue-main); border-color: var(--barber-blue-main); }
+
+        .float-btn { position: fixed; width: 50px; height: 50px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(15px); z-index: 1500; border: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; color: white; }
+        #cart-btn-floating { bottom: 20px; left: 20px; }
+        #admin-btn { bottom: 20px; right: 20px; background: var(--barber-blue-main); border: none; }
+        #cart-badge { position: absolute; top: -5px; right: -5px; background: white; color: var(--barber-blue-main); font-size: 9px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        @media (max-width: 768px) { .modal { align-items: flex-end; padding: 0; } .modal-content { border-radius: 20px 20px 0 0; } body { cursor: auto; } #custom-cursor { display: none; } }
+    </style>
 </head>
 <body>
 
-    <div class="background-elements">
-        <div class="circle circle-1"></div>
-        <div class="circle circle-2"></div>
-        <div class="circle circle-3"></div>
+    <div id="custom-cursor">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 3H17V5H7V3ZM7 7H17V17C17 18.1046 16.1046 19 15 19H9C7.89543 19 7 18.1046 7 17V7ZM9 9V17H15V9H9ZM6 3V5H4V3H6ZM20 3V5H18V3H20ZM4 7V9H6V7H4ZM20 7V9H18V7H20ZM4 11V13H6V11H4ZM20 11V13H18V11H20Z" fill="#007bff"/>
+        </svg>
     </div>
 
-    <div id="auth-container" class="glass-card main-card active">
-        <h2 class="title">Bem-vindo à Renatus</h2>
-        <p class="subtitle">Faça login ou cadastre-se para agendar seu horário.</p>
-        
-        <div class="input-group">
-            <input type="email" id="auth-email" placeholder="E-mail">
-            <input type="password" id="auth-password" placeholder="Senha">
+    <nav class="main-nav">
+        <div class="logo-text">BARBER PRO</div>
+    </nav>
+
+    <div class="category-nav" id="cat-nav-list"></div>
+    <main class="content-wrapper" id="main-content"></main>
+
+    <button id="cart-btn-floating" class="float-btn" onclick="openCartModal()">📅 <div id="cart-badge">0</div></button>
+    <button id="admin-btn" class="float-btn" onclick="openAdminModal()">+</button>
+
+    <div id="details-modal" class="modal">
+        <div class="modal-overlay" onclick="closeModals()"></div>
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModals()">&times;</button>
+            <div id="details-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"></div>
         </div>
-        
-        <button onclick="loginEmail()" class="btn-liquid">Entrar</button>
-        <button onclick="loginGoogle()" class="btn-liquid btn-google">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
-            Entrar com Google
-        </button>
-        <p class="toggle-auth">Não tem conta? <span onclick="toggleAuthMode()">Cadastre-se</span></p>
     </div>
 
-    <div id="app-container" class="main-card hidden">
-        <header class="glass-header">
-            <span id="user-display-name">Olá, Cliente</span>
-            <button onclick="logout()" class="btn-liquid btn-outline">Sair</button>
-        </header>
-
-        <div id="step-service" class="glass-card step-card active">
-            <h3 class="step-title">1. Escolha o Serviço</h3>
-            <div class="service-grid">
-                <div class="service-card" data-service="cabelo" data-price="40">
-                    <h4>Corte de Cabelo</h4>
-                    <p>R$ 40,00</p>
-                    <span>Moderno ou Clássico</span>
-                </div>
-                <div class="service-card" data-service="barba" data-price="30">
-                    <h4>Barba Modelada</h4>
-                    <p>R$ 30,00</p>
-                    <span>Toalha quente e finalização</span>
-                </div>
-                <div class="service-card" data-service="completo" data-price="65">
-                    <h4>Cabelo e Barba</h4>
-                    <p>R$ 65,00</p>
-                    <span>Combo completo</span>
-                </div>
-                <div class="service-card" data-service="platinado" data-price="120">
-                    <h4>Platinado</h4>
-                    <p>R$ 120,00</p>
-                    <span>Descoloração e tonalização</span>
-                </div>
-            </div>
-            <button onclick="nextStep('step-datetime')" class="btn-liquid mt-20">Próximo</button>
+    <div id="admin-modal" class="modal">
+        <div class="modal-overlay" onclick="closeModals()"></div>
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="close-btn" onclick="closeModals()">&times;</button>
+            <h2 style="margin-bottom: 20px; color: var(--barber-blue-main); font-size: 1.1rem;">Novo Serviço</h2>
+            <input type="text" id="p-category" class="edit-field" placeholder="Categoria">
+            <input type="text" id="p-name" class="edit-field" placeholder="Nome do Serviço">
+            <input type="number" id="p-price" class="edit-field" placeholder="Preço">
+            <input type="text" id="p-barbers" class="edit-field" placeholder="Barbeiros">
+            <input type="text" id="p-slots" class="edit-field" placeholder="Horários (Ex: 09:00, 10:30, 14:00)">
+            <textarea id="p-desc" class="edit-field" placeholder="Descrição"></textarea>
+            <button class="card-btn-fix" onclick="saveDemoService()">CADASTRAR</button>
         </div>
-
-        <div id="step-datetime" class="glass-card step-card hidden">
-            <h3 class="step-title">2. Selecione Data e Hora</h3>
-            <p>Serviço selecionado: <strong id="selected-service-display"></strong></p>
-            <div class="input-group">
-                <label for="date-input">Data:</label>
-                <input type="date" id="date-input">
-            </div>
-            <div class="input-group">
-                <label for="time-input">Horário:</label>
-                <input type="time" id="time-input" min="09:00" max="18:00">
-            </div>
-            <div class="step-navigation">
-                <button onclick="prevStep('step-service')" class="btn-liquid btn-outline">Voltar</button>
-                <button onclick="nextStep('step-confirm')" class="btn-liquid">Revisar</button>
-            </div>
-        </div>
-
-        <div id="step-confirm" class="glass-card step-card hidden">
-            <h3 class="step-title">3. Confirme seu Agendamento</h3>
-            <p>Serviço: <strong id="confirm-service"></strong></p>
-            <p>Data: <strong id="confirm-date"></strong></p>
-            <p>Horário: <strong id="confirm-time"></strong></p>
-            <p>Preço Total: <strong id="confirm-price"></strong></p>
-            <div class="step-navigation">
-                <button onclick="prevStep('step-datetime')" class="btn-liquid btn-outline">Voltar</button>
-                <button onclick="saveAppointment()" class="btn-liquid btn-confirm">Confirmar Agendamento</button>
-            </div>
-        </div>
-
-        <div id="step-my-appointments" class="glass-card step-card hidden">
-            <h3 class="step-title">Meus Próximos Agendamentos</h3>
-            <ul id="appointment-list" class="appointment-list">
-                </ul>
-            <button onclick="goToHome()" class="btn-liquid btn-outline">Novo Agendamento</button>
-        </div>
-
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script>
+        const demoInitial = [
+            { id: 1, category: "Cabelo", name: "Degradê Navalhado", price: 55.00, barbers: "Felipe, Igor", slots: "09:00, 10:00, 14:00, 16:00", desc: "Corte moderno com acabamento na navalha." },
+            { id: 2, category: "Barba", name: "Barba Tradicional", price: 30.00, barbers: "Igor", slots: "08:30, 11:00, 15:30", desc: "Alinhamento e hidratação dos fios." }
+        ];
+
+        let services = JSON.parse(localStorage.getItem('barber_v5_services')) || demoInitial;
+        let cart = JSON.parse(localStorage.getItem('barber_v5_cart')) || [];
+        let currentService = null;
+        let selectedSlot = "";
+
+        window.onload = () => { renderServices(); updateBadge(); };
+
+        function renderServices() {
+            const main = document.getElementById('main-content');
+            const catNav = document.getElementById('cat-nav-list');
+            main.innerHTML = "";
+            catNav.innerHTML = `<button class="cat-filter-btn active" onclick="filterCat('all')">Todos</button>`;
+            const cats = [...new Set(services.map(s => s.category))];
+            cats.forEach(cat => {
+                catNav.innerHTML += `<button class="cat-filter-btn" onclick="filterCat('${cat}')">${cat}</button>`;
+                const section = document.createElement('div');
+                section.className = `cat-group cat-${cat}`;
+                section.innerHTML = `<h2 class="category-title">${cat}</h2><div class="carousel-container" id="container-${cat}"></div>`;
+                main.appendChild(section);
+                services.filter(s => s.category === cat).forEach(s => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.onclick = () => openServiceDetails(s);
+                    card.innerHTML = `<div class="img-sculpt-frame"><img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png"></div><div><h3 style="font-size: 0.8rem; text-align: center;">${s.name}</h3><div style="font-weight: 700; color: var(--barber-blue-main); margin-top: 5px; text-align: center; font-size: 0.9rem;">R$ ${s.price.toFixed(2)}</div></div><button class="card-btn-fix">AGENDAR</button>`;
+                    document.getElementById(`container-${cat}`).appendChild(card);
+                });
+            });
+        }
+
+        function openServiceDetails(s) {
+            currentService = s;
+            selectedSlot = "";
+            const body = document.getElementById('details-body');
+            const slotBtns = s.slots.split(',').map(slot => `<div class="slot-btn" onclick="selectSlot(this, '${slot.trim()}')">${slot.trim()}</div>`).join('');
+            
+            body.innerHTML = `
+                <div class="img-sculpt-frame" style="height: 100%"><img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png" style="max-width: 60%"></div>
+                <div>
+                    <h3>${s.name}</h3>
+                    <p style="margin: 10px 0; opacity: 0.6; font-size: 0.65rem;">${s.desc}</p>
+                    <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; margin-bottom: 12px; border: 1px solid var(--glass-border);">
+                        <label style="font-size: 0.5rem; color: var(--barber-blue-main);">PROFISSIONAL</label>
+                        <select id="u-barber" class="user-input" style="margin-top: 3px;">
+                            ${s.barbers.split(',').map(b => `<option value="${b.trim()}">${b.trim()}</option>`)}
+                        </select>
+                        <label style="font-size: 0.5rem; color: var(--barber-blue-main);">HORÁRIOS DISPONÍVEIS</label>
+                        <div class="slot-container">${slotBtns}</div>
+                    </div>
+                    <button class="card-btn-fix" onclick="addToDemoCart()">CONFIRMAR</button>
+                </div>
+            `;
+            if(window.innerWidth <= 768) body.style.gridTemplateColumns = "1fr";
+            document.getElementById('details-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
+        }
+
+        function selectSlot(el, slot) {
+            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedSlot = slot;
+        }
+
+        function addToDemoCart() {
+            if(!selectedSlot) return alert("Selecione um horário!");
+            cart.push({ name: currentService.name, barber: document.getElementById('u-barber').value, date: selectedSlot, price: currentService.price });
+            localStorage.setItem('barber_v5_cart', JSON.stringify(cart));
+            updateBadge();
+            closeModals();
+        }
+
+        function openCartModal() {
+            const body = document.getElementById('details-body');
+            let total = 0;
+            let list = cart.map((i, idx) => {
+                total += i.price;
+                return `<div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.65rem; position: relative;"><b>${i.name}</b><br><span style="opacity:0.5">${i.barber} • ${i.date}</span><button onclick="removeItem(${idx})" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ff4d4d; cursor: pointer;">&times;</button></div>`;
+            }).join('');
+            body.innerHTML = `<div style="grid-column: 1/-1;"><h3 style="margin-bottom:12px;">Agenda</h3><div style="margin-bottom: 15px;">${list || '<p style="opacity:0.5; text-align:center;">Vazia.</p>'}</div><div style="background: var(--barber-blue-main); color: white; padding: 12px; border-radius: 12px; text-align: right; font-weight: 700;">R$ ${total.toFixed(2)}</div><button class="card-btn-fix" onclick="alert('Demo Finalizada!')">AGENDAR</button></div>`;
+            document.getElementById('details-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
+        }
+
+        function removeItem(idx) { cart.splice(idx, 1); localStorage.setItem('barber_v5_cart', JSON.stringify(cart)); openCartModal(); updateBadge(); }
+        function updateBadge() { document.getElementById('cart-badge').innerText = cart.length; }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => { m.classList.remove('active'); setTimeout(()=>m.style.display='none', 300); }); }
+        function openAdminModal() { document.getElementById('admin-modal').style.display='flex'; setTimeout(()=>document.getElementById('admin-modal').classList.add('active'), 10); }
+
+        function saveDemoService() {
+            const cat = document.getElementById('p-category').value;
+            const name = document.getElementById('p-name').value;
+            const price = parseFloat(document.getElementById('p-price').value);
+            const slots = document.getElementById('p-slots').value;
+            if(!cat || !name || !price || !slots) return alert("Preencha todos os campos, incluindo horários!");
+            services.push({ id: Date.now(), category: cat, name, price, barbers: document.getElementById('p-barbers').value, slots, desc: document.getElementById('p-desc').value });
+            localStorage.setItem('barber_v5_services', JSON.stringify(services));
+            renderServices();
+            closeModals();
+        }
+
+        function filterCat(c) {
+            document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
+            if(event) event.target.classList.add('active');
+            document.querySelectorAll('.cat-group').forEach(g => { g.style.display = (c === 'all' || g.classList.contains('cat-' + c)) ? 'block' : 'none'; });
+        }
+
+        const cursor = document.getElementById('custom-cursor');
+        window.onmousemove = (e) => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; };
+    </script>
 </body>
 </html>
