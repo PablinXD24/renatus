@@ -61,12 +61,10 @@
         .col-dot { width: 8px; height: 8px; border-radius: 50%; }
 
         .pedido-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--glass-border); transition: 0.2s; position: relative; }
-        .pedido-card:hover { transform: scale(1.02); background: rgba(255,255,255,0.08); }
-        
         .status-select { padding: 8px; border-radius: 10px; border: none; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; cursor: pointer; width: 100%; background: #2a2c2e; color: #fff; }
         
         .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .service-card { background: rgba(255,255,255,0.03); border-radius: 25px; padding: 20px; border: 1px solid var(--glass-border); }
+        .item-card { background: rgba(255,255,255,0.03); border-radius: 25px; padding: 20px; border: 1px solid var(--glass-border); }
         
         .edit-field-inline {
             width: 100%; border: none; background: transparent; padding: 4px; font-family: inherit; font-size: 0.7rem;
@@ -74,8 +72,7 @@
         }
         .edit-field-inline:focus { border-bottom: 1px solid var(--barber-blue-main); background: rgba(255,255,255,0.05); }
 
-        #modal-view { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .modal-content { background: #1a1c1e; padding: 30px; border-radius: 40px; max-width: 90%; width: 450px; border: 1px solid var(--glass-border); position: relative; }
+        .prof-photo-circle { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--barber-blue-main); object-fit: cover; margin-bottom: 10px; }
 
         @media (max-width: 900px) { .kanban-container { grid-template-columns: 1fr; } }
     </style>
@@ -86,12 +83,6 @@
         <div class="login-card">
             <div class="logo-text" style="margin-bottom: 25px;">RENATUS ADMIN</div>
             <button onclick="login()" style="background: var(--barber-blue-main); color: white; border: none; padding: 12px 30px; border-radius: 15px; font-weight: 700; cursor: pointer;">ACESSAR PAINEL</button>
-        </div>
-    </div>
-
-    <div id="modal-view" onclick="this.style.display='none'">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div id="modal-body"></div>
         </div>
     </div>
 
@@ -112,12 +103,9 @@
         </div>
 
         <div class="card-rb">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="section-title" style="margin:0">Meta Mensal</h3>
-                <input type="number" id="meta-val" style="background:transparent; border:none; border-bottom:1px solid var(--barber-blue-main); width:80px; text-align:right; font-weight:700; color: white;" onchange="salvarMeta(this.value)">
-            </div>
-            <div class="bar-bg"><div id="meta-bar" class="bar-fill"></div></div>
-            <p id="txt-status-meta" style="font-size: 0.65rem; font-weight: 700; text-align: right;"></p>
+            <h3 class="section-title">Profissionais (Equipe)</h3>
+            <button onclick="addProfissional()" style="background:var(--barber-blue-main); border:none; color:white; padding:8px 15px; border-radius:10px; font-size:0.6rem; font-weight:700; cursor:pointer; margin-bottom:20px">+ NOVO PROFISSIONAL</button>
+            <div id="grid-equipe" class="stock-grid"></div>
         </div>
 
         <div class="card-rb">
@@ -139,7 +127,7 @@
         </div>
 
         <div class="card-rb">
-            <h3 class="section-title">Gestão de Serviços (Editável)</h3>
+            <h3 class="section-title">Gestão de Serviços</h3>
             <div id="grid-servicos" class="stock-grid"></div>
         </div>
     </div>
@@ -171,104 +159,83 @@
         });
 
         function iniciarEscutas() {
-            database.ref('renatus_config/meta').on('value', snap => {
-                metaGlobal = parseFloat(snap.val()) || 5000;
-                document.getElementById('meta-val').value = metaGlobal;
-                recalcularGestao();
-            });
             database.ref('renatus_bookings').on('value', snap => {
                 allBookings = snap.val() || {};
                 renderPedidos(Object.values(allBookings));
                 recalcularGestao();
             });
             database.ref('renatus_services').on('value', snap => renderServicos(snap.val() || {}));
+            database.ref('renatus_barbers').on('value', snap => renderEquipe(snap.val() || {}));
+        }
+
+        function renderEquipe(data) {
+            let html = "";
+            Object.entries(data).forEach(([id, b]) => {
+                html += `
+                    <div class="item-card" style="text-align:center">
+                        <img src="${b.photo || 'https://cdn-icons-png.flaticon.com/512/147/147144.png'}" class="prof-photo-circle">
+                        <input type="text" value="${b.name}" class="edit-field-inline" style="text-align:center; font-weight:800; color:var(--barber-blue-main)" onchange="updateDB('renatus_barbers/${id}', 'name', this)">
+                        <input type="text" value="${b.photo || ''}" placeholder="URL da Foto" class="edit-field-inline" style="font-size:0.5rem; opacity:0.5" onchange="updateDB('renatus_barbers/${id}', 'photo', this)">
+                        <button onclick="remover('renatus_barbers/${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.6rem; margin-top:10px">REMOVER</button>
+                    </div>`;
+            });
+            document.getElementById('grid-equipe').innerHTML = html || '<p style="opacity:0.5; font-size:0.7rem">Nenhum profissional cadastrado.</p>';
+        }
+
+        function addProfissional() {
+            const newRef = database.ref('renatus_barbers').push();
+            newRef.set({ name: "Novo Barbeiro", photo: "" });
         }
 
         function renderServicos(data) {
             let html = "";
             Object.entries(data).forEach(([id, s]) => {
                 html += `
-                    <div class="service-card">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-                             <input type="text" value="${s.category}" class="edit-field-inline" style="font-size:0.5rem; opacity:0.5; text-transform:uppercase; width:70%" onchange="updateDB('renatus_services/${id}', 'category', this)">
-                             <button onclick="remover('renatus_services/${id}')" style="border:none; background:none; cursor:pointer; color:var(--danger); font-weight:800">&times;</button>
-                        </div>
-                        <input type="text" value="${s.name}" class="edit-field-inline" style="font-weight:800; color:var(--barber-blue-main); font-size:0.8rem" onchange="updateDB('renatus_services/${id}', 'name', this)">
-                        <textarea class="edit-field-inline" style="font-size:0.6rem; opacity:0.7; height:40px; margin:5px 0" onchange="updateDB('renatus_services/${id}', 'desc', this)">${s.desc || ''}</textarea>
-                        
-                        <div style="border-top:1px solid var(--glass-border); padding-top:10px; margin-top:10px">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
-                                <span style="font-size:0.6rem; opacity:0.5">PREÇO R$:</span>
-                                <input type="number" value="${s.price}" class="edit-field-inline" style="width:60px; text-align:right; font-weight:700" onchange="updateDB('renatus_services/${id}', 'price', this, true)">
-                            </div>
-                            <span style="font-size:0.5rem; opacity:0.5">BARBEIROS (sep. vírgula):</span>
-                            <input type="text" value="${s.barbers}" class="edit-field-inline" onchange="updateDB('renatus_services/${id}', 'barbers', this)">
-                            <span style="font-size:0.5rem; opacity:0.5; margin-top:5px; display:block">HORÁRIOS:</span>
-                            <input type="text" value="${s.slots}" class="edit-field-inline" onchange="updateDB('renatus_services/${id}', 'slots', this)">
-                        </div>
+                    <div class="item-card">
+                        <input type="text" value="${s.name}" class="edit-field-inline" style="font-weight:800; color:var(--barber-blue-main)" onchange="updateDB('renatus_services/${id}', 'name', this)">
+                        <input type="number" value="${s.price}" class="edit-field-inline" style="font-size:0.9rem" onchange="updateDB('renatus_services/${id}', 'price', this, true)">
+                        <input type="text" value="${s.barbers}" class="edit-field-inline" style="font-size:0.55rem; opacity:0.5" onchange="updateDB('renatus_services/${id}', 'barbers', this)">
                     </div>`;
             });
-            document.getElementById('grid-servicos').innerHTML = html || '<p style="opacity:0.5; font-size:0.7rem">Nenhum serviço cadastrado.</p>';
+            document.getElementById('grid-servicos').innerHTML = html;
         }
 
         function renderPedidos(pedidosArray) {
             const cols = { pendente: document.getElementById('col-pendente'), atendimento: document.getElementById('col-atendimento'), finalizado: document.getElementById('col-finalizado') };
             Object.values(cols).forEach(c => c.innerHTML = "");
-
-            [...pedidosArray].reverse().forEach(p => {
+            pedidosArray.reverse().forEach(p => {
                 const id = Object.keys(allBookings).find(key => allBookings[key].token === p.token);
                 const st = p.status || 'pendente';
-                const cardHTML = `
-                <div class="pedido-card" draggable="true" ondragstart="dragCard(event, '${id}')">
-                    <div style="padding:15px">
-                        <span style="font-size:0.5rem; color:var(--barber-blue-main)">#${p.token}</span>
-                        <span class="client-name">${p.clientName}</span>
-                        <span style="font-size:0.6rem; opacity:0.6">${p.items[0].name} • R$ ${p.total.toFixed(2)}</span>
-                        <div style="margin-top:10px">
+                const card = `
+                    <div class="pedido-card" draggable="true" ondragstart="ev => ev.dataTransfer.setData('id', '${id}')">
+                        <div style="padding:15px">
+                            <span class="client-name">${p.clientName}</span>
+                            <span style="font-size:0.6rem; opacity:0.6">${p.items[0].name}</span>
                             <select class="status-select st-${st}" onchange="updateDB('renatus_bookings/${id}', 'status', this)">
                                 <option value="pendente" ${st==='pendente'?'selected':''}>Pendente</option>
                                 <option value="atendimento" ${st==='atendimento'?'selected':''}>Na Cadeira</option>
                                 <option value="finalizado" ${st==='finalizado'?'selected':''}>Finalizado</option>
                             </select>
                         </div>
-                    </div>
-                </div>`;
-                if(cols[st]) cols[st].innerHTML += cardHTML;
+                    </div>`;
+                if(cols[st]) cols[st].innerHTML += card;
             });
         }
 
-        function dragCard(ev, id) { ev.dataTransfer.setData("bookingId", id); }
-        function dropCard(ev, newStatus) {
-            ev.preventDefault();
-            const id = ev.dataTransfer.getData("bookingId");
-            updateDB(`renatus_bookings/${id}`, 'status', { value: newStatus });
+        function updateDB(path, key, element, isNum = false) {
+            let val = isNum ? (parseFloat(element.value) || 0) : element.value;
+            database.ref(path).update({ [key]: val });
         }
 
         function recalcularGestao() {
             const arr = Object.values(allBookings);
-            const finalizados = arr.filter(p => p.status === 'finalizado');
-            const total = finalizados.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
-            const ticket = finalizados.length > 0 ? (total / finalizados.length) : 0;
-            const perc = (total / metaGlobal) * 100;
-
-            document.getElementById('kpi-total').innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById('kpi-ticket').innerText = `R$ ${ticket.toLocaleString('pt-BR', {maximumFractionDigits:0})}`;
+            const fin = arr.filter(p => p.status === 'finalizado');
+            const total = fin.reduce((acc, p) => acc + (p.total || 0), 0);
+            document.getElementById('kpi-total').innerText = `R$ ${total.toFixed(2)}`;
             document.getElementById('kpi-prod').innerText = arr.filter(p => p.status === 'atendimento').length;
-            
-            document.getElementById('meta-bar').style.width = Math.min(perc, 100) + "%";
-            document.getElementById('txt-status-meta').innerText = `${Math.floor(perc)}% ALCANÇADO`;
         }
 
-        function updateDB(path, key, element, isNum = false) {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                let val = isNum ? (parseFloat(element.value) || 0) : element.value;
-                database.ref(path).update({ [key]: val });
-            }, 500);
-        }
-
-        function salvarMeta(v) { database.ref('renatus_config/meta').set(parseFloat(v) || 0); }
-        function remover(path) { if(confirm("Remover permanentemente?")) database.ref(path).remove(); }
+        function remover(path) { if(confirm("Deseja remover?")) database.ref(path).remove(); }
     </script>
 </body>
 </html>
