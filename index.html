@@ -62,6 +62,8 @@
         #dash-btn { bottom: 80px; right: 20px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); display: none; }
         #cart-badge { position: absolute; top: -5px; right: -5px; background: white; color: var(--barber-blue-main); font-size: 9px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
+        .token-tag { font-size: 0.5rem; color: var(--barber-blue-main); font-weight: 700; background: rgba(0, 123, 255, 0.1); padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block; }
+
         @media (max-width: 768px) { .modal { align-items: flex-end; padding: 0; } .modal-content { border-radius: 20px 20px 0 0; } body { cursor: auto; } #custom-cursor { display: none; } }
     </style>
 </head>
@@ -75,7 +77,10 @@
 
     <nav class="main-nav">
         <div class="logo-text">RENATUS BARBER</div>
-        <div id="auth-ui"></div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button class="cat-filter-btn" id="view-bookings-btn" onclick="openMyBookingsModal()" style="display: none; padding: 8px;">📋</button>
+            <div id="auth-ui"></div>
+        </div>
     </nav>
 
     <div class="category-nav" id="cat-nav-list">
@@ -139,13 +144,11 @@
             const ui = document.getElementById('auth-ui');
             const adminBtn = document.getElementById('admin-btn');
             const dashBtn = document.getElementById('dash-btn');
+            const viewBookingsBtn = document.getElementById('view-bookings-btn');
+            
             if(user) {
-                ui.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <button class="cat-filter-btn" onclick="openUserBookings()" style="padding:4px 10px; font-size:0.5rem; background:rgba(0,123,255,0.2)">MIS AGENDAS</button>
-                        <span style="font-size:0.6rem; font-weight:700">${user.displayName.split(' ')[0]}</span> 
-                        <button class="cat-filter-btn" onclick="auth.signOut()" style="padding:4px 10px; font-size:0.5rem">Sair</button>
-                    </div>`;
+                ui.innerHTML = `<span style="font-size:0.6rem; font-weight:700">${user.displayName.split(' ')[0]}</span> <button class="cat-filter-btn" onclick="auth.signOut()" style="padding:4px 10px; font-size:0.5rem; margin-left:5px">Sair</button>`;
+                viewBookingsBtn.style.display = 'block';
                 if(user.email === ADM_EMAIL) {
                     adminBtn.style.display = 'flex';
                     dashBtn.style.display = 'flex';
@@ -154,6 +157,7 @@
                 ui.innerHTML = `<button class="cat-filter-btn" onclick="auth.signInWithPopup(provider)">ENTRAR</button>`;
                 adminBtn.style.display = 'none';
                 dashBtn.style.display = 'none';
+                viewBookingsBtn.style.display = 'none';
             }
             updateBadge();
         });
@@ -276,8 +280,7 @@
                 name: currentService.name, 
                 barber: document.getElementById('u-barber').value, 
                 time: selectedSlot, 
-                price: parseFloat(currentService.price),
-                date: new Date().toLocaleDateString()
+                price: parseFloat(currentService.price) 
             });
             localStorage.setItem('renatus_cart', JSON.stringify(cart));
             updateBadge();
@@ -301,74 +304,93 @@
             }).join('');
 
             body.innerHTML = `
-                <h3 style="margin-bottom:12px;">Seus Agendamentos</h3>
+                <h3 style="margin-bottom:12px;">Agendamento Pendente</h3>
                 <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Nenhum serviço selecionado.</p>'}</div>
                 <div style="background: var(--barber-blue-main); color: white; padding: 12px; border-radius: 12px; text-align: right; font-weight: 700; margin-bottom:15px">Total: R$ ${total.toFixed(2)}</div>
                 <input type="text" id="client-name" class="user-input" value="${auth.currentUser?.displayName || ''}" placeholder="Seu Nome">
-                <button class="card-btn-fix" onclick="finishBooking(${total})">FINALIZAR E ENVIAR WHATSAPP</button>
+                <button class="card-btn-fix" onclick="finishBooking(${total})">CONFIRMAR E GERAR TOKEN</button>
             `;
             document.getElementById('details-modal').style.display = 'flex';
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
+        }
+
+        function generateToken() {
+            return Math.random().toString(36).substr(2, 6).toUpperCase();
         }
 
         function finishBooking(total) {
             const name = document.getElementById('client-name').value;
             if(!name) return alert("Digite seu nome!");
             
-            const uid = auth.currentUser.uid;
+            const user = auth.currentUser;
+            const bookingToken = generateToken();
+            const timestamp = new Date().toISOString();
+
+            // Salva no Firebase vinculado ao usuário
             const bookingData = {
-                client: name,
+                clientName: name,
+                clientId: user.uid,
                 items: cart,
                 total: total,
-                timestamp: Date.now(),
-                status: "Pendente"
+                token: bookingToken,
+                date: timestamp,
+                status: 'pendente'
             };
 
-            // Salva no Firebase para persistência do usuário
-            database.ref('users_bookings/' + uid).push(bookingData).then(() => {
-                let msg = `💈 *RENATUS BARBER - AGENDAMENTO* 💈\n\n👤 *Cliente:* ${name}\n\n`;
+            database.ref('renatus_bookings').push(bookingData).then(() => {
+                let msg = `💈 *RENATUS BARBER* 💈\n\n👤 *Cliente:* ${name}\n🎟️ *Token:* ${bookingToken}\n\n`;
                 cart.forEach(i => {
-                    msg += `🔹 *${i.name}*\n   📅 Horário: ${i.time}\n   ✂️ Barbeiro: ${i.barber}\n\n`;
+                    msg += `🔹 *${i.name}* (${i.time})\n`;
                 });
-                msg += `💰 *Total: R$ ${total.toFixed(2)}*\n\n_Aguardo confirmação!_`;
+                msg += `\n💰 *Total: R$ ${total.toFixed(2)}*`;
                 
                 window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
+                
                 cart = [];
                 localStorage.setItem('renatus_cart', JSON.stringify(cart));
                 updateBadge();
                 closeModals();
+                alert("Agendamento realizado! Token: " + bookingToken);
             });
         }
 
-        function openUserBookings() {
-            if(!auth.currentUser) return;
+        function openMyBookingsModal() {
             const body = document.getElementById('details-body');
             body.style.display = "block";
-            body.innerHTML = `<p style="text-align:center; opacity:0.5">Carregando seus agendamentos...</p>`;
+            body.innerHTML = `<h3 style="margin-bottom:15px">Meus Agendamentos</h3><div id="bookings-list" style="opacity:0.6; font-size:0.7rem; text-align:center">Carregando seus horários...</div>`;
             
-            database.ref('users_bookings/' + auth.currentUser.uid).once('value', snap => {
-                const data = snap.val();
-                if(!data) {
-                    body.innerHTML = `<h3 style="margin-bottom:12px;">Meus Agendamentos</h3><p style="text-align:center; opacity:0.5; padding:20px;">Você ainda não possui agendamentos finalizados.</p>`;
-                } else {
-                    let html = `<h3 style="margin-bottom:12px;">Meus Agendamentos</h3>`;
-                    Object.values(data).reverse().forEach(b => {
-                        html += `
-                        <div style="padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 15px; margin-bottom: 10px;">
-                            <div style="display:flex; justify-content:space-between; font-size:0.55rem; color:var(--barber-blue-main); margin-bottom:5px;">
-                                <span>${new Date(b.timestamp).toLocaleDateString()}</span>
-                                <span style="font-weight:700">${b.status}</span>
-                            </div>
-                            ${b.items.map(i => `<div style="font-size:0.65rem;">• ${i.name} (${i.time})</div>`).join('')}
-                            <div style="text-align:right; font-size:0.65rem; font-weight:700; margin-top:5px;">Total: R$ ${b.total.toFixed(2)}</div>
-                        </div>`;
-                    });
-                    body.innerHTML = html;
-                }
-            });
-
             document.getElementById('details-modal').style.display = 'flex';
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
+
+            database.ref('renatus_bookings').orderByChild('clientId').equalTo(auth.currentUser.uid).once('value', snap => {
+                const data = snap.val();
+                const listDiv = document.getElementById('bookings-list');
+                if(!data) {
+                    listDiv.innerHTML = "Você ainda não possui agendamentos.";
+                    return;
+                }
+                
+                let html = "";
+                Object.values(data).reverse().forEach(b => {
+                    const dateObj = new Date(b.date);
+                    const formattedDate = dateObj.toLocaleDateString('pt-BR');
+                    html += `
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; margin-bottom: 12px; text-align: left;">
+                            <div style="display:flex; justify-content:space-between; align-items:start">
+                                <div>
+                                    <div style="font-weight:700; font-size:0.8rem; color:var(--barber-blue-main)">${b.items[0].name}</div>
+                                    <div style="font-size:0.6rem; opacity:0.5">${formattedDate} • ${b.items[0].time}</div>
+                                    <div class="token-tag">TOKEN: ${b.token}</div>
+                                </div>
+                                <div style="font-size:0.7rem; font-weight:700">R$ ${b.total.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                listDiv.style.opacity = "1";
+                listDiv.style.textAlign = "left";
+                listDiv.innerHTML = html;
+            });
         }
 
         function saveServiceToFirebase() {
