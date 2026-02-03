@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Barber Pro | Renatus Admin Edition</title>
+    <title>Barber Pro | Renatus Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -36,17 +36,13 @@
         .category-title { margin-left: 5%; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; color: var(--barber-blue-main); }
         .carousel-container { display: flex; gap: 20px; overflow-x: auto; padding: 15px 5% 35px 5%; scrollbar-width: none; }
 
-        .product-card { flex: 0 0 240px; background: var(--glass-bg); backdrop-filter: blur(25px); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; min-height: 280px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+        .product-card { flex: 0 0 240px; background: var(--glass-bg); backdrop-filter: blur(25px); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
         .product-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.08); border-color: var(--barber-blue-main); }
         
         .img-sculpt-frame { background: rgba(0,0,0,0.2); height: 100px; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-bottom: 12px; border: 1px solid var(--glass-border); position: relative; }
         .img-sculpt-frame img { max-width: 50%; max-height: 50%; opacity: 0.6; filter: invert(1); }
 
         .card-btn-fix { background: var(--barber-blue-main); color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 0.6rem; cursor: pointer; transition: 0.3s; text-transform: uppercase; width: 100%; margin-top: 10px; }
-
-        /* Edição Inline Adm */
-        .adm-inline-edit { background: transparent; border: 1px dashed rgba(255,255,255,0.2); color: white; width: 100%; text-align: center; font-family: inherit; font-size: 0.8rem; padding: 2px; margin-bottom: 5px; }
-        .adm-inline-edit:focus { border-color: var(--barber-blue-main); outline: none; background: rgba(255,255,255,0.05); }
 
         .modal { position: fixed; inset: 0; z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
@@ -106,14 +102,15 @@
             <input type="text" id="p-category" class="edit-field" placeholder="Categoria">
             <input type="text" id="p-name" class="edit-field" placeholder="Nome do Serviço">
             <input type="number" id="p-price" class="edit-field" placeholder="Preço">
-            <input type="text" id="p-barbers" class="edit-field" placeholder="Barbeiros">
-            <input type="text" id="p-slots" class="edit-field" placeholder="Horários (Ex: 09:00, 10:30)">
+            <input type="text" id="p-barbers" class="edit-field" placeholder="Barbeiros (separados por vírgula)">
+            <input type="text" id="p-slots" class="edit-field" placeholder="Horários (Ex: 09:00, 10:00, 14:00)">
             <textarea id="p-desc" class="edit-field" placeholder="Descrição"></textarea>
             <button class="card-btn-fix" onclick="saveServiceToFirebase()">CADASTRAR</button>
         </div>
     </div>
 
     <script>
+        // CONFIGURAÇÃO FIREBASE RENATUS
         const firebaseConfig = {
             apiKey: "AIzaSyAEG84kLya9LIK7TwAjsAxbP_FxcW4TGO4",
             authDomain: "renatus-4ecbf.firebaseapp.com",
@@ -147,7 +144,6 @@
                 ui.innerHTML = `<button class="cat-filter-btn" onclick="auth.signInWithPopup(provider)">ENTRAR</button>`;
                 adminBtn.style.display = 'none';
             }
-            renderServices(); // Re-render para mostrar campos editáveis ou normais
         });
 
         function listenToServices() {
@@ -164,9 +160,7 @@
             main.innerHTML = "";
             catNav.innerHTML = `<button class="cat-filter-btn active" onclick="filterCat('all')">Todos</button>`;
             
-            const isAdm = auth.currentUser?.email === ADM_EMAIL;
             const cats = [...new Set(services.map(s => s.category))];
-            
             cats.forEach(cat => {
                 catNav.innerHTML += `<button class="cat-filter-btn" onclick="filterCat('${cat}')">${cat}</button>`;
                 const section = document.createElement('div');
@@ -177,73 +171,80 @@
                 services.filter(s => s.category === cat).forEach(s => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
-                    card.onclick = (e) => { if(!isAdm) openServiceDetails(s); };
-                    
-                    if(isAdm) {
-                        card.innerHTML = `
-                            <div class="img-sculpt-frame">
-                                <img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png">
-                                <button onclick="event.stopPropagation(); deleteService('${s.id}')" style="position:absolute; top:10px; right:10px; border:none; background:none; color:white; font-size:1.2rem; cursor:pointer;">&times;</button>
-                            </div>
-                            <div>
-                                <input type="text" class="adm-inline-edit" value="${s.name}" onchange="updateServiceInline('${s.id}', 'name', this.value)" placeholder="Nome">
-                                <input type="number" class="adm-inline-edit" value="${s.price}" onchange="updateServiceInline('${s.id}', 'price', this.value)" style="color: var(--barber-blue-main); font-weight:700" placeholder="Preço">
-                                <textarea class="adm-inline-edit" onchange="updateServiceInline('${s.id}', 'desc', this.value)" style="font-size:0.6rem; opacity:0.6" placeholder="Descrição">${s.desc || ''}</textarea>
-                            </div>
-                            <button class="card-btn-fix" onclick="openServiceDetails(JSON.parse('${JSON.stringify(s).replace(/'/g, "\\'")}'))">HORÁRIOS</button>
-                        `;
-                    } else {
-                        card.innerHTML = `
-                            <div class="img-sculpt-frame"><img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png"></div>
-                            <div>
-                                <h3 style="font-size: 0.8rem; text-align: center;">${s.name}</h3>
-                                <div style="font-weight: 700; color: var(--barber-blue-main); margin-top: 5px; text-align: center; font-size: 0.9rem;">R$ ${parseFloat(s.price).toFixed(2)}</div>
-                            </div>
-                            <button class="card-btn-fix">AGENDAR</button>
-                        `;
-                    }
+                    card.onclick = () => openServiceDetails(s);
+                    card.innerHTML = `
+                        <div class="img-sculpt-frame">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png">
+                            ${auth.currentUser?.email === ADM_EMAIL ? `<button onclick="event.stopPropagation(); deleteService('${s.id}')" style="position:absolute; top:10px; right:10px; border:none; background:none; color:white; font-size:1.2rem; cursor:pointer;">&times;</button>` : ''}
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.8rem; text-align: center;">${s.name}</h3>
+                            <div style="font-weight: 700; color: var(--barber-blue-main); margin-top: 5px; text-align: center; font-size: 0.9rem;">R$ ${parseFloat(s.price).toFixed(2)}</div>
+                        </div>
+                        <button class="card-btn-fix">AGENDAR</button>
+                    `;
                     document.getElementById(`container-${cat}`).appendChild(card);
                 });
             });
-        }
-
-        // Atualização Direta no Card (Adm)
-        function updateServiceInline(id, field, value) {
-            const upd = {};
-            upd[field] = field === 'price' ? parseFloat(value) : value;
-            database.ref(`renatus_services/${id}`).update(upd).then(() => {
-                console.log("Serviço atualizado!");
-            }).catch(err => alert("Erro ao atualizar: " + err.message));
         }
 
         function openServiceDetails(s) {
             currentService = s;
             selectedSlot = "";
             const body = document.getElementById('details-body');
+            const isAdmin = auth.currentUser?.email === ADM_EMAIL;
+
             body.style.display = "grid";
             body.style.gridTemplateColumns = window.innerWidth <= 768 ? "1fr" : "1fr 1fr";
             body.style.gap = "20px";
 
             const slotBtns = s.slots.split(',').map(slot => `<div class="slot-btn" onclick="selectSlot(this, '${slot.trim()}')">${slot.trim()}</div>`).join('');
             
+            // Layout condicional para ADM (Editável) ou Cliente
             body.innerHTML = `
                 <div class="img-sculpt-frame" style="height: 100%"><img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png" style="max-width: 60%"></div>
                 <div>
-                    <h3>${s.name}</h3>
-                    <p style="margin: 10px 0; opacity: 0.6; font-size: 0.65rem;">${s.desc}</p>
-                    <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; margin-bottom: 12px; border: 1px solid var(--glass-border);">
-                        <label style="font-size: 0.5rem; color: var(--barber-blue-main);">PROFISSIONAL</label>
-                        <select id="u-barber" class="user-input" style="margin-top: 3px;">
-                            ${s.barbers.split(',').map(b => `<option value="${b.trim()}">${b.trim()}</option>`).join('')}
-                        </select>
-                        <label style="font-size: 0.5rem; color: var(--barber-blue-main);">HORÁRIOS DISPONÍVEIS</label>
-                        <div class="slot-container">${slotBtns}</div>
-                    </div>
-                    <button class="card-btn-fix" onclick="addToCart()">CONFIRMAR AGENDAMENTO</button>
+                    ${isAdmin ? `
+                        <input type="text" id="e-cat" class="edit-field" value="${s.category}" placeholder="Categoria">
+                        <input type="text" id="e-name" class="edit-field" value="${s.name}" placeholder="Nome">
+                        <textarea id="e-desc" class="edit-field" placeholder="Descrição">${s.desc}</textarea>
+                        <input type="number" id="e-price" class="edit-field" value="${s.price}" placeholder="Preço">
+                        <input type="text" id="e-barbers" class="edit-field" value="${s.barbers}" placeholder="Barbeiros">
+                        <input type="text" id="e-slots" class="edit-field" value="${s.slots}" placeholder="Slots">
+                        <button class="card-btn-fix" onclick="updateServiceAll('${s.id}')">SALVAR ALTERAÇÕES</button>
+                    ` : `
+                        <h3>${s.name}</h3>
+                        <p style="margin: 10px 0; opacity: 0.6; font-size: 0.65rem;">${s.desc}</p>
+                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; margin-bottom: 12px; border: 1px solid var(--glass-border);">
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">PROFISSIONAL</label>
+                            <select id="u-barber" class="user-input" style="margin-top: 3px;">
+                                ${s.barbers.split(',').map(b => `<option value="${b.trim()}">${b.trim()}</option>`).join('')}
+                            </select>
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">HORÁRIOS DISPONÍVEIS</label>
+                            <div class="slot-container">${slotBtns}</div>
+                        </div>
+                        <button class="card-btn-fix" onclick="addToCart()">CONFIRMAR AGENDAMENTO</button>
+                    `}
                 </div>
             `;
             document.getElementById('details-modal').style.display = 'flex';
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
+        }
+
+        function updateServiceAll(id) {
+            const upd = {
+                category: document.getElementById('e-cat').value,
+                name: document.getElementById('e-name').value,
+                desc: document.getElementById('e-desc').value,
+                price: parseFloat(document.getElementById('e-price').value),
+                barbers: document.getElementById('e-barbers').value,
+                slots: document.getElementById('e-slots').value
+            };
+            
+            database.ref('renatus_services/' + id).update(upd).then(() => {
+                alert("Serviço atualizado!");
+                closeModals();
+            }).catch(err => alert("Erro ao salvar: " + err.message));
         }
 
         function selectSlot(el, slot) {
@@ -254,7 +255,12 @@
 
         function addToCart() {
             if(!selectedSlot) return alert("Selecione um horário!");
-            cart.push({ name: currentService.name, barber: document.getElementById('u-barber').value, time: selectedSlot, price: parseFloat(currentService.price) });
+            cart.push({ 
+                name: currentService.name, 
+                barber: document.getElementById('u-barber').value, 
+                time: selectedSlot, 
+                price: parseFloat(currentService.price) 
+            });
             localStorage.setItem('renatus_cart', JSON.stringify(cart));
             updateBadge();
             closeModals();
@@ -278,10 +284,10 @@
 
             body.innerHTML = `
                 <h3 style="margin-bottom:12px;">Seus Agendamentos</h3>
-                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Vazio.</p>'}</div>
+                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Nenhum serviço selecionado.</p>'}</div>
                 <div style="background: var(--barber-blue-main); color: white; padding: 12px; border-radius: 12px; text-align: right; font-weight: 700; margin-bottom:15px">Total: R$ ${total.toFixed(2)}</div>
                 <input type="text" id="client-name" class="user-input" placeholder="Seu Nome">
-                <button class="card-btn-fix" onclick="finishBooking(${total})">AGENDAR VIA WHATSAPP</button>
+                <button class="card-btn-fix" onclick="finishBooking(${total})">FINALIZAR E ENVIAR WHATSAPP</button>
             `;
             document.getElementById('details-modal').style.display = 'flex';
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
@@ -290,9 +296,13 @@
         function finishBooking(total) {
             const name = document.getElementById('client-name').value;
             if(!name) return alert("Digite seu nome!");
+            
             let msg = `💈 *RENATUS BARBER - AGENDAMENTO* 💈\n\n👤 *Cliente:* ${name}\n\n`;
-            cart.forEach(i => { msg += `🔹 *${i.name}*\n   📅 Horário: ${i.time}\n   ✂️ Barbeiro: ${i.barber}\n\n`; });
+            cart.forEach(i => {
+                msg += `🔹 *${i.name}*\n   📅 Horário: ${i.time}\n   ✂️ Barbeiro: ${i.barber}\n\n`;
+            });
             msg += `💰 *Total: R$ ${total.toFixed(2)}*\n\n_Aguardo confirmação!_`;
+            
             window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
             cart = [];
             localStorage.setItem('renatus_cart', JSON.stringify(cart));
@@ -306,18 +316,38 @@
             const price = document.getElementById('p-price').value;
             const slots = document.getElementById('p-slots').value;
             const barbers = document.getElementById('p-barbers').value;
+            
             if(!cat || !name || !price || !slots) return alert("Preencha os campos obrigatórios!");
+
             const newRef = database.ref('renatus_services').push();
-            newRef.set({ id: newRef.key, category: cat, name: name, price: parseFloat(price), barbers: barbers || "A definir", slots: slots, desc: document.getElementById('p-desc').value })
-            .then(() => { closeModals(); alert("Serviço cadastrado!"); });
+            newRef.set({
+                id: newRef.key,
+                category: cat,
+                name: name,
+                price: parseFloat(price),
+                barbers: barbers || "A definir",
+                slots: slots,
+                desc: document.getElementById('p-desc').value
+            }).then(() => {
+                closeModals();
+                alert("Serviço Renatus cadastrado!");
+            }).catch(err => alert("Erro: " + err.message));
         }
 
-        function deleteService(id) { if(confirm("Excluir serviço?")) database.ref(`renatus_services/${id}`).remove(); }
+        function deleteService(id) {
+            if(confirm("Remover este serviço do Renatus?")) {
+                database.ref(`renatus_services/${id}`).remove();
+            }
+        }
+
         function filterCat(c) {
             document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
             if(event) event.target.classList.add('active');
-            document.querySelectorAll('.cat-group').forEach(g => { g.style.display = (c === 'all' || g.classList.contains('cat-' + c)) ? 'block' : 'none'; });
+            document.querySelectorAll('.cat-group').forEach(g => { 
+                g.style.display = (c === 'all' || g.classList.contains('cat-' + c)) ? 'block' : 'none'; 
+            });
         }
+
         function removeItem(idx) { cart.splice(idx, 1); updateBadge(); openCartModal(); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => { m.classList.remove('active'); setTimeout(()=>m.style.display='none', 300); }); }
         function openAdminModal() { document.getElementById('admin-modal').style.display='flex'; setTimeout(()=>document.getElementById('admin-modal').classList.add('active'), 10); }
