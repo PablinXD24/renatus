@@ -52,6 +52,9 @@
         .section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--barber-blue-main); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
         .section-title::before { content: ''; width: 4px; height: 15px; background: var(--barber-blue-main); border-radius: 2px; }
 
+        .date-filter-container { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .date-input { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 8px 15px; border-radius: 12px; font-family: inherit; font-size: 0.8rem; outline: none; }
+
         .kanban-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
         .kanban-column { background: rgba(255,255,255,0.02); border-radius: 25px; padding: 15px; min-height: 500px; border: 1px solid var(--glass-border); transition: background 0.3s; }
         .kanban-column.drag-over { background: rgba(255,255,255,0.08); }
@@ -66,6 +69,7 @@
         
         .client-name { font-size: 0.75rem; font-weight: 700; display: block; margin-bottom: 3px; }
         .time-tag { font-size: 0.6rem; color: var(--barber-blue-main); font-weight: 700; }
+        .barber-tag { font-size: 0.5rem; opacity: 0.5; display: block; margin-top: 2px; }
 
         .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .item-card { background: rgba(255,255,255,0.03); border-radius: 25px; padding: 20px; border: 1px solid var(--glass-border); }
@@ -105,7 +109,13 @@
         </div>
 
         <div class="card-rb">
-            <h3 class="section-title">Fluxo de Atendimento</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 class="section-title" style="margin-bottom: 0;">Fluxo de Atendimento</h3>
+                <div class="date-filter-container">
+                    <span style="font-size: 0.6rem; font-weight: 800; opacity: 0.5; text-transform: uppercase;">Filtrar Data:</span>
+                    <input type="date" id="dash-date-filter" class="date-input" onchange="renderPedidos(Object.values(allBookings))">
+                </div>
+            </div>
             <div class="kanban-container">
                 <div class="kanban-column" id="col-pendente-box" ondragover="allowDrop(event)" ondragleave="clearDrag(event)" ondrop="drop(event, 'pendente')">
                     <div class="col-header"><div class="col-dot" style="background:#666"></div> Agendado</div>
@@ -154,6 +164,9 @@
         const ADM_EMAIL = "pablo11ssousa2@gmail.com";
         let allBookings = {};
 
+        // Inicializa o filtro de data com hoje
+        document.getElementById('dash-date-filter').value = new Date().toISOString().split('T')[0];
+
         function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
         auth.onAuthStateChanged(user => {
@@ -175,7 +188,6 @@
             setInterval(() => renderPedidos(Object.values(allBookings)), 60000);
         }
 
-        // --- FUNÇÕES DE ARRASTAR E SOLTAR (DRAG & DROP) ---
         function allowDrop(ev) {
             ev.preventDefault();
             ev.currentTarget.classList.add('drag-over');
@@ -196,19 +208,10 @@
             if (id) updateStatus(id, newStatus);
         }
 
-        // --- ATUALIZAÇÃO DE STATUS E DISPONIBILIDADE ---
         function updateStatus(id, newStatus) {
             const booking = allBookings[id];
             if (!booking) return;
-
-            // Se desmarcar, removemos a trava do horário/barbeiro no banco se necessário
-            if (newStatus === 'desmarcado') {
-                // Aqui você pode adicionar lógica para apagar o registro ou liberar o nó de agenda
-                // Por enquanto, apenas mudamos o status para permitir visualização histórica
-                database.ref(`renatus_bookings/${id}`).update({ status: 'desmarcado' });
-            } else {
-                database.ref(`renatus_bookings/${id}`).update({ status: newStatus });
-            }
+            database.ref(`renatus_bookings/${id}`).update({ status: newStatus });
         }
 
         function renderPedidos(pedidosArray) {
@@ -220,13 +223,20 @@
             };
             Object.values(cols).forEach(c => c.innerHTML = "");
 
+            const selectedDate = document.getElementById('dash-date-filter').value;
             const agora = new Date();
+            const hojeStr = agora.toISOString().split('T')[0];
 
             pedidosArray.reverse().forEach(p => {
+                // Filtro de data: corresponde ao scheduleDate enviado pelo index
+                const dataPedido = p.scheduleDate || p.date.split('T')[0];
+                if (dataPedido !== selectedDate) return;
+
                 const id = Object.keys(allBookings).find(key => allBookings[key].token === p.token);
                 let st = p.status || 'pendente';
 
-                if (st === 'pendente' && p.time) {
+                // Lógica de atraso apenas para a data de hoje
+                if (st === 'pendente' && p.time && selectedDate === hojeStr) {
                     const [h, m] = p.time.split(':');
                     const agendado = new Date();
                     agendado.setHours(h, m, 0);
@@ -237,12 +247,17 @@
                 card.className = 'pedido-card';
                 card.draggable = true;
                 card.ondragstart = (e) => drag(e, id);
+                
+                const servico = p.items ? p.items[0].name : 'Serviço';
+                const barbeiro = p.items ? p.items[0].barber : '---';
+
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:start">
                         <span class="client-name">${p.clientName}</span>
                         <span class="time-tag">${p.time || '--:--'}</span>
                     </div>
-                    <span style="font-size:0.6rem; opacity:0.6">${p.items ? p.items[0].name : 'Serviço'}</span>
+                    <span style="font-size:0.6rem; opacity:0.8; font-weight:600">${servico}</span>
+                    <span class="barber-tag">Profissional: ${barbeiro}</span>
                     <select class="status-select" onchange="updateStatus('${id}', this.value)">
                         <option value="pendente" ${st==='pendente'?'selected':''}>Agendado</option>
                         <option value="finalizado" ${st==='finalizado'?'selected':''}>Realizado</option>
@@ -254,7 +269,6 @@
             });
         }
 
-        // --- DEMAIS FUNÇÕES DE GESTÃO (MANTIDAS) ---
         function renderEquipe(data) {
             let html = "";
             Object.entries(data).forEach(([id, b]) => {
