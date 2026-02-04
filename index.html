@@ -57,6 +57,13 @@
         .slot-btn.selected { background: var(--barber-blue-main); border-color: var(--barber-blue-main); }
         .slot-btn.occupied { opacity: 0.3; cursor: not-allowed; background: #333; }
 
+        .barber-selector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin: 10px 0; }
+        .barber-option { border: 1px solid var(--glass-border); border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.02); }
+        .barber-option img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid transparent; }
+        .barber-option p { font-size: 0.5rem; font-weight: 700; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .barber-option.active { border-color: var(--barber-blue-main); background: rgba(0,123,255,0.1); }
+        .barber-option.active img { border-color: var(--barber-blue-main); }
+
         .float-btn { position: fixed; width: 50px; height: 50px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(15px); z-index: 1500; border: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; color: white; }
         #cart-btn-floating { bottom: 20px; left: 20px; display: none; }
         #admin-btn { bottom: 20px; right: 20px; background: var(--barber-blue-main); border: none; display: none; }
@@ -110,7 +117,6 @@
             <input type="text" id="p-category" class="edit-field" placeholder="Categoria">
             <input type="text" id="p-name" class="edit-field" placeholder="Nome do Serviço">
             <input type="number" id="p-price" class="edit-field" placeholder="Preço">
-            <input type="text" id="p-barbers" class="edit-field" placeholder="Barbeiros (separados por vírgula)">
             <input type="text" id="p-slots" class="edit-field" placeholder="Horários (Ex: 09:00, 10:00, 14:00)">
             <textarea id="p-desc" class="edit-field" placeholder="Descrição"></textarea>
             <button class="card-btn-fix" onclick="saveServiceToFirebase()">CADASTRAR</button>
@@ -135,12 +141,14 @@
         const WPP_NUM = "5511998937643";
 
         let services = [];
+        let team = [];
         let allBookings = [];
         let cart = JSON.parse(localStorage.getItem('renatus_cart')) || [];
         let currentService = null;
         let selectedSlot = "";
+        let selectedBarber = "";
 
-        window.onload = () => { listenToServices(); listenToBookings(); updateBadge(); };
+        window.onload = () => { listenToServices(); listenToBookings(); listenToTeam(); updateBadge(); };
 
         auth.onAuthStateChanged(user => {
             const ui = document.getElementById('auth-ui');
@@ -169,6 +177,13 @@
                 const data = snap.val();
                 services = data ? Object.values(data) : [];
                 renderServices();
+            });
+        }
+
+        function listenToTeam() {
+            database.ref('renatus_barbers').on('value', snap => {
+                const data = snap.val();
+                team = data ? Object.values(data) : [];
             });
         }
 
@@ -215,12 +230,13 @@
         }
 
         function isSlotOccupied(serviceName, slot) {
-            return allBookings.some(b => b.items.some(i => i.name === serviceName && i.time === slot));
+            return allBookings.some(b => b.status !== 'cancelado' && b.items.some(i => i.name === serviceName && i.time === slot));
         }
 
         function openServiceDetails(s) {
             currentService = s;
             selectedSlot = "";
+            selectedBarber = "";
             const body = document.getElementById('details-body');
             const isAdmin = auth.currentUser?.email === ADM_EMAIL;
 
@@ -233,6 +249,13 @@
                 const occupied = isSlotOccupied(s.name, cleanSlot);
                 return `<div class="slot-btn ${occupied ? 'occupied' : ''}" onclick="${occupied ? '' : `selectSlot(this, '${cleanSlot}')`}">${cleanSlot}</div>`;
             }).join('');
+
+            const barberBtns = team.map(b => `
+                <div class="barber-option" onclick="selectBarber(this, '${b.name}')">
+                    <img src="${b.photo || 'https://cdn-icons-png.flaticon.com/512/147/147144.png'}">
+                    <p>${b.name}</p>
+                </div>
+            `).join('');
             
             body.innerHTML = `
                 <div class="img-sculpt-frame" style="height: 100%"><img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png" style="max-width: 60%"></div>
@@ -242,17 +265,14 @@
                         <input type="text" id="e-name" class="edit-field" value="${s.name}" placeholder="Nome">
                         <textarea id="e-desc" class="edit-field" placeholder="Descrição">${s.desc}</textarea>
                         <input type="number" id="e-price" class="edit-field" value="${s.price}" placeholder="Preço">
-                        <input type="text" id="e-barbers" class="edit-field" value="${s.barbers}" placeholder="Barbeiros">
                         <input type="text" id="e-slots" class="edit-field" value="${s.slots}" placeholder="Slots">
                         <button class="card-btn-fix" onclick="updateServiceAll('${s.id}')">SALVAR ALTERAÇÕES</button>
                     ` : `
                         <h3>${s.name}</h3>
                         <p style="margin: 10px 0; opacity: 0.6; font-size: 0.65rem;">${s.desc}</p>
                         <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; margin-bottom: 12px; border: 1px solid var(--glass-border);">
-                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">PROFISSIONAL</label>
-                            <select id="u-barber" class="user-input" style="margin-top: 3px;">
-                                ${s.barbers.split(',').map(b => `<option value="${b.trim()}">${b.trim()}</option>`).join('')}
-                            </select>
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">ESCOLHA O PROFISSIONAL</label>
+                            <div class="barber-selector-grid">${barberBtns}</div>
                             <label style="font-size: 0.5rem; color: var(--barber-blue-main);">HORÁRIOS DISPONÍVEIS</label>
                             <div class="slot-container">${slotBtns}</div>
                         </div>
@@ -264,20 +284,10 @@
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
         }
 
-        function updateServiceAll(id) {
-            const upd = {
-                category: document.getElementById('e-cat').value,
-                name: document.getElementById('e-name').value,
-                desc: document.getElementById('e-desc').value,
-                price: parseFloat(document.getElementById('e-price').value),
-                barbers: document.getElementById('e-barbers').value,
-                slots: document.getElementById('e-slots').value
-            };
-            
-            database.ref('renatus_services/' + id).update(upd).then(() => {
-                alert("Serviço atualizado!");
-                closeModals();
-            }).catch(err => alert("Erro ao salvar: " + err.message));
+        function selectBarber(el, name) {
+            document.querySelectorAll('.barber-option').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            selectedBarber = name;
         }
 
         function selectSlot(el, slot) {
@@ -292,16 +302,12 @@
                 auth.signInWithPopup(provider);
                 return;
             }
-
+            if(!selectedBarber) return alert("Selecione um barbeiro!");
             if(!selectedSlot) return alert("Selecione um horário!");
             
-            if(isSlotOccupied(currentService.name, selectedSlot)) {
-                return alert("Este horário acabou de ser reservado por outra pessoa.");
-            }
-
             cart.push({ 
                 name: currentService.name, 
-                barber: document.getElementById('u-barber').value, 
+                barber: selectedBarber, 
                 time: selectedSlot, 
                 price: parseFloat(currentService.price) 
             });
@@ -320,11 +326,13 @@
         function openCartModal() {
             const body = document.getElementById('details-body');
             body.style.display = "block";
-            let total = 0;
-            let list = cart.map((i, idx) => {
-                total += i.price;
-                return `<div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.65rem; position: relative;"><b>${i.name}</b><br><span style="opacity:0.5">${i.barber} • ${i.time}</span><button onclick="removeItem(${idx})" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ff4d4d; cursor: pointer;">&times;</button></div>`;
-            }).join('');
+            let total = cart.reduce((acc, i) => acc + i.price, 0);
+            let list = cart.map((i, idx) => `
+                <div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.65rem; position: relative;">
+                    <b>${i.name}</b><br><span style="opacity:0.5">${i.barber} • ${i.time}</span>
+                    <button onclick="removeItem(${idx})" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ff4d4d; cursor: pointer;">&times;</button>
+                </div>
+            `).join('');
 
             body.innerHTML = `
                 <h3 style="margin-bottom:12px;">Agendamento Pendente</h3>
@@ -337,93 +345,43 @@
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
         }
 
-        function generateToken() {
-            return Math.random().toString(36).substr(2, 6).toUpperCase();
-        }
-
         function finishBooking(total) {
             const name = document.getElementById('client-name').value;
             if(!name) return alert("Digite seu nome!");
-            
-            const user = auth.currentUser;
-            const bookingToken = generateToken();
-            const timestamp = new Date().toISOString();
-
-            const bookingData = {
-                clientName: name,
-                clientId: user.uid,
-                items: cart,
-                total: total,
-                token: bookingToken,
-                date: timestamp,
-                status: 'pendente'
-            };
+            const bookingToken = Math.random().toString(36).substr(2, 6).toUpperCase();
+            const bookingData = { clientName: name, clientId: auth.currentUser.uid, items: cart, total: total, token: bookingToken, date: new Date().toISOString(), status: 'pendente' };
 
             database.ref('renatus_bookings').push(bookingData).then(() => {
                 let msg = `💈 *RENATUS BARBER* 💈\n\n👤 *Cliente:* ${name}\n🎟️ *Token:* ${bookingToken}\n\n`;
-                cart.forEach(i => {
-                    msg += `🔹 *${i.name}* (${i.time})\n`;
-                });
+                cart.forEach(i => { msg += `🔹 *${i.name}* (${i.time} com ${i.barber})\n`; });
                 msg += `\n💰 *Total: R$ ${total.toFixed(2)}*`;
-                
                 window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
-                
-                cart = [];
-                localStorage.setItem('renatus_cart', JSON.stringify(cart));
-                updateBadge();
-                closeModals();
-                alert("Agendamento realizado! Token: " + bookingToken);
+                cart = []; localStorage.setItem('renatus_cart', JSON.stringify(cart)); updateBadge(); closeModals(); alert("Agendamento realizado! Token: " + bookingToken);
             });
-        }
-
-        function cancelBooking(bookingId) {
-            if(confirm("Tem certeza que deseja cancelar este agendamento? O horário ficará livre para outros clientes.")) {
-                database.ref(`renatus_bookings/${bookingId}`).remove().then(() => {
-                    alert("Agendamento cancelado com sucesso.");
-                    openMyBookingsModal();
-                });
-            }
         }
 
         function openMyBookingsModal() {
             const body = document.getElementById('details-body');
             body.style.display = "block";
-            body.innerHTML = `<h3 style="margin-bottom:15px">Meus Agendamentos</h3><div id="bookings-list" style="opacity:0.6; font-size:0.7rem; text-align:center">Carregando seus horários...</div>`;
-            
+            body.innerHTML = `<h3 style="margin-bottom:15px">Meus Agendamentos</h3><div id="bookings-list" style="font-size:0.7rem; text-align:center">Carregando...</div>`;
             document.getElementById('details-modal').style.display = 'flex';
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
 
             database.ref('renatus_bookings').orderByChild('clientId').equalTo(auth.currentUser.uid).once('value', snap => {
                 const data = snap.val();
-                const listDiv = document.getElementById('bookings-list');
-                if(!data) {
-                    listDiv.innerHTML = "Você ainda não possui agendamentos.";
-                    return;
-                }
-                
                 let html = "";
-                Object.entries(data).reverse().forEach(([id, b]) => {
-                    const dateObj = new Date(b.date);
-                    const formattedDate = dateObj.toLocaleDateString('pt-BR');
-                    html += `
-                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; margin-bottom: 12px; text-align: left;">
-                            <div style="display:flex; justify-content:space-between; align-items:start">
-                                <div>
-                                    <div style="font-weight:700; font-size:0.8rem; color:var(--barber-blue-main)">${b.items[0].name}</div>
-                                    <div style="font-size:0.6rem; opacity:0.5">${formattedDate} • ${b.items[0].time}</div>
-                                    <div class="token-tag">TOKEN: ${b.token}</div>
-                                </div>
-                                <div style="text-align:right">
-                                    <div style="font-size:0.7rem; font-weight:700">R$ ${b.total.toFixed(2)}</div>
-                                    <button onclick="cancelBooking('${id}')" style="background:none; border:none; color:#ff4d4d; font-size:0.55rem; font-weight:700; cursor:pointer; margin-top:10px; text-transform:uppercase">Cancelar</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                listDiv.style.opacity = "1";
-                listDiv.style.textAlign = "left";
-                listDiv.innerHTML = html;
+                if(!data) { html = "Você não possui agendamentos."; }
+                else {
+                    Object.entries(data).reverse().forEach(([id, b]) => {
+                        html += `
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; margin-bottom: 12px;">
+                                <div style="font-weight:700; color:var(--barber-blue-main)">${b.items[0].name}</div>
+                                <div style="font-size:0.6rem; opacity:0.5">${new Date(b.date).toLocaleDateString('pt-BR')} • ${b.items[0].time} com ${b.items[0].barber}</div>
+                                <div class="token-tag">TOKEN: ${b.token}</div>
+                            </div>`;
+                    });
+                }
+                document.getElementById('bookings-list').innerHTML = html;
             });
         }
 
@@ -432,43 +390,20 @@
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
             const slots = document.getElementById('p-slots').value;
-            const barbers = document.getElementById('p-barbers').value;
-            
-            if(!cat || !name || !price || !slots) return alert("Preencha os campos obrigatórios!");
-
+            if(!cat || !name || !price || !slots) return alert("Preencha tudo!");
             const newRef = database.ref('renatus_services').push();
-            newRef.set({
-                id: newRef.key,
-                category: cat,
-                name: name,
-                price: parseFloat(price),
-                barbers: barbers || "A definir",
-                slots: slots,
-                desc: document.getElementById('p-desc').value
-            }).then(() => {
-                closeModals();
-                alert("Serviço Renatus cadastrado!");
-            }).catch(err => alert("Erro: " + err.message));
-        }
-
-        function deleteService(id) {
-            if(confirm("Remover este serviço do Renatus?")) {
-                database.ref(`renatus_services/${id}`).remove();
-            }
+            newRef.set({ id: newRef.key, category: cat, name: name, price: parseFloat(price), slots: slots, desc: document.getElementById('p-desc').value }).then(() => { closeModals(); alert("Serviço cadastrado!"); });
         }
 
         function filterCat(c) {
             document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
             if(event) event.target.classList.add('active');
-            document.querySelectorAll('.cat-group').forEach(g => { 
-                g.style.display = (c === 'all' || g.classList.contains('cat-' + c)) ? 'block' : 'none'; 
-            });
+            document.querySelectorAll('.cat-group').forEach(g => { g.style.display = (c === 'all' || g.classList.contains('cat-' + c)) ? 'block' : 'none'; });
         }
 
         function removeItem(idx) { cart.splice(idx, 1); updateBadge(); if(cart.length > 0) openCartModal(); else closeModals(); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => { m.classList.remove('active'); setTimeout(()=>m.style.display='none', 300); }); }
         function openAdminModal() { document.getElementById('admin-modal').style.display='flex'; setTimeout(()=>document.getElementById('admin-modal').classList.add('active'), 10); }
-
         const cursor = document.getElementById('custom-cursor');
         window.onmousemove = (e) => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; };
     </script>
