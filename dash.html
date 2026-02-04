@@ -52,17 +52,18 @@
         .section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--barber-blue-main); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
         .section-title::before { content: ''; width: 4px; height: 15px; background: var(--barber-blue-main); border-radius: 2px; }
 
-        .bar-bg { height: 12px; background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; margin: 15px 0; border: 1px solid var(--glass-border); }
-        .bar-fill { height: 100%; width: 0%; background: var(--barber-blue-main); transition: 1.5s ease-in-out; box-shadow: 0 0 15px var(--barber-blue-main); }
-
-        .kanban-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; }
+        .kanban-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
         .kanban-column { background: rgba(255,255,255,0.02); border-radius: 25px; padding: 15px; min-height: 400px; max-height: 70vh; overflow-y: auto; border: 1px solid var(--glass-border); }
-        .col-header { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-bottom: 15px; text-align: center; display: flex; justify-content: center; align-items: center; gap: 8px; position: sticky; top: 0; background: inherit; z-index: 1; padding: 5px 0; }
+        .col-header { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-bottom: 15px; text-align: center; display: flex; justify-content: center; align-items: center; gap: 8px; position: sticky; top: 0; background: inherit; z-index: 1; padding: 5px 0; }
         .col-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-        .pedido-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--glass-border); transition: 0.2s; position: relative; }
-        .status-select { padding: 8px; border-radius: 10px; border: none; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; cursor: pointer; width: 100%; background: #2a2c2e; color: #fff; }
+        .pedido-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--glass-border); transition: 0.2s; position: relative; }
+        .status-select { padding: 8px; border-radius: 10px; border: none; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; cursor: pointer; width: 100%; background: #2a2c2e; color: #fff; margin-top: 10px; }
         
+        .client-name { font-size: 0.75rem; font-weight: 700; display: block; margin-bottom: 3px; }
+        .service-info { font-size: 0.6rem; opacity: 0.6; display: block; }
+        .time-tag { font-size: 0.6rem; color: var(--barber-blue-main); font-weight: 700; }
+
         .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .item-card { background: rgba(255,255,255,0.03); border-radius: 25px; padding: 20px; border: 1px solid var(--glass-border); }
         
@@ -74,7 +75,8 @@
 
         .prof-photo-circle { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--barber-blue-main); object-fit: cover; margin-bottom: 10px; }
 
-        @media (max-width: 900px) { .kanban-container { grid-template-columns: 1fr; } }
+        @media (max-width: 1100px) { .kanban-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .kanban-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -111,17 +113,21 @@
         <div class="card-rb">
             <h3 class="section-title">Fluxo de Atendimento</h3>
             <div class="kanban-container">
-                <div class="kanban-column" ondragover="event.preventDefault()" ondrop="dropCard(event, 'pendente')">
-                    <div class="col-header"><div class="col-dot" style="background:#666"></div> Pendente</div>
+                <div class="kanban-column">
+                    <div class="col-header"><div class="col-dot" style="background:#666"></div> Agendado</div>
                     <div id="col-pendente"></div>
                 </div>
-                <div class="kanban-column" ondragover="event.preventDefault()" ondrop="dropCard(event, 'atendimento')">
-                    <div class="col-header"><div class="col-dot" style="background:var(--info)"></div> Na Cadeira</div>
-                    <div id="col-atendimento"></div>
+                <div class="kanban-column">
+                    <div class="col-header"><div class="col-dot" style="background:var(--warning)"></div> Atrasado (+10m)</div>
+                    <div id="col-atrasado"></div>
                 </div>
-                <div class="kanban-column" ondragover="event.preventDefault()" ondrop="dropCard(event, 'finalizado')">
-                    <div class="col-header"><div class="col-dot" style="background:var(--success)"></div> Finalizado</div>
+                <div class="kanban-column">
+                    <div class="col-header"><div class="col-dot" style="background:var(--success)"></div> Realizado</div>
                     <div id="col-finalizado"></div>
+                </div>
+                <div class="kanban-column">
+                    <div class="col-header"><div class="col-dot" style="background:var(--danger)"></div> Desmarcado</div>
+                    <div id="col-desmarcado"></div>
                 </div>
             </div>
         </div>
@@ -146,7 +152,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(), database = firebase.database();
         const ADM_EMAIL = "pablo11ssousa2@gmail.com";
-        let metaGlobal = 5000, allBookings = {}, debounceTimer;
+        let allBookings = {};
 
         function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
@@ -166,6 +172,9 @@
             });
             database.ref('renatus_services').on('value', snap => renderServicos(snap.val() || {}));
             database.ref('renatus_barbers').on('value', snap => renderEquipe(snap.val() || {}));
+            
+            // Auto-refresh a cada minuto para atualizar status de atraso
+            setInterval(() => renderPedidos(Object.values(allBookings)), 60000);
         }
 
         function renderEquipe(data) {
@@ -201,23 +210,45 @@
         }
 
         function renderPedidos(pedidosArray) {
-            const cols = { pendente: document.getElementById('col-pendente'), atendimento: document.getElementById('col-atendimento'), finalizado: document.getElementById('col-finalizado') };
+            const cols = { 
+                pendente: document.getElementById('col-pendente'), 
+                atrasado: document.getElementById('col-atrasado'), 
+                finalizado: document.getElementById('col-finalizado'),
+                desmarcado: document.getElementById('col-desmarcado')
+            };
             Object.values(cols).forEach(c => c.innerHTML = "");
+
+            const agora = new Date();
+
             pedidosArray.reverse().forEach(p => {
                 const id = Object.keys(allBookings).find(key => allBookings[key].token === p.token);
-                const st = p.status || 'pendente';
+                let st = p.status || 'pendente';
+
+                // Lógica de Atraso (10 min de tolerância)
+                if (st === 'pendente' && p.time) {
+                    const [h, m] = p.time.split(':');
+                    const agendado = new Date();
+                    agendado.setHours(h, m, 0);
+                    
+                    if ((agora - agendado) > 600000) { // 10 minutos em ms
+                        st = 'atrasado';
+                    }
+                }
+
                 const card = `
-                    <div class="pedido-card" draggable="true" ondragstart="ev => ev.dataTransfer.setData('id', '${id}')">
-                        <div style="padding:15px">
+                    <div class="pedido-card">
+                        <div style="display:flex; justify-content:space-between; align-items:start">
                             <span class="client-name">${p.clientName}</span>
-                            <span style="font-size:0.6rem; opacity:0.6">${p.items[0].name}</span>
-                            <select class="status-select st-${st}" onchange="updateDB('renatus_bookings/${id}', 'status', this)">
-                                <option value="pendente" ${st==='pendente'?'selected':''}>Pendente</option>
-                                <option value="atendimento" ${st==='atendimento'?'selected':''}>Na Cadeira</option>
-                                <option value="finalizado" ${st==='finalizado'?'selected':''}>Finalizado</option>
-                            </select>
+                            <span class="time-tag">${p.time || '--:--'}</span>
                         </div>
+                        <span class="service-info">${p.items[0].name}</span>
+                        <select class="status-select" onchange="updateDB('renatus_bookings/${id}', 'status', this)">
+                            <option value="pendente" ${st==='pendente'?'selected':''}>Agendado</option>
+                            <option value="finalizado" ${st==='finalizado'?'selected':''}>Realizado</option>
+                            <option value="desmarcado" ${st==='desmarcado'?'selected':''}>Desmarcado</option>
+                        </select>
                     </div>`;
+                
                 if(cols[st]) cols[st].innerHTML += card;
             });
         }
@@ -232,7 +263,7 @@
             const fin = arr.filter(p => p.status === 'finalizado');
             const total = fin.reduce((acc, p) => acc + (p.total || 0), 0);
             document.getElementById('kpi-total').innerText = `R$ ${total.toFixed(2)}`;
-            document.getElementById('kpi-prod').innerText = arr.filter(p => p.status === 'atendimento').length;
+            document.getElementById('kpi-prod').innerText = arr.filter(p => p.status === 'pendente' || p.status === 'atrasado').length;
         }
 
         function remover(path) { if(confirm("Deseja remover?")) database.ref(path).remove(); }
