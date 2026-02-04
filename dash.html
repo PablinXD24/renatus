@@ -53,24 +53,24 @@
         .section-title::before { content: ''; width: 4px; height: 15px; background: var(--barber-blue-main); border-radius: 2px; }
 
         .kanban-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
-        .kanban-column { background: rgba(255,255,255,0.02); border-radius: 25px; padding: 15px; min-height: 400px; max-height: 70vh; overflow-y: auto; border: 1px solid var(--glass-border); }
+        .kanban-column { background: rgba(255,255,255,0.02); border-radius: 25px; padding: 15px; min-height: 500px; border: 1px solid var(--glass-border); transition: background 0.3s; }
+        .kanban-column.drag-over { background: rgba(255,255,255,0.08); }
+        
         .col-header { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-bottom: 15px; text-align: center; display: flex; justify-content: center; align-items: center; gap: 8px; position: sticky; top: 0; background: inherit; z-index: 1; padding: 5px 0; }
         .col-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-        .pedido-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--glass-border); transition: 0.2s; position: relative; }
+        .pedido-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--glass-border); cursor: grab; transition: transform 0.2s; position: relative; }
+        .pedido-card:active { cursor: grabbing; transform: scale(0.95); }
+        
         .status-select { padding: 8px; border-radius: 10px; border: none; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; cursor: pointer; width: 100%; background: #2a2c2e; color: #fff; margin-top: 10px; }
         
         .client-name { font-size: 0.75rem; font-weight: 700; display: block; margin-bottom: 3px; }
-        .service-info { font-size: 0.6rem; opacity: 0.6; display: block; }
         .time-tag { font-size: 0.6rem; color: var(--barber-blue-main); font-weight: 700; }
 
         .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .item-card { background: rgba(255,255,255,0.03); border-radius: 25px; padding: 20px; border: 1px solid var(--glass-border); }
         
-        .edit-field-inline {
-            width: 100%; border: none; background: transparent; padding: 4px; font-family: inherit; font-size: 0.7rem;
-            color: white; border-bottom: 1px solid transparent; transition: 0.3s; outline: none;
-        }
+        .edit-field-inline { width: 100%; border: none; background: transparent; padding: 4px; font-family: inherit; font-size: 0.7rem; color: white; border-bottom: 1px solid transparent; transition: 0.3s; outline: none; }
         .edit-field-inline:focus { border-bottom: 1px solid var(--barber-blue-main); background: rgba(255,255,255,0.05); }
 
         .prof-photo-circle { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--barber-blue-main); object-fit: cover; margin-bottom: 10px; }
@@ -100,36 +100,36 @@
         <div class="kpi-grid">
             <div class="card-rb kpi-card"><span class="kpi-label">Faturamento Total</span><span id="kpi-total" class="kpi-value">R$ 0,00</span></div>
             <div class="card-rb kpi-card"><span class="kpi-label">Ticket Médio</span><span id="kpi-ticket" class="kpi-value">R$ 0,00</span></div>
-            <div class="card-rb kpi-card"><span class="kpi-label">Em Espera</span><span id="kpi-prod" class="kpi-value">0</span></div>
+            <div class="card-rb kpi-card"><span class="kpi-label">Ativos</span><span id="kpi-prod" class="kpi-value">0</span></div>
             <div class="card-rb kpi-card"><span class="kpi-label">Destaque</span><span id="kpi-top-client" class="kpi-value">---</span></div>
+        </div>
+
+        <div class="card-rb">
+            <h3 class="section-title">Fluxo de Atendimento</h3>
+            <div class="kanban-container">
+                <div class="kanban-column" id="col-pendente-box" ondragover="allowDrop(event)" ondragleave="clearDrag(event)" ondrop="drop(event, 'pendente')">
+                    <div class="col-header"><div class="col-dot" style="background:#666"></div> Agendado</div>
+                    <div id="col-pendente"></div>
+                </div>
+                <div class="kanban-column" id="col-atrasado-box">
+                    <div class="col-header"><div class="col-dot" style="background:var(--warning)"></div> Atrasado (+10m)</div>
+                    <div id="col-atrasado"></div>
+                </div>
+                <div class="kanban-column" id="col-finalizado-box" ondragover="allowDrop(event)" ondragleave="clearDrag(event)" ondrop="drop(event, 'finalizado')">
+                    <div class="col-header"><div class="col-dot" style="background:var(--success)"></div> Realizado</div>
+                    <div id="col-finalizado"></div>
+                </div>
+                <div class="kanban-column" id="col-desmarcado-box" ondragover="allowDrop(event)" ondragleave="clearDrag(event)" ondrop="drop(event, 'desmarcado')">
+                    <div class="col-header"><div class="col-dot" style="background:var(--danger)"></div> Desmarcado</div>
+                    <div id="col-desmarcado"></div>
+                </div>
+            </div>
         </div>
 
         <div class="card-rb">
             <h3 class="section-title">Profissionais (Equipe)</h3>
             <button onclick="addProfissional()" style="background:var(--barber-blue-main); border:none; color:white; padding:8px 15px; border-radius:10px; font-size:0.6rem; font-weight:700; cursor:pointer; margin-bottom:20px">+ NOVO PROFISSIONAL</button>
             <div id="grid-equipe" class="stock-grid"></div>
-        </div>
-
-        <div class="card-rb">
-            <h3 class="section-title">Fluxo de Atendimento</h3>
-            <div class="kanban-container">
-                <div class="kanban-column">
-                    <div class="col-header"><div class="col-dot" style="background:#666"></div> Agendado</div>
-                    <div id="col-pendente"></div>
-                </div>
-                <div class="kanban-column">
-                    <div class="col-header"><div class="col-dot" style="background:var(--warning)"></div> Atrasado (+10m)</div>
-                    <div id="col-atrasado"></div>
-                </div>
-                <div class="kanban-column">
-                    <div class="col-header"><div class="col-dot" style="background:var(--success)"></div> Realizado</div>
-                    <div id="col-finalizado"></div>
-                </div>
-                <div class="kanban-column">
-                    <div class="col-header"><div class="col-dot" style="background:var(--danger)"></div> Desmarcado</div>
-                    <div id="col-desmarcado"></div>
-                </div>
-            </div>
         </div>
 
         <div class="card-rb">
@@ -172,41 +172,43 @@
             });
             database.ref('renatus_services').on('value', snap => renderServicos(snap.val() || {}));
             database.ref('renatus_barbers').on('value', snap => renderEquipe(snap.val() || {}));
-            
-            // Auto-refresh a cada minuto para atualizar status de atraso
             setInterval(() => renderPedidos(Object.values(allBookings)), 60000);
         }
 
-        function renderEquipe(data) {
-            let html = "";
-            Object.entries(data).forEach(([id, b]) => {
-                html += `
-                    <div class="item-card" style="text-align:center">
-                        <img src="${b.photo || 'https://cdn-icons-png.flaticon.com/512/147/147144.png'}" class="prof-photo-circle">
-                        <input type="text" value="${b.name}" class="edit-field-inline" style="text-align:center; font-weight:800; color:var(--barber-blue-main)" onchange="updateDB('renatus_barbers/${id}', 'name', this)">
-                        <input type="text" value="${b.photo || ''}" placeholder="URL da Foto" class="edit-field-inline" style="font-size:0.5rem; opacity:0.5" onchange="updateDB('renatus_barbers/${id}', 'photo', this)">
-                        <button onclick="remover('renatus_barbers/${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.6rem; margin-top:10px">REMOVER</button>
-                    </div>`;
-            });
-            document.getElementById('grid-equipe').innerHTML = html || '<p style="opacity:0.5; font-size:0.7rem">Nenhum profissional cadastrado.</p>';
+        // --- FUNÇÕES DE ARRASTAR E SOLTAR (DRAG & DROP) ---
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
         }
 
-        function addProfissional() {
-            const newRef = database.ref('renatus_barbers').push();
-            newRef.set({ name: "Novo Barbeiro", photo: "" });
+        function clearDrag(ev) {
+            ev.currentTarget.classList.remove('drag-over');
         }
 
-        function renderServicos(data) {
-            let html = "";
-            Object.entries(data).forEach(([id, s]) => {
-                html += `
-                    <div class="item-card">
-                        <input type="text" value="${s.name}" class="edit-field-inline" style="font-weight:800; color:var(--barber-blue-main)" onchange="updateDB('renatus_services/${id}', 'name', this)">
-                        <input type="number" value="${s.price}" class="edit-field-inline" style="font-size:0.9rem" onchange="updateDB('renatus_services/${id}', 'price', this, true)">
-                        <input type="text" value="${s.barbers}" class="edit-field-inline" style="font-size:0.55rem; opacity:0.5" onchange="updateDB('renatus_services/${id}', 'barbers', this)">
-                    </div>`;
-            });
-            document.getElementById('grid-servicos').innerHTML = html;
+        function drag(ev, bookingId) {
+            ev.dataTransfer.setData("bookingId", bookingId);
+        }
+
+        function drop(ev, newStatus) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            const id = ev.dataTransfer.getData("bookingId");
+            if (id) updateStatus(id, newStatus);
+        }
+
+        // --- ATUALIZAÇÃO DE STATUS E DISPONIBILIDADE ---
+        function updateStatus(id, newStatus) {
+            const booking = allBookings[id];
+            if (!booking) return;
+
+            // Se desmarcar, removemos a trava do horário/barbeiro no banco se necessário
+            if (newStatus === 'desmarcado') {
+                // Aqui você pode adicionar lógica para apagar o registro ou liberar o nó de agenda
+                // Por enquanto, apenas mudamos o status para permitir visualização histórica
+                database.ref(`renatus_bookings/${id}`).update({ status: 'desmarcado' });
+            } else {
+                database.ref(`renatus_bookings/${id}`).update({ status: newStatus });
+            }
         }
 
         function renderPedidos(pedidosArray) {
@@ -224,33 +226,60 @@
                 const id = Object.keys(allBookings).find(key => allBookings[key].token === p.token);
                 let st = p.status || 'pendente';
 
-                // Lógica de Atraso (10 min de tolerância)
                 if (st === 'pendente' && p.time) {
                     const [h, m] = p.time.split(':');
                     const agendado = new Date();
                     agendado.setHours(h, m, 0);
-                    
-                    if ((agora - agendado) > 600000) { // 10 minutos em ms
-                        st = 'atrasado';
-                    }
+                    if ((agora - agendado) > 600000) st = 'atrasado';
                 }
 
-                const card = `
-                    <div class="pedido-card">
-                        <div style="display:flex; justify-content:space-between; align-items:start">
-                            <span class="client-name">${p.clientName}</span>
-                            <span class="time-tag">${p.time || '--:--'}</span>
-                        </div>
-                        <span class="service-info">${p.items[0].name}</span>
-                        <select class="status-select" onchange="updateDB('renatus_bookings/${id}', 'status', this)">
-                            <option value="pendente" ${st==='pendente'?'selected':''}>Agendado</option>
-                            <option value="finalizado" ${st==='finalizado'?'selected':''}>Realizado</option>
-                            <option value="desmarcado" ${st==='desmarcado'?'selected':''}>Desmarcado</option>
-                        </select>
-                    </div>`;
+                const card = document.createElement('div');
+                card.className = 'pedido-card';
+                card.draggable = true;
+                card.ondragstart = (e) => drag(e, id);
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:start">
+                        <span class="client-name">${p.clientName}</span>
+                        <span class="time-tag">${p.time || '--:--'}</span>
+                    </div>
+                    <span style="font-size:0.6rem; opacity:0.6">${p.items ? p.items[0].name : 'Serviço'}</span>
+                    <select class="status-select" onchange="updateStatus('${id}', this.value)">
+                        <option value="pendente" ${st==='pendente'?'selected':''}>Agendado</option>
+                        <option value="finalizado" ${st==='finalizado'?'selected':''}>Realizado</option>
+                        <option value="desmarcado" ${st==='desmarcado'?'selected':''}>Desmarcado</option>
+                    </select>
+                `;
                 
-                if(cols[st]) cols[st].innerHTML += card;
+                if(cols[st]) cols[st].appendChild(card);
             });
+        }
+
+        // --- DEMAIS FUNÇÕES DE GESTÃO (MANTIDAS) ---
+        function renderEquipe(data) {
+            let html = "";
+            Object.entries(data).forEach(([id, b]) => {
+                html += `
+                    <div class="item-card" style="text-align:center">
+                        <img src="${b.photo || 'https://cdn-icons-png.flaticon.com/512/147/147144.png'}" class="prof-photo-circle">
+                        <input type="text" value="${b.name}" class="edit-field-inline" style="text-align:center; font-weight:800; color:var(--barber-blue-main)" onchange="updateDB('renatus_barbers/${id}', 'name', this)">
+                        <input type="text" value="${b.photo || ''}" placeholder="URL da Foto" class="edit-field-inline" style="font-size:0.5rem; opacity:0.5" onchange="updateDB('renatus_barbers/${id}', 'photo', this)">
+                        <button onclick="remover('renatus_barbers/${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.6rem; margin-top:10px">REMOVER</button>
+                    </div>`;
+            });
+            document.getElementById('grid-equipe').innerHTML = html || '<p style="opacity:0.5; font-size:0.7rem">Nenhum profissional cadastrado.</p>';
+        }
+
+        function renderServicos(data) {
+            let html = "";
+            Object.entries(data).forEach(([id, s]) => {
+                html += `
+                    <div class="item-card">
+                        <input type="text" value="${s.name}" class="edit-field-inline" style="font-weight:800; color:var(--barber-blue-main)" onchange="updateDB('renatus_services/${id}', 'name', this)">
+                        <input type="number" value="${s.price}" class="edit-field-inline" style="font-size:0.9rem" onchange="updateDB('renatus_services/${id}', 'price', this, true)">
+                        <input type="text" value="${s.barbers}" class="edit-field-inline" style="font-size:0.55rem; opacity:0.5" onchange="updateDB('renatus_services/${id}', 'barbers', this)">
+                    </div>`;
+            });
+            document.getElementById('grid-servicos').innerHTML = html;
         }
 
         function updateDB(path, key, element, isNum = false) {
@@ -264,6 +293,11 @@
             const total = fin.reduce((acc, p) => acc + (p.total || 0), 0);
             document.getElementById('kpi-total').innerText = `R$ ${total.toFixed(2)}`;
             document.getElementById('kpi-prod').innerText = arr.filter(p => p.status === 'pendente' || p.status === 'atrasado').length;
+        }
+
+        function addProfissional() {
+            const newRef = database.ref('renatus_barbers').push();
+            newRef.set({ name: "Novo Barbeiro", photo: "" });
         }
 
         function remover(path) { if(confirm("Deseja remover?")) database.ref(path).remove(); }
