@@ -79,8 +79,13 @@
 
         .prof-photo-circle { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--barber-blue-main); object-fit: cover; margin-bottom: 10px; }
 
+        /* Estilos Novos para Gestão de Datas */
+        .date-management-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .config-input { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 10px; border-radius: 10px; width: 100%; margin-top: 5px; }
+        .blocked-date-item { display: flex; justify-content: space-between; align-items: center; background: rgba(231, 76, 60, 0.1); padding: 8px 15px; border-radius: 10px; margin-bottom: 5px; font-size: 0.7rem; border: 1px solid rgba(231, 76, 60, 0.2); }
+
         @media (max-width: 1100px) { .kanban-container { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .kanban-container { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { .kanban-container { grid-template-columns: 1fr; .date-management-grid { grid-template-columns: 1fr; } } }
     </style>
 </head>
 <body>
@@ -109,10 +114,29 @@
         </div>
 
         <div class="card-rb">
+            <h3 class="section-title">Gestão de Calendário (Configurações do Site)</h3>
+            <div class="date-management-grid">
+                <div>
+                    <label style="font-size: 0.6rem; font-weight: 800; opacity: 0.5;">DURANTE QUANTOS DIAS O CLIENTE PODE AGENDAR?</label>
+                    <input type="number" id="config-days-range" class="config-input" placeholder="Ex: 7" onchange="updateConfig('daysRange', this.value)">
+                    <p style="font-size: 0.5rem; opacity: 0.4; margin-top: 5px;">Define o limite de dias futuros visíveis no site.</p>
+                </div>
+                <div>
+                    <label style="font-size: 0.6rem; font-weight: 800; opacity: 0.5;">BLOQUEAR DATAS ESPECÍFICAS (FOLGAS/FERIADOS)</label>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="date" id="block-date-input" class="config-input" style="margin-top:0">
+                        <button onclick="addBlockedDate()" style="background: var(--danger); color: white; border: none; padding: 0 20px; border-radius: 10px; font-weight: 700; font-size: 0.6rem; cursor: pointer;">BLOQUEAR</button>
+                    </div>
+                    <div id="blocked-dates-list" style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-rb">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 class="section-title" style="margin-bottom: 0;">Fluxo de Atendimento</h3>
                 <div class="date-filter-container">
-                    <span style="font-size: 0.6rem; font-weight: 800; opacity: 0.5; text-transform: uppercase;">Filtrar Data:</span>
+                    <span style="font-size: 0.6rem; font-weight: 800; opacity: 0.5; text-transform: uppercase;">Filtrar Visualização:</span>
                     <input type="date" id="dash-date-filter" class="date-input" onchange="renderPedidos(Object.values(allBookings))">
                 </div>
             </div>
@@ -164,7 +188,6 @@
         const ADM_EMAIL = "pablo11ssousa2@gmail.com";
         let allBookings = {};
 
-        // Inicializa o filtro de data com hoje
         document.getElementById('dash-date-filter').value = new Date().toISOString().split('T')[0];
 
         function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
@@ -185,22 +208,50 @@
             });
             database.ref('renatus_services').on('value', snap => renderServicos(snap.val() || {}));
             database.ref('renatus_barbers').on('value', snap => renderEquipe(snap.val() || {}));
+            
+            // Ouvir configurações de data
+            database.ref('renatus_config').on('value', snap => {
+                const config = snap.val() || {};
+                document.getElementById('config-days-range').value = config.daysRange || 7;
+                renderBlockedDates(config.blockedDates || {});
+            });
+
             setInterval(() => renderPedidos(Object.values(allBookings)), 60000);
         }
 
-        function allowDrop(ev) {
-            ev.preventDefault();
-            ev.currentTarget.classList.add('drag-over');
+        // --- GESTÃO DE CONFIGURAÇÕES DE DATA ---
+        function updateConfig(key, val) {
+            database.ref('renatus_config').update({ [key]: val });
         }
 
-        function clearDrag(ev) {
-            ev.currentTarget.classList.remove('drag-over');
+        function addBlockedDate() {
+            const date = document.getElementById('block-date-input').value;
+            if(!date) return;
+            const dateId = date.replace(/-/g, '');
+            database.ref(`renatus_config/blockedDates/${dateId}`).set(date);
         }
 
-        function drag(ev, bookingId) {
-            ev.dataTransfer.setData("bookingId", bookingId);
+        function removeBlockedDate(dateId) {
+            database.ref(`renatus_config/blockedDates/${dateId}`).remove();
         }
 
+        function renderBlockedDates(dates) {
+            const list = document.getElementById('blocked-dates-list');
+            list.innerHTML = "";
+            Object.entries(dates).forEach(([id, date]) => {
+                const d = new Date(date + "T00:00:00").toLocaleDateString('pt-BR');
+                list.innerHTML += `
+                    <div class="blocked-date-item">
+                        <span>${d}</span>
+                        <button onclick="removeBlockedDate('${id}')" style="background:none; border:none; color:white; font-weight:700; cursor:pointer;">&times;</button>
+                    </div>`;
+            });
+        }
+
+        // --- KANBAN E DRAG & DROP ---
+        function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+        function clearDrag(ev) { ev.currentTarget.classList.remove('drag-over'); }
+        function drag(ev, bookingId) { ev.dataTransfer.setData("bookingId", bookingId); }
         function drop(ev, newStatus) {
             ev.preventDefault();
             ev.currentTarget.classList.remove('drag-over');
@@ -209,8 +260,6 @@
         }
 
         function updateStatus(id, newStatus) {
-            const booking = allBookings[id];
-            if (!booking) return;
             database.ref(`renatus_bookings/${id}`).update({ status: newStatus });
         }
 
@@ -228,14 +277,12 @@
             const hojeStr = agora.toISOString().split('T')[0];
 
             pedidosArray.reverse().forEach(p => {
-                // Filtro de data: corresponde ao scheduleDate enviado pelo index
                 const dataPedido = p.scheduleDate || p.date.split('T')[0];
                 if (dataPedido !== selectedDate) return;
 
                 const id = Object.keys(allBookings).find(key => allBookings[key].token === p.token);
                 let st = p.status || 'pendente';
 
-                // Lógica de atraso apenas para a data de hoje
                 if (st === 'pendente' && p.time && selectedDate === hojeStr) {
                     const [h, m] = p.time.split(':');
                     const agendado = new Date();
@@ -248,23 +295,19 @@
                 card.draggable = true;
                 card.ondragstart = (e) => drag(e, id);
                 
-                const servico = p.items ? p.items[0].name : 'Serviço';
-                const barbeiro = p.items ? p.items[0].barber : '---';
-
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:start">
                         <span class="client-name">${p.clientName}</span>
                         <span class="time-tag">${p.time || '--:--'}</span>
                     </div>
-                    <span style="font-size:0.6rem; opacity:0.8; font-weight:600">${servico}</span>
-                    <span class="barber-tag">Profissional: ${barbeiro}</span>
+                    <span style="font-size:0.6rem; opacity:0.8; font-weight:600">${p.items ? p.items[0].name : 'Serviço'}</span>
+                    <span class="barber-tag">Profissional: ${p.items ? p.items[0].barber : '---'}</span>
                     <select class="status-select" onchange="updateStatus('${id}', this.value)">
                         <option value="pendente" ${st==='pendente'?'selected':''}>Agendado</option>
                         <option value="finalizado" ${st==='finalizado'?'selected':''}>Realizado</option>
                         <option value="desmarcado" ${st==='desmarcado'?'selected':''}>Desmarcado</option>
                     </select>
                 `;
-                
                 if(cols[st]) cols[st].appendChild(card);
             });
         }
@@ -280,7 +323,7 @@
                         <button onclick="remover('renatus_barbers/${id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.6rem; margin-top:10px">REMOVER</button>
                     </div>`;
             });
-            document.getElementById('grid-equipe').innerHTML = html || '<p style="opacity:0.5; font-size:0.7rem">Nenhum profissional cadastrado.</p>';
+            document.getElementById('grid-equipe').innerHTML = html;
         }
 
         function renderServicos(data) {
