@@ -55,7 +55,7 @@
         .slot-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; }
         .slot-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; padding: 8px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; transition: 0.3s; text-align: center; }
         .slot-btn.selected { background: var(--barber-blue-main); border-color: var(--barber-blue-main); }
-        .slot-btn.occupied { opacity: 0.3; cursor: not-allowed; background: #333; text-decoration: line-through; }
+        .slot-btn.occupied { opacity: 0.3; cursor: not-allowed; background: #333; }
 
         .barber-selector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin: 10px 0; }
         .barber-option { border: 1px solid var(--glass-border); border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.02); }
@@ -147,6 +147,7 @@
         let currentService = null;
         let selectedSlot = "";
         let selectedBarber = "";
+        let selectedDate = new Date().toISOString().split('T')[0];
 
         window.onload = () => { listenToServices(); listenToBookings(); listenToTeam(); updateBadge(); };
 
@@ -191,8 +192,8 @@
             database.ref('renatus_bookings').on('value', snap => {
                 const data = snap.val();
                 allBookings = data ? Object.entries(data).map(([id, val]) => ({...val, bookingId: id})) : [];
-                if(currentService) openServiceDetails(currentService); // Refresh se modal aberto
                 renderServices();
+                if(currentService) openServiceDetails(currentService);
             });
         }
 
@@ -230,11 +231,11 @@
             });
         }
 
-        // LIBERAÇÃO DE HORÁRIO: Só considera ocupado se o status NÃO for 'desmarcado'
-        function isSlotOccupied(barberName, slot) {
+        function isSlotOccupied(barberName, slot, date) {
             return allBookings.some(b => 
-                b.status !== 'desmarcado' && 
                 b.status !== 'cancelado' && 
+                b.status !== 'desmarcado' &&
+                b.scheduleDate === date && 
                 b.items.some(i => i.barber === barberName && i.time === slot)
             );
         }
@@ -248,20 +249,18 @@
             body.style.gridTemplateColumns = window.innerWidth <= 768 ? "1fr" : "1fr 1fr";
             body.style.gap = "20px";
 
+            const slotBtns = s.slots.split(',').map(slot => {
+                const cleanSlot = slot.trim();
+                const occupied = selectedBarber ? isSlotOccupied(selectedBarber, cleanSlot, selectedDate) : false;
+                return `<div class="slot-btn ${occupied ? 'occupied' : ''} ${selectedSlot === cleanSlot ? 'selected' : ''}" onclick="${occupied || !selectedBarber ? '' : `selectSlot(this, '${cleanSlot}')`}">${cleanSlot}</div>`;
+            }).join('');
+
             const barberBtns = team.map(b => `
                 <div class="barber-option ${selectedBarber === b.name ? 'active' : ''}" onclick="selectBarber(this, '${b.name}')">
                     <img src="${b.photo || 'https://cdn-icons-png.flaticon.com/512/147/147144.png'}">
                     <p>${b.name}</p>
                 </div>
             `).join('');
-
-            // Slots são gerados dinamicamente baseados no barbeiro selecionado
-            const slotsHtml = selectedBarber ? s.slots.split(',').map(slot => {
-                const cleanSlot = slot.trim();
-                const occupied = isSlotOccupied(selectedBarber, cleanSlot);
-                return `<div class="slot-btn ${occupied ? 'occupied' : ''} ${selectedSlot === cleanSlot ? 'selected' : ''}" 
-                        onclick="${occupied ? '' : `selectSlot(this, '${cleanSlot}')`}">${cleanSlot}</div>`;
-            }).join('') : '<p style="font-size:0.6rem; opacity:0.5; grid-column: 1/-1; text-align:center">Selecione um profissional primeiro</p>';
             
             body.innerHTML = `
                 <div class="img-sculpt-frame" style="height: 100%"><img src="https://cdn-icons-png.flaticon.com/512/2602/2602160.png" style="max-width: 60%"></div>
@@ -277,10 +276,14 @@
                         <h3>${s.name}</h3>
                         <p style="margin: 10px 0; opacity: 0.6; font-size: 0.65rem;">${s.desc}</p>
                         <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; margin-bottom: 12px; border: 1px solid var(--glass-border);">
-                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">ESCOLHA O PROFISSIONAL</label>
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">1. ESCOLHA A DATA</label>
+                            <input type="date" class="edit-field" value="${selectedDate}" min="${new Date().toISOString().split('T')[0]}" onchange="updateDate(this.value)" style="margin-top:5px">
+                            
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">2. ESCOLHA O PROFISSIONAL</label>
                             <div class="barber-selector-grid">${barberBtns}</div>
-                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">HORÁRIOS DISPONÍVEIS</label>
-                            <div class="slot-container" id="slot-render-area">${slotsHtml}</div>
+                            
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">3. HORÁRIOS DISPONÍVEIS</label>
+                            <div class="slot-container" id="slot-container">${slotBtns}</div>
                         </div>
                         <button class="card-btn-fix" onclick="addToCart()">CONFIRMAR AGENDAMENTO</button>
                     `}
@@ -290,9 +293,15 @@
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
         }
 
+        function updateDate(val) {
+            selectedDate = val;
+            selectedSlot = "";
+            openServiceDetails(currentService);
+        }
+
         function selectBarber(el, name) {
             selectedBarber = name;
-            selectedSlot = ""; // Reset slot ao trocar barbeiro
+            selectedSlot = "";
             openServiceDetails(currentService);
         }
 
@@ -303,12 +312,24 @@
         }
 
         function addToCart() {
-            if(!auth.currentUser) { auth.signInWithPopup(provider); return; }
+            if(!auth.currentUser) {
+                alert("Você precisa entrar na sua conta para confirmar um agendamento.");
+                auth.signInWithPopup(provider);
+                return;
+            }
             if(!selectedBarber) return alert("Selecione um barbeiro!");
             if(!selectedSlot) return alert("Selecione um horário!");
-            cart.push({ name: currentService.name, barber: selectedBarber, time: selectedSlot, price: parseFloat(currentService.price) });
+            
+            cart.push({ 
+                name: currentService.name, 
+                barber: selectedBarber, 
+                time: selectedSlot, 
+                date: selectedDate,
+                price: parseFloat(currentService.price) 
+            });
             localStorage.setItem('renatus_cart', JSON.stringify(cart));
-            updateBadge(); closeModals();
+            updateBadge();
+            closeModals();
         }
 
         function updateBadge() {
@@ -324,17 +345,17 @@
             let total = cart.reduce((acc, i) => acc + i.price, 0);
             let list = cart.map((i, idx) => `
                 <div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.65rem; position: relative;">
-                    <b>${i.name}</b><br><span style="opacity:0.5">${i.barber} • ${i.time}</span>
+                    <b>${i.name}</b><br><span style="opacity:0.5">${i.barber} • ${i.date} às ${i.time}</span>
                     <button onclick="removeItem(${idx})" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ff4d4d; cursor: pointer;">&times;</button>
                 </div>
             `).join('');
 
             body.innerHTML = `
-                <h3 style="margin-bottom:12px;">Finalizar Agendamento</h3>
-                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Vazio.</p>'}</div>
+                <h3 style="margin-bottom:12px;">Agendamento Pendente</h3>
+                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Nenhum serviço selecionado.</p>'}</div>
                 <div style="background: var(--barber-blue-main); color: white; padding: 12px; border-radius: 12px; text-align: right; font-weight: 700; margin-bottom:15px">Total: R$ ${total.toFixed(2)}</div>
                 <input type="text" id="client-name" class="user-input" value="${auth.currentUser?.displayName || ''}" placeholder="Seu Nome">
-                <button class="card-btn-fix" onclick="finishBooking(${total})">GERAR TOKEN E AGENDAR</button>
+                <button class="card-btn-fix" onclick="finishBooking(${total})">CONFIRMAR E GERAR TOKEN</button>
             `;
             document.getElementById('details-modal').style.display = 'flex';
             setTimeout(() => document.getElementById('details-modal').classList.add('active'), 10);
@@ -344,20 +365,26 @@
             const name = document.getElementById('client-name').value;
             if(!name) return alert("Digite seu nome!");
             const bookingToken = Math.random().toString(36).substr(2, 6).toUpperCase();
-            const bookingData = { clientName: name, clientId: auth.currentUser.uid, items: cart, total: total, token: bookingToken, date: new Date().toISOString(), status: 'pendente', time: cart[0].time };
+            
+            // Usamos a data do primeiro item do carrinho como data de referência do agendamento
+            const bookingData = { 
+                clientName: name, 
+                clientId: auth.currentUser.uid, 
+                items: cart, 
+                total: total, 
+                token: bookingToken, 
+                date: new Date().toISOString(), 
+                scheduleDate: cart[0].date,
+                status: 'pendente' 
+            };
 
-            database.ref('renatus_bookings').push(bookingData)
-                .then(() => {
-                    let msg = `💈 *RENATUS BARBER* 💈\n\n👤 *Cliente:* ${name}\n🎟️ *Token:* ${bookingToken}\n\n`;
-                    cart.forEach(i => { msg += `🔹 *${i.name}* (${i.time} com ${i.barber})\n`; });
-                    msg += `\n💰 *Total: R$ ${total.toFixed(2)}*`;
-                    window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
-                    cart = []; localStorage.setItem('renatus_cart', JSON.stringify(cart)); updateBadge(); closeModals(); alert("Sucesso! Token: " + bookingToken);
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("Erro de permissão! Verifique as regras do Firebase.");
-                });
+            database.ref('renatus_bookings').push(bookingData).then(() => {
+                let msg = `💈 *RENATUS BARBER* 💈\n\n👤 *Cliente:* ${name}\n🎟️ *Token:* ${bookingToken}\n\n`;
+                cart.forEach(i => { msg += `🔹 *${i.name}* (${i.date} às ${i.time} com ${i.barber})\n`; });
+                msg += `\n💰 *Total: R$ ${total.toFixed(2)}*`;
+                window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
+                cart = []; localStorage.setItem('renatus_cart', JSON.stringify(cart)); updateBadge(); closeModals(); alert("Agendamento realizado! Token: " + bookingToken);
+            });
         }
 
         function openMyBookingsModal() {
@@ -370,13 +397,14 @@
             database.ref('renatus_bookings').orderByChild('clientId').equalTo(auth.currentUser.uid).once('value', snap => {
                 const data = snap.val();
                 let html = "";
-                if(!data) html = "Nenhum agendamento encontrado.";
+                if(!data) { html = "Você não possui agendamentos."; }
                 else {
                     Object.entries(data).reverse().forEach(([id, b]) => {
+                        const dateRef = b.scheduleDate || new Date(b.date).toLocaleDateString('pt-BR');
                         html += `
-                            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; margin-bottom: 12px; position:relative">
-                                <div style="font-weight:700; color:${b.status === 'desmarcado' ? '#666' : 'var(--barber-blue-main)'}">${b.items[0].name} ${b.status === 'desmarcado' ? '(DESMARCADO)' : ''}</div>
-                                <div style="font-size:0.6rem; opacity:0.5">${new Date(b.date).toLocaleDateString('pt-BR')} • ${b.items[0].time} com ${b.items[0].barber}</div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; margin-bottom: 12px; ${b.status === 'desmarcado' ? 'opacity:0.5' : ''}">
+                                <div style="font-weight:700; color:var(--barber-blue-main)">${b.items[0].name} ${b.status === 'desmarcado' ? '(DESMARCADO)' : ''}</div>
+                                <div style="font-size:0.6rem; opacity:0.5">${dateRef} às ${b.items[0].time} com ${b.items[0].barber}</div>
                                 <div class="token-tag">TOKEN: ${b.token}</div>
                             </div>`;
                     });
@@ -392,7 +420,7 @@
             const slots = document.getElementById('p-slots').value;
             if(!cat || !name || !price || !slots) return alert("Preencha tudo!");
             const newRef = database.ref('renatus_services').push();
-            newRef.set({ id: newRef.key, category: cat, name: name, price: parseFloat(price), slots: slots, desc: document.getElementById('p-desc').value }).then(() => { closeModals(); alert("Cadastrado!"); });
+            newRef.set({ id: newRef.key, category: cat, name: name, price: parseFloat(price), slots: slots, desc: document.getElementById('p-desc').value }).then(() => { closeModals(); alert("Serviço cadastrado!"); });
         }
 
         function filterCat(c) {
@@ -404,7 +432,6 @@
         function removeItem(idx) { cart.splice(idx, 1); updateBadge(); if(cart.length > 0) openCartModal(); else closeModals(); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => { m.classList.remove('active'); setTimeout(()=>m.style.display='none', 300); }); }
         function openAdminModal() { document.getElementById('admin-modal').style.display='flex'; setTimeout(()=>document.getElementById('admin-modal').classList.add('active'), 10); }
-        
         const cursor = document.getElementById('custom-cursor');
         window.onmousemove = (e) => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; };
     </script>
