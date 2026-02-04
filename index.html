@@ -18,6 +18,7 @@
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
             --font-sans: 'Montserrat', sans-serif;
+            --danger: #e74c3c;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -51,6 +52,15 @@
         .close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: white; }
 
         .user-input, .edit-field { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 10px; border-radius: 10px; margin-bottom: 10px; outline: none; font-family: inherit; color: white; font-size: 0.75rem; }
+
+        /* Estilização Moderna das Datas */
+        .date-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; margin-bottom: 15px; }
+        .date-item { flex: 0 0 65px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 12px 5px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .date-item.selected { background: var(--barber-blue-main); border-color: var(--barber-blue-main); box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3); }
+        .date-item span { display: block; }
+        .date-day-name { font-size: 0.5rem; text-transform: uppercase; opacity: 0.5; font-weight: 800; }
+        .date-number { font-size: 1rem; font-weight: 700; margin: 4px 0; }
+        .date-month { font-size: 0.5rem; opacity: 0.5; font-weight: 700; }
 
         .slot-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; }
         .slot-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; padding: 8px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; transition: 0.3s; text-align: center; }
@@ -148,8 +158,9 @@
         let selectedSlot = "";
         let selectedBarber = "";
         let selectedDate = new Date().toISOString().split('T')[0];
+        let dashConfig = { daysRange: 7, blockedDates: {} };
 
-        window.onload = () => { listenToServices(); listenToBookings(); listenToTeam(); updateBadge(); };
+        window.onload = () => { listenToServices(); listenToBookings(); listenToTeam(); listenToConfig(); updateBadge(); };
 
         auth.onAuthStateChanged(user => {
             const ui = document.getElementById('auth-ui');
@@ -172,6 +183,13 @@
             }
             updateBadge();
         });
+
+        function listenToConfig() {
+            database.ref('renatus_config').on('value', snap => {
+                dashConfig = snap.val() || { daysRange: 7, blockedDates: {} };
+                if(currentService) openServiceDetails(currentService);
+            });
+        }
 
         function listenToServices() {
             database.ref('renatus_services').on('value', snap => {
@@ -249,6 +267,32 @@
             body.style.gridTemplateColumns = window.innerWidth <= 768 ? "1fr" : "1fr 1fr";
             body.style.gap = "20px";
 
+            // Geração Moderna de Datas respeitando DashConfig
+            let datesHtml = "";
+            const today = new Date();
+            const daysToRender = dashConfig.daysRange || 7;
+            const blocked = dashConfig.blockedDates || {};
+
+            for(let i = 0; i < daysToRender; i++) {
+                const d = new Date();
+                d.setDate(today.getDate() + i);
+                const iso = d.toISOString().split('T')[0];
+                const dateId = iso.replace(/-/g, '');
+                
+                if(blocked[dateId]) continue; // Pula datas bloqueadas no Dash
+
+                const dayName = d.toLocaleDateString('pt-BR', {weekday: 'short'});
+                const dayNum = d.getDate();
+                const month = d.toLocaleDateString('pt-BR', {month: 'short'});
+
+                datesHtml += `
+                    <div class="date-item ${selectedDate === iso ? 'selected' : ''}" onclick="updateDate('${iso}')">
+                        <span class="date-day-name">${dayName}</span>
+                        <span class="date-number">${dayNum}</span>
+                        <span class="date-month">${month}</span>
+                    </div>`;
+            }
+
             const slotBtns = s.slots.split(',').map(slot => {
                 const cleanSlot = slot.trim();
                 const occupied = selectedBarber ? isSlotOccupied(selectedBarber, cleanSlot, selectedDate) : false;
@@ -276,16 +320,16 @@
                         <h3>${s.name}</h3>
                         <p style="margin: 10px 0; opacity: 0.6; font-size: 0.65rem;">${s.desc}</p>
                         <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; margin-bottom: 12px; border: 1px solid var(--glass-border);">
-                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">1. ESCOLHA A DATA</label>
-                            <input type="date" class="edit-field" value="${selectedDate}" min="${new Date().toISOString().split('T')[0]}" onchange="updateDate(this.value)" style="margin-top:5px">
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main); letter-spacing: 1px;">1. SELECIONE A DATA</label>
+                            <div class="date-scroller">${datesHtml}</div>
                             
-                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">2. ESCOLHA O PROFISSIONAL</label>
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main); letter-spacing: 1px;">2. ESCOLHA O PROFISSIONAL</label>
                             <div class="barber-selector-grid">${barberBtns}</div>
                             
-                            <label style="font-size: 0.5rem; color: var(--barber-blue-main);">3. HORÁRIOS DISPONÍVEIS</label>
-                            <div class="slot-container" id="slot-container">${slotBtns}</div>
+                            <label style="font-size: 0.5rem; color: var(--barber-blue-main); letter-spacing: 1px;">3. HORÁRIO</label>
+                            <div class="slot-container">${slotBtns}</div>
                         </div>
-                        <button class="card-btn-fix" onclick="addToCart()">CONFIRMAR AGENDAMENTO</button>
+                        <button class="card-btn-fix" onclick="addToCart()">ADICIONAR AO CARRINHO</button>
                     `}
                 </div>
             `;
@@ -312,24 +356,12 @@
         }
 
         function addToCart() {
-            if(!auth.currentUser) {
-                alert("Você precisa entrar na sua conta para confirmar um agendamento.");
-                auth.signInWithPopup(provider);
-                return;
-            }
+            if(!auth.currentUser) { auth.signInWithPopup(provider); return; }
             if(!selectedBarber) return alert("Selecione um barbeiro!");
             if(!selectedSlot) return alert("Selecione um horário!");
-            
-            cart.push({ 
-                name: currentService.name, 
-                barber: selectedBarber, 
-                time: selectedSlot, 
-                date: selectedDate,
-                price: parseFloat(currentService.price) 
-            });
+            cart.push({ name: currentService.name, barber: selectedBarber, time: selectedSlot, date: selectedDate, price: parseFloat(currentService.price) });
             localStorage.setItem('renatus_cart', JSON.stringify(cart));
-            updateBadge();
-            closeModals();
+            updateBadge(); closeModals();
         }
 
         function updateBadge() {
@@ -345,14 +377,14 @@
             let total = cart.reduce((acc, i) => acc + i.price, 0);
             let list = cart.map((i, idx) => `
                 <div style="padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.65rem; position: relative;">
-                    <b>${i.name}</b><br><span style="opacity:0.5">${i.barber} • ${i.date} às ${i.time}</span>
+                    <b>${i.name}</b><br><span style="opacity:0.5">${i.barber} • ${new Date(i.date + "T00:00:00").toLocaleDateString('pt-BR')} às ${i.time}</span>
                     <button onclick="removeItem(${idx})" style="position: absolute; right: 10px; top: 10px; border: none; background: none; color: #ff4d4d; cursor: pointer;">&times;</button>
                 </div>
             `).join('');
 
             body.innerHTML = `
-                <h3 style="margin-bottom:12px;">Agendamento Pendente</h3>
-                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Nenhum serviço selecionado.</p>'}</div>
+                <h3 style="margin-bottom:12px;">Finalizar Agendamento</h3>
+                <div style="margin-bottom: 15px;">${list || '<p style="text-align:center; opacity:0.5">Vazio.</p>'}</div>
                 <div style="background: var(--barber-blue-main); color: white; padding: 12px; border-radius: 12px; text-align: right; font-weight: 700; margin-bottom:15px">Total: R$ ${total.toFixed(2)}</div>
                 <input type="text" id="client-name" class="user-input" value="${auth.currentUser?.displayName || ''}" placeholder="Seu Nome">
                 <button class="card-btn-fix" onclick="finishBooking(${total})">CONFIRMAR E GERAR TOKEN</button>
@@ -365,22 +397,11 @@
             const name = document.getElementById('client-name').value;
             if(!name) return alert("Digite seu nome!");
             const bookingToken = Math.random().toString(36).substr(2, 6).toUpperCase();
-            
-            // Usamos a data do primeiro item do carrinho como data de referência do agendamento
-            const bookingData = { 
-                clientName: name, 
-                clientId: auth.currentUser.uid, 
-                items: cart, 
-                total: total, 
-                token: bookingToken, 
-                date: new Date().toISOString(), 
-                scheduleDate: cart[0].date,
-                status: 'pendente' 
-            };
+            const bookingData = { clientName: name, clientId: auth.currentUser.uid, items: cart, total: total, token: bookingToken, date: new Date().toISOString(), scheduleDate: cart[0].date, status: 'pendente' };
 
             database.ref('renatus_bookings').push(bookingData).then(() => {
                 let msg = `💈 *RENATUS BARBER* 💈\n\n👤 *Cliente:* ${name}\n🎟️ *Token:* ${bookingToken}\n\n`;
-                cart.forEach(i => { msg += `🔹 *${i.name}* (${i.date} às ${i.time} com ${i.barber})\n`; });
+                cart.forEach(i => { msg += `🔹 *${i.name}* (${new Date(i.date + "T00:00:00").toLocaleDateString('pt-BR')} às ${i.time} com ${i.barber})\n`; });
                 msg += `\n💰 *Total: R$ ${total.toFixed(2)}*`;
                 window.open(`https://wa.me/${WPP_NUM}?text=${encodeURIComponent(msg)}`);
                 cart = []; localStorage.setItem('renatus_cart', JSON.stringify(cart)); updateBadge(); closeModals(); alert("Agendamento realizado! Token: " + bookingToken);
@@ -397,10 +418,10 @@
             database.ref('renatus_bookings').orderByChild('clientId').equalTo(auth.currentUser.uid).once('value', snap => {
                 const data = snap.val();
                 let html = "";
-                if(!data) { html = "Você não possui agendamentos."; }
+                if(!data) html = "Você não possui agendamentos.";
                 else {
                     Object.entries(data).reverse().forEach(([id, b]) => {
-                        const dateRef = b.scheduleDate || new Date(b.date).toLocaleDateString('pt-BR');
+                        const dateRef = b.scheduleDate ? new Date(b.scheduleDate + "T00:00:00").toLocaleDateString('pt-BR') : new Date(b.date).toLocaleDateString('pt-BR');
                         html += `
                             <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px; margin-bottom: 12px; ${b.status === 'desmarcado' ? 'opacity:0.5' : ''}">
                                 <div style="font-weight:700; color:var(--barber-blue-main)">${b.items[0].name} ${b.status === 'desmarcado' ? '(DESMARCADO)' : ''}</div>
