@@ -18,7 +18,7 @@
 
     <style>
         /* ==========================================================================
-           RESET & VARIÁVEIS DE DESIGN (Mugsy's Mugs Style)
+           RESET & VARIÁVEIS DE DESIGN
            ========================================================================== */
         :root {
             --accent-main: #234BBA;
@@ -276,6 +276,12 @@
             letter-spacing: 0.5px;
         }
 
+        .title-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         /* Lista de Serviços */
         .services-list {
             display: grid;
@@ -356,7 +362,7 @@
             background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px);
         }
 
-        /* Seleção de Barbeiros (Agora no Modal) */
+        /* Seleção de Barbeiros */
         .barbers-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -410,16 +416,34 @@
             color: var(--text-secondary);
         }
 
-        /* Seleção de Data (Agora no Modal) */
+        /* Seleção de Data (Scroll Horizontal) */
         .dates-scroll {
             display: flex;
             gap: 12px;
-            flex-wrap: wrap; /* Alterado para wrap no modal */
-            justify-content: center;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin; 
+            scrollbar-color: var(--card-border) transparent;
+        }
+
+        .dates-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .dates-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .dates-scroll::-webkit-scrollbar-thumb {
+            background-color: var(--card-border);
+            border-radius: 20px;
         }
 
         .date-card {
-            flex: 0 0 80px;
+            flex: 0 0 85px; 
+            scroll-snap-align: start;
             background: var(--bg-secondary);
             border-radius: var(--radius-sm);
             padding: 15px 10px;
@@ -458,7 +482,38 @@
             font-weight: 600;
         }
 
-        /* Seleção de Horários (Agora no Modal) */
+        /* Botões de Período (Horários) */
+        .period-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .period-btn {
+            flex: 1;
+            padding: 12px 10px;
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+        .period-btn:hover {
+            background: #E8EDFF;
+        }
+        .period-btn.active {
+            background: var(--accent-main);
+            color: var(--bg-primary);
+            border-color: var(--accent-main);
+        }
+
+        /* Seleção de Horários */
         .time-slots {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
@@ -861,8 +916,13 @@
 
             <div class="booking-grid">
                 <div>
-                    <!-- Passo 1: Fica na tela principal -->
-                    <div class="section-title">1. Escolha o Serviço</div>
+                    <!-- Passo 1: Multi-Seleção de Serviços -->
+                    <div class="section-title title-flex">
+                        <span>1. Escolha os Serviços</span>
+                        <button id="btnContinueFromServices" class="btn-confirm" style="width:auto; padding: 8px 20px; font-size: 14px; margin: 0; display: none;" onclick="openModal('barberModal')">
+                            Continuar <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
                     <div class="services-list" id="servicesContainer"></div>
                 </div>
 
@@ -871,12 +931,12 @@
                         <div class="section-title" style="font-size: 32px;">RESUMO</div>
                         
                         <div class="summary-row">
-                            <span class="label">Serviço</span>
+                            <span class="label">Serviço(s)</span>
                             <span class="value" id="sumService">Nenhum</span>
                         </div>
                         <div class="summary-row">
                             <span class="label">Profissional</span>
-                            <span class="value" id="sumBarber" onclick="if(selectedService) openModal('barberModal')" title="Clique para alterar">Pendente</span>
+                            <span class="value" id="sumBarber" onclick="if(selectedServices.length > 0) openModal('barberModal')" title="Clique para alterar">Pendente</span>
                         </div>
                         <div class="summary-row">
                             <span class="label">Data</span>
@@ -948,7 +1008,7 @@
                     <thead>
                         <tr>
                             <th>Cliente</th>
-                            <th>Serviço</th>
+                            <th>Serviços</th>
                             <th>Barbeiro</th>
                             <th>Data/Hora</th>
                             <th>Valor</th>
@@ -982,12 +1042,19 @@
         </div>
     </div>
 
-    <!-- Modal: Seleção de Horário -->
+    <!-- Modal: Seleção de Horário (Filtro por Período) -->
     <div class="modal-overlay" id="timeModal">
         <div class="selection-modal">
             <button class="modal-close" onclick="closeModal('timeModal')"><i class="fa-solid fa-xmark"></i></button>
             <div class="section-title">4. Selecione o Horário</div>
-            <div class="time-slots" id="timeSlotsContainer"></div>
+            
+            <div class="period-selector">
+                <button class="period-btn active" onclick="setPeriod('manha', this)"><i class="fa-regular fa-sun"></i> Manhã</button>
+                <button class="period-btn" onclick="setPeriod('tarde', this)"><i class="fa-solid fa-cloud-sun"></i> Tarde</button>
+                <button class="period-btn" onclick="setPeriod('noite', this)"><i class="fa-solid fa-moon"></i> Noite</button>
+            </div>
+
+            <div id="timeSlotsContainer"></div>
         </div>
     </div>
 
@@ -1057,16 +1124,19 @@
 
         let currentUser = null;
         let currentAuthMode = 'login'; 
-        let selectedService = null;
+        
+        let selectedServices = []; // Agora é um array
         let selectedBarber = null;
         let selectedDate = null;
         let selectedTime = null;
+        let selectedPeriod = 'manha'; // Estado para o filtro de horários
+        
         let generatedDates = [];
 
         const servicesData = [
             { id: 's1', name: 'Corte Social / Fade', duration: '40 min', price: 45.00, icon: 'fa-scissors' },
             { id: 's2', name: 'Barba Completa', duration: '30 min', price: 35.00, icon: 'fa-user-ninja' },
-            { id: 's3', name: 'Combo Cabelo + Barba', duration: '60 min', price: 70.00, icon: 'fa-crown' },
+            { id: 's3', name: 'Sobrancelha', duration: '10 min', price: 15.00, icon: 'fa-eye' },
             { id: 's4', name: 'Pigmentação', duration: '45 min', price: 50.00, icon: 'fa-wand-magic-sparkles' }
         ];
 
@@ -1101,7 +1171,7 @@
         function renderServices() {
             const container = document.getElementById('servicesContainer');
             container.innerHTML = servicesData.map(s => `
-                <div class="service-card ${selectedService?.id === s.id ? 'selected' : ''}" onclick="selectService('${s.id}')">
+                <div class="service-card ${selectedServices.some(x => x.id === s.id) ? 'selected' : ''}" onclick="selectService('${s.id}')">
                     <div class="price">R$ ${s.price.toFixed(2).replace('.', ',')}</div>
                     <h3>${s.name}</h3>
                     <div class="duration"><i class="fa-regular fa-clock"></i> ${s.duration}</div>
@@ -1156,19 +1226,56 @@
             `).join('');
         }
 
+        /* Lógica para Filtro de Horários por Período */
+        function setPeriod(period, btn) {
+            selectedPeriod = period;
+            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            updateTimeSlots();
+        }
+
         function updateTimeSlots() {
             const container = document.getElementById('timeSlotsContainer');
-            container.innerHTML = availableTimes.map(t => `
-                <div class="time-slot ${selectedTime === t ? 'selected' : ''}" onclick="selectTime('${t}')">${t}</div>
-            `).join('');
+            let filteredTimes = [];
+            
+            if (selectedPeriod === 'manha') {
+                filteredTimes = availableTimes.filter(t => parseInt(t.split(':')[0]) < 12);
+            } else if (selectedPeriod === 'tarde') {
+                filteredTimes = availableTimes.filter(t => parseInt(t.split(':')[0]) >= 12 && parseInt(t.split(':')[0]) < 18);
+            } else if (selectedPeriod === 'noite') {
+                filteredTimes = availableTimes.filter(t => parseInt(t.split(':')[0]) >= 18);
+            }
+
+            if (filteredTimes.length > 0) {
+                container.innerHTML = `<div class="time-slots">` + filteredTimes.map(t => `
+                    <div class="time-slot ${selectedTime === t ? 'selected' : ''}" onclick="selectTime('${t}')">${t}</div>
+                `).join('') + `</div>`;
+            } else {
+                container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-secondary);">Nenhum horário disponível neste período.</div>`;
+            }
         }
 
         /* Funções de Seleção (Flow dos Modais) */
         function selectService(id) {
-            selectedService = servicesData.find(s => s.id === id);
+            const service = servicesData.find(s => s.id === id);
+            const index = selectedServices.findIndex(s => s.id === id);
+            
+            if (index > -1) {
+                selectedServices.splice(index, 1); // Remove se já estiver selecionado
+            } else {
+                selectedServices.push(service); // Adiciona se não estiver
+            }
+            
             renderServices();
             updateSummary();
-            openModal('barberModal');
+            
+            // Exibir ou ocultar botão "Continuar"
+            const btn = document.getElementById('btnContinueFromServices');
+            if (selectedServices.length > 0) {
+                btn.style.display = 'inline-flex';
+            } else {
+                btn.style.display = 'none';
+            }
         }
 
         function selectBarber(id) {
@@ -1200,7 +1307,14 @@
         }
 
         function updateSummary() {
-            document.getElementById('sumService').innerText = selectedService ? selectedService.name : 'Nenhum';
+            const serviceEl = document.getElementById('sumService');
+            if (selectedServices.length === 1) {
+                serviceEl.innerText = selectedServices[0].name;
+            } else if (selectedServices.length > 1) {
+                serviceEl.innerText = `${selectedServices.length} serviços selecionados`;
+            } else {
+                serviceEl.innerText = 'Nenhum';
+            }
             
             const barberEl = document.getElementById('sumBarber');
             barberEl.innerText = selectedBarber ? selectedBarber.name : 'Pendente';
@@ -1215,11 +1329,11 @@
             
             document.getElementById('sumTime').innerText = selectedTime || '--:--';
             
-            const total = selectedService ? selectedService.price : 0;
+            const total = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
             document.getElementById('sumTotal').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
 
             const btn = document.getElementById('btnConfirmBooking');
-            btn.disabled = !(selectedService && selectedBarber && selectedDate && selectedTime);
+            btn.disabled = !(selectedServices.length > 0 && selectedBarber && selectedDate && selectedTime);
         }
 
         /* Autenticação */
@@ -1318,9 +1432,13 @@
             if (!currentUser) {
                 openModal('authModal'); showToast('Faça login para concluir o agendamento.'); return;
             }
+
+            const combinedServiceNames = selectedServices.map(s => s.name).join(' + ');
+            const combinedPrice = selectedServices.reduce((acc, curr) => acc + curr.price, 0);
+
             const appointmentData = {
                 id: 'app-' + Date.now(), userId: currentUser.uid, userName: currentUser.name, userEmail: currentUser.email,
-                serviceName: selectedService.name, servicePrice: selectedService.price, barberName: selectedBarber.name,
+                serviceName: combinedServiceNames, servicePrice: combinedPrice, barberName: selectedBarber.name,
                 date: selectedDate, time: selectedTime, status: 'confirmado', createdAt: new Date().toISOString()
             };
             
@@ -1330,7 +1448,13 @@
                 } catch (err) { saveAppointmentLocally(appointmentData); }
             } else { saveAppointmentLocally(appointmentData); }
 
-            selectedService = null; selectedBarber = null; selectedDate = null; selectedTime = null;
+            // Limpa seleções pós agendamento
+            selectedServices = []; 
+            selectedBarber = null; 
+            selectedDate = null; 
+            selectedTime = null;
+            document.getElementById('btnContinueFromServices').style.display = 'none';
+
             renderServices(); updateSummary();
             
             renderAppointments(); renderAdminDashboard();
