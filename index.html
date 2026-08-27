@@ -3,562 +3,1658 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mugsy's Mugs - Forma Original (Radial Gradient)</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700;800&display=swap');
+    <title>BarberSaaS - Agendamento Online</title>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Firebase Compat SDKs (v10.8.0) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ==========================================================================
+           RESET & VARIÁVEIS DE DESIGN (Glassmorphism & Dark Premium Theme)
+           ========================================================================== */
         :root {
-            --blue: #234BBA;
-            --yellow: #FFCE00;
-            --white: #FFFFFF;
-            --black: #111111;
-            --gray-light: #F4F5F8;
-            --gray-text: #666666;
+            --bg-primary: #0b0f17;
+            --bg-secondary: #131c2e;
+            --card-bg: rgba(22, 32, 51, 0.65);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-border-active: #f59e0b;
+            --accent-gold: #f59e0b;
+            --accent-gold-hover: #d97706;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: var(--white);
-            color: var(--black);
-            padding: 20px;
-        }
-
-        /* --- HERO SECTION --- */
-        .hero-container {
-            background-color: var(--blue);
-            border-radius: 30px;
-            padding: 30px 50px;
-            position: relative;
-            overflow: hidden;
-            color: var(--white);
-            min-height: 80vh;
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Aba do Logo - FORMA ORIGINAL COM RADIAL GRADIENT */
-        .logo-tab {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: var(--white);
-            padding: 20px 30px;
-            border-bottom-right-radius: 20px;
-            border-top-left-radius: 30px; /* Acompanha o raio do Hero */
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'Anton', sans-serif;
-            font-size: 24px;
-            letter-spacing: 1px;
-            color: var(--black);
-            z-index: 20;
-        }
-
-        /* Curva perfeita embaixo */
-        .logo-tab::before {
-            content: "";
-            position: absolute;
-            bottom: -20px; 
-            left: 0;
-            width: 20px;
-            height: 20px;
-            /* Recorte circular que revela o fundo, criando a curva */
-            background: radial-gradient(circle at 100% 100%, transparent 20px, var(--white) 20.5px);
-        }
-
-        /* Curva perfeita à direita */
-        .logo-tab::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            right: -20px;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle at 100% 100%, transparent 20px, var(--white) 20.5px);
-        }
-
-        /* Navbar */
+        /* ==========================================================================
+           HEADER & NAVEGAÇÃO
+           ========================================================================== */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 15, 23, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 2rem;
         }
 
-        .header-spacer {
-            width: 200px;
-        }
-
-        nav {
-            display: flex;
-            gap: 30px;
-        }
-
-        nav a {
-            color: var(--white);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 15px;
-            transition: opacity 0.3s ease;
-        }
-
-        nav a:hover {
-            opacity: 0.7;
-        }
-
-        .btn {
-            background-color: var(--yellow);
-            color: var(--black);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: transform 0.2s ease;
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-icon {
-            background: var(--white);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        /* Hero Content */
-        .hero-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            flex-grow: 1;
-            padding-bottom: 20px;
-            position: relative;
-            z-index: 10;
-            margin-top: 40px;
-        }
-
-        .hero-bg-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -60%);
-            font-family: 'Anton', sans-serif;
-            font-size: 18vw;
-            color: var(--white);
-            line-height: 1;
-            z-index: 1;
-            width: 100%;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-
-        .hero-left {
-            max-width: 300px;
-        }
-
-        .hero-left h2 {
-            color: var(--yellow);
-            font-size: 32px;
-            margin-bottom: 15px;
-            font-weight: 800;
-        }
-
-        .hero-left p {
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-
-        .hero-center-product {
-            position: absolute;
-            left: 50%;
-            bottom: -20px;
-            transform: translateX(-50%);
-            z-index: 5;
-            height: 85%;
-        }
-
-        .hero-center-product img {
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0px 20px 30px rgba(0,0,0,0.4));
-        }
-
-        .hero-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 30px;
-        }
-
-        /* Glassmorphism Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 16px;
-            padding: 25px;
-            width: 260px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .glass-card h3 {
-            font-size: 42px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: var(--black);
-        }
-
-        .avatars {
-            display: flex;
-            margin-bottom: 15px;
-        }
-
-        .avatars div {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #ccc;
-            border: 2px solid var(--blue);
-            margin-left: -10px;
-        }
-        .avatars div:first-child { margin-left: 0; }
-
-        .glass-card p {
-            font-size: 12px;
-            line-height: 1.4;
-            color: var(--black);
-        }
-
-        .hero-controls {
-            display: flex;
-            gap: 15px;
-        }
-
-        .control-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--yellow);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: bold;
-            color: var(--white);
-        }
-
-        /* --- COLLECTION SECTION --- */
-        .collection-section {
-            padding: 80px 20px;
+        .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        .collection-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 50px;
+            align-items: center;
         }
 
-        .collection-header h2 {
-            font-family: 'Anton', sans-serif;
-            font-size: 48px;
-            line-height: 1.1;
-            max-width: 400px;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+            background: rgba(245, 158, 11, 0.15);
+            padding: 10px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-gold);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .user-auth-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 10px 22px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+        }
+
+        .user-auth-btn:hover {
+            background: var(--accent-gold-hover);
+            transform: translateY(-2px);
+        }
+
+        .user-profile-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: 1px solid var(--card-border);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        /* ==========================================================================
+           CONTAINER PRINCIPAL & VIEWS
+           ========================================================================== */
+        main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .firebase-alert {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .firebase-alert i {
+            color: var(--accent-gold);
+            font-size: 1.3rem;
+        }
+
+        /* ==========================================================================
+           VIEW DE AGENDAMENTO (CLIENTE)
+           ========================================================================== */
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .booking-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Passos do Agendamento (Lógica Sequencial) */
+        .booking-step {
+            display: none;
+            opacity: 0;
+            transform: translateY(15px);
+            margin-bottom: 1.5rem;
+        }
+
+        .booking-step.active-step {
+            display: block;
+            animation: slideUpFade 0.4s ease forwards;
+        }
+
+        @keyframes slideUpFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--accent-gold);
+        }
+
+        .card-glass {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Lista de Serviços */
+        .services-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .service-card:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .service-card.selected {
+            border-color: var(--accent-gold);
+            background: rgba(245, 158, 11, 0.08);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+        }
+
+        .service-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .service-card .duration {
+            font-size: 0.825rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .service-card .price {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        /* Seleção de Barbeiros */
+        .barbers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .barber-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .barber-card:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .barber-card.selected {
+            border-color: var(--accent-gold);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .barber-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 0.75rem auto;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            border: 2px solid var(--card-border);
+        }
+
+        .barber-card.selected .barber-avatar {
+            border-color: var(--accent-gold);
+        }
+
+        .barber-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .barber-role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Seleção de Data (Cards Estilizados) */
+        .dates-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-gold) var(--card-border);
+        }
+
+        .dates-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .dates-scroll::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 4px;
+        }
+
+        .date-card {
+            flex: 0 0 75px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .date-card:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .date-card.selected {
+            border-color: var(--accent-gold);
+            background: rgba(245, 158, 11, 0.08);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+        }
+
+        .date-card .d-week {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 4px;
             text-transform: uppercase;
         }
 
-        .collection-header-right {
-            max-width: 350px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: flex-start;
+        .date-card .d-num {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
         }
 
-        .collection-header-right p {
-            color: var(--gray-text);
-            font-size: 14px;
-            line-height: 1.6;
+        .date-card .d-month {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 600;
         }
 
-        .product-grid {
+        .date-card.selected .d-num {
+            color: var(--accent-gold);
+        }
+
+        /* Seleção de Horários */
+        .time-slots {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
         }
 
-        .product-card {
-            background: var(--gray-light);
-            border-radius: 20px;
-            padding: 20px;
-            position: relative;
+        .time-slots::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .time-slots::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 4px;
+        }
+
+        .time-slot {
+            padding: 12px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .time-slot:hover {
+            border-color: var(--accent-gold);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .time-slot.selected {
+            background: var(--accent-gold);
+            color: #000;
+            border-color: var(--accent-gold);
+            font-weight: 800;
+        }
+
+        /* Resumo da Reserva (Sidebar) */
+        .summary-card {
+            position: sticky;
+            top: 90px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .summary-row .label {
+            color: var(--text-secondary);
+        }
+
+        .summary-row .value {
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .summary-total {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-total .total-price {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+        }
+
+        .btn-confirm {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-confirm:hover {
+            background: var(--accent-gold-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-confirm:disabled {
+            background: #334155;
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* ==========================================================================
+           VIEW MEUS AGENDAMENTOS
+           ========================================================================== */
+        .appointments-list {
             display: flex;
             flex-direction: column;
-            height: 380px;
-            transition: box-shadow 0.3s ease;
+            gap: 1rem;
         }
 
-        .product-card:hover {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-        }
-
-        /* Etiqueta de Preço Top-Left (Forma Nativa) */
-        .price-tag {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: var(--white);
-            padding: 10px 15px;
-            border-bottom-right-radius: 16px;
-            border-top-left-radius: 20px;
-            font-size: 14px;
-            font-weight: 700;
-            z-index: 10;
-        }
-
-        .price-tag::before {
-            content: "";
-            position: absolute;
-            bottom: -16px;
-            left: 0;
-            width: 16px;
-            height: 16px;
-            background: radial-gradient(circle at 100% 100%, transparent 16px, var(--white) 16.5px);
-        }
-
-        .price-tag::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            right: -16px;
-            width: 16px;
-            height: 16px;
-            background: radial-gradient(circle at 100% 100%, transparent 16px, var(--white) 16.5px);
-        }
-
-        /* Container dos botões Top-Right (Forma Nativa) */
-        .card-actions-container {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: var(--white);
-            padding: 10px 10px;
-            border-bottom-left-radius: 16px;
-            border-top-right-radius: 20px;
+        .appointment-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
             display: flex;
-            gap: 8px;
-            z-index: 10;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
 
-        .card-actions-container::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -16px;
-            width: 16px;
-            height: 16px;
-            /* Para o lado direito, o centro do circulo de recorte fica à esquerda/baixo */
-            background: radial-gradient(circle at 0 100%, transparent 16px, var(--white) 16.5px);
+        .appointment-info {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
         }
 
-        .card-actions-container::after {
-            content: "";
-            position: absolute;
-            bottom: -16px;
-            right: 0;
-            width: 16px;
-            height: 16px;
-            background: radial-gradient(circle at 0 100%, transparent 16px, var(--white) 16.5px);
+        .appointment-date-badge {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            text-align: center;
+            min-width: 80px;
         }
 
-        .old-price {
-            text-decoration: line-through;
-            color: #aaa;
-            font-size: 12px;
-            margin-right: 5px;
+        .appointment-date-badge .day {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            line-height: 1;
         }
 
-        .action-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--yellow);
-            border: none;
-            color: var(--white);
+        .appointment-date-badge .month {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-confirmed {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-canceled {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-cancel {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-cancel:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* ==========================================================================
+           VIEW PAINEL ADMIN
+           ========================================================================== */
+        .admin-dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-md);
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-gold);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
+            font-size: 1.4rem;
         }
 
-        .product-name {
-            font-size: 14px;
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            font-size: 0.825rem;
+            color: var(--text-muted);
+        }
+
+        .admin-table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--text-secondary);
             font-weight: 600;
-            margin-top: 40px; /* Empurra o nome para baixo da etiqueta absoluta */
-            z-index: 2;
+            border-bottom: 1px solid var(--card-border);
         }
 
-        .product-image {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 65%;
-            z-index: 1;
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
         }
 
-        .product-image img {
+        /* ==========================================================================
+           MODAL DE AUTENTICAÇÃO
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15));
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
         }
 
-        /* Responsividade */
-        @media (max-width: 900px) {
-            .product-grid { grid-template-columns: repeat(2, 1fr); }
-            .hero-bg-text { font-size: 24vw; }
-            .hero-content { flex-direction: column; align-items: center; gap: 40px; text-align: center; }
-            .hero-left, .hero-right { align-items: center; }
-            .hero-center-product { position: relative; bottom: 0; transform: none; left: 0; height: 300px; margin-top: 30px;}
-            .header-spacer { display: none; }
-            .logo-tab { position: relative; border-radius: 15px; margin-bottom: 20px; padding: 10px 20px; }
-            .logo-tab::before, .logo-tab::after { display: none; } 
+        .modal-overlay.active {
+            display: flex;
         }
-        @media (max-width: 600px) {
-            .product-grid { grid-template-columns: 1fr; }
-            nav { display: none; }
-            .collection-header { flex-direction: column; gap: 20px; }
+
+        .auth-modal {
+            background: #131c2e;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 420px;
+            padding: 2.25rem;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .auth-tab {
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .auth-tab.active {
+            color: var(--accent-gold);
+        }
+
+        .auth-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.8rem;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-gold);
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            background: #ffffff;
+            color: #0f172a;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .btn-google:hover {
+            background: #f1f5f9;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin: 1.25rem 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        /* Notificação Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            color: #fff;
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--accent-gold);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            display: flex;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
         }
     </style>
 </head>
 <body>
 
-    <section class="hero-container">
-        <div class="logo-tab">
-            <span style="color: var(--yellow);">☕</span> MUGSY'S
-        </div>
-
-        <header>
-            <div class="header-spacer"></div>
-            <nav>
-                <a href="#">Home</a>
-                <a href="#">About</a>
-                <a href="#">Company</a>
-                <a href="#">Stores</a>
+    <!-- ==========================================================================
+       HEADER & NAVEGAÇÃO PRINCIPAL
+       ========================================================================== -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-scissors"></i>
+                BarberSaaS
+            </a>
+            
+            <nav class="nav-menu">
+                <span class="nav-link active" onclick="switchView('bookingView', this)">Agendar</span>
+                <span class="nav-link" onclick="switchView('myAppointmentsView', this)">Meus Agendamentos</span>
+                <span class="nav-link" onclick="switchView('adminView', this)"><i class="fa-solid fa-chart-line"></i> Painel Admin</span>
+                
+                <div id="authContainer">
+                    <button class="user-auth-btn" onclick="openAuthModal()">
+                        <i class="fa-solid fa-user"></i> Entrar
+                    </button>
+                </div>
             </nav>
-            <button class="btn" onclick="exploreAction()">
-                <span class="btn-icon">→</span> Explore Collection
-            </button>
-        </header>
+        </div>
+    </header>
 
-        <div class="hero-bg-text">MUGSY'S</div>
+    <!-- ==========================================================================
+       CONTEÚDO PRINCIPAL (VIEWS)
+       ========================================================================== -->
+    <main>
+        <!-- Alerta Educacional de Configuração do Firebase -->
+        <div class="firebase-alert" id="firebaseNotice">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                    <strong>Modo Demonstrativo com Fallback Local</strong> - Configure suas credenciais no objeto <code>firebaseConfig</code> do arquivo para habilitar a nuvem em tempo real do Firebase.
+                </div>
+            </div>
+            <button onclick="document.getElementById('firebaseNotice').style.display='none'" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
 
-        <div class="hero-content">
-            <div class="hero-left">
-                <h2>PREMIUM</h2>
-                <p>Engineered for everyday adventures. Durable, lightweight, and built to move with you wherever the journey leads.</p>
-                <button class="btn" onclick="shopAction()">
-                    <span class="btn-icon">→</span> Shop Now
-                </button>
+        <!-- VIEW 1: FORMULÁRIO DE AGENDAMENTO (CLIENTE) -->
+        <section id="bookingView" class="view-section active">
+            <div class="page-header">
+                <h1>Agende seu Horário</h1>
+                <p>Siga os passos abaixo para marcar seu estilo em segundos.</p>
             </div>
 
-            <div class="hero-center-product">
-                <img src="https://placehold.co/300x600/transparent/234BBA?text=Blue+Mug&font=Montserrat" alt="Mugsy's Premium Blue Mug">
-            </div>
-
-            <div class="hero-right">
-                <div class="glass-card">
-                    <h3>98%</h3>
-                    <div class="avatars">
-                        <div style="background: #FFB6C1;"></div>
-                        <div style="background: #ADD8E6;"></div>
-                        <div style="background: #90EE90;"></div>
+            <div class="booking-grid">
+                <!-- Coluna Principal (Passos do Agendamento) -->
+                <div>
+                    <!-- Passo 1: Serviços -->
+                    <div class="card-glass booking-step active-step" id="step1">
+                        <div class="section-title">
+                            <i class="fa-solid fa-list-check"></i> 1. Escolha o Serviço
+                        </div>
+                        <div class="services-list" id="servicesContainer">
+                            <!-- Inserido dinamicamente via JS -->
+                        </div>
                     </div>
-                    <p>Customer satisfaction rating across all orders</p>
+
+                    <!-- Passo 2: Barbeiro (Inicialmente Oculto) -->
+                    <div class="card-glass booking-step" id="step2">
+                        <div class="section-title">
+                            <i class="fa-solid fa-user-ninja"></i> 2. Selecione o Profissional
+                        </div>
+                        <div class="barbers-grid" id="barbersContainer">
+                            <!-- Inserido dinamicamente via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Passo 3: Data (Inicialmente Oculto) -->
+                    <div class="card-glass booking-step" id="step3">
+                        <div class="section-title">
+                            <i class="fa-regular fa-calendar-days"></i> 3. Escolha a Data
+                        </div>
+                        <div class="dates-scroll" id="datesContainer">
+                            <!-- Inserido dinamicamente via JS limitando a 15 dias úteis -->
+                        </div>
+                    </div>
+
+                    <!-- Passo 4: Horário (Inicialmente Oculto) -->
+                    <div class="card-glass booking-step" id="step4">
+                        <div class="section-title">
+                            <i class="fa-regular fa-clock"></i> 4. Selecione o Horário
+                        </div>
+                        <div class="time-slots" id="timeSlotsContainer">
+                            <!-- Inserido dinamicamente via JS -->
+                        </div>
+                    </div>
                 </div>
-                <div class="hero-controls">
-                    <button class="control-btn">←</button>
-                    <button class="control-btn">→</button>
+
+                <!-- Coluna Lateral (Resumo do Agendamento) -->
+                <div>
+                    <div class="card-glass summary-card">
+                        <div class="section-title">
+                            <i class="fa-solid fa-receipt"></i> Resumo da Reserva
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span class="label">Serviço</span>
+                            <span class="value" id="sumService">Nenhum selecionado</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">Profissional</span>
+                            <span class="value" id="sumBarber">Pendente</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">Data</span>
+                            <span class="value" id="sumDate">--/--/----</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">Horário</span>
+                            <span class="value" id="sumTime">--:--</span>
+                        </div>
+
+                        <div class="summary-total">
+                            <div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Valor Total</div>
+                                <div class="total-price" id="sumTotal">R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <button class="btn-confirm" id="btnConfirmBooking" onclick="handleConfirmBooking()" disabled>
+                            Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="collection-section">
-        <div class="collection-header">
-            <h2>Explore The<br>Collection</h2>
-            <div class="collection-header-right">
-                <p>Limited edition mugs designed for everyday carry and modern travel. Only 2,000 units worldwide.</p>
-                <button class="btn" onclick="exploreAction()">
-                    <span class="btn-icon">→</span> Explore Collection
+        <!-- VIEW 2: MEUS AGENDAMENTOS (CLIENTE) -->
+        <section id="myAppointmentsView" class="view-section">
+            <div class="page-header">
+                <h1>Meus Agendamentos</h1>
+                <p>Acompanhe e gerencie todos os seus horários marcados na barbearia.</p>
+            </div>
+
+            <div class="appointments-list" id="myAppointmentsContainer">
+                <!-- Inserido dinamicamente via JS -->
+            </div>
+        </section>
+
+        <!-- VIEW 3: PAINEL ADMINISTRATIVO (BARBEARIA) -->
+        <section id="adminView" class="view-section">
+            <div class="page-header">
+                <h1>Painel da Barbearia</h1>
+                <p>Visão geral dos agendamentos, clientes e faturamento do dia.</p>
+            </div>
+
+            <!-- Dashboard Métricas -->
+            <div class="admin-dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div>
+                        <div class="stat-val" id="statTodayBookings">0</div>
+                        <div class="stat-label">Agendamentos Hoje</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+                    <div>
+                        <div class="stat-val" id="statRevenue">R$ 0,00</div>
+                        <div class="stat-label">Faturamento Estimado</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div>
+                        <div class="stat-val" id="statTotalClients">0</div>
+                        <div class="stat-label">Clientes Cadastrados</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela de Agenda -->
+            <div class="card-glass">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.25rem;">
+                    <div class="section-title" style="margin:0;">
+                        <i class="fa-solid fa-clock"></i> Agendamentos Gerais
+                    </div>
+                </div>
+
+                <div class="admin-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Serviço</th>
+                                <th>Barbeiro</th>
+                                <th>Data/Hora</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminAppointmentsTable">
+                            <!-- Inserido dinamicamente via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==========================================================================
+       MODAL DE AUTENTICAÇÃO
+       ========================================================================== -->
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-modal">
+            <button class="modal-close" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tabLogin" onclick="setAuthMode('login')">Entrar</div>
+                <div class="auth-tab" id="tabRegister" onclick="setAuthMode('register')">Criar Conta</div>
+            </div>
+
+            <!-- Botão Login Google -->
+            <button class="btn-google" onclick="loginWithGoogle()">
+                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.41-1.57-5.13-3.7l-2.9 2.22C2.45 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.87 10.82c-.18-.53-.28-1.1-.28-1.82s.1-1.29.28-1.82L.97 4.96C.35 6.18 0 7.55 0 9s.35 2.82.97 4.04l2.9-2.22z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.45 2.02.97 4.96l2.9 2.22C4.59 5.15 6.62 3.58 9 3.58z"/></svg>
+                Continuar com Google
+            </button>
+
+            <div class="divider">
+                <span>OU E-MAIL MANUAL</span>
+            </div>
+
+            <!-- Form E-mail / Senha -->
+            <form id="authForm" onsubmit="handleEmailAuth(event)">
+                <div class="form-group" id="nameGroup" style="display:none;">
+                    <label for="authName">Nome Completo</label>
+                    <input type="text" id="authName" class="form-control" placeholder="Seu nome">
+                </div>
+                <div class="form-group">
+                    <label for="authEmail">E-mail</label>
+                    <input type="email" id="authEmail" class="form-control" placeholder="seuemail@exemplo.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="authPassword">Senha</label>
+                    <input type="password" id="authPassword" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-confirm" style="margin-top:1rem;" id="authSubmitBtn">
+                    Entrar na Conta
                 </button>
-            </div>
+            </form>
         </div>
+    </div>
 
-        <div class="product-grid" id="productGrid">
-            </div>
-    </section>
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-check" style="color:var(--accent-gold); font-size:1.2rem;"></i>
+        <span id="toastMsg">Mensagem de Notificação</span>
+    </div>
 
+    <!-- ==========================================================================
+       JAVASCRIPT & LÓGICA DO FIREBASE / APLICAÇÃO
+       ========================================================================== -->
     <script>
-        const products = [
-            { name: "The Classic", oldPrice: "$120", newPrice: "$80", color: "#594A41" },
-            { name: "The Camper", oldPrice: "$90", newPrice: "$60", color: "#222222" },
-            { name: "The Couple", oldPrice: "$150", newPrice: "$110", color: "#48C4C8" },
-            { name: "The Ridge", oldPrice: "$70", newPrice: "$40", color: "#111111" },
-            { name: "Dreams", oldPrice: "$60", newPrice: "$35", color: "#F7CD46" },
-            { name: "Van Life", oldPrice: "$110", newPrice: "$85", color: "#54B87C" }
+        /* ==========================================================================
+           1. CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE
+           ========================================================================== */
+        const firebaseConfig = {
+            apiKey: "AIzaSyYOUR_API_KEY_HERE",
+            authDomain: "seu-projeto.firebaseapp.com",
+            projectId: "seu-projeto",
+            storageBucket: "seu-projeto.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
+
+        let db = null;
+        let auth = null;
+        let firebaseInitialized = false;
+
+        try {
+            if (firebaseConfig.apiKey !== "AIzaSyYOUR_API_KEY_HERE") {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                firebaseInitialized = true;
+                console.log("Firebase inicializado com sucesso.");
+            }
+        } catch (e) {
+            console.warn("Firebase executando em modo Fallback/Local. Atualize as credenciais para ativar o Firestore.");
+        }
+
+        /* ==========================================================================
+           2. ESTADO DA APLICAÇÃO E DADOS MOCK
+           ========================================================================== */
+        let currentUser = null;
+        let currentAuthMode = 'login'; 
+
+        let selectedService = null;
+        let selectedBarber = null;
+        let selectedDate = null;
+        let selectedTime = null;
+        let generatedDates = [];
+
+        // Serviços Padrão
+        const servicesData = [
+            { id: 's1', name: 'Corte Social / Fade', duration: '40 min', price: 45.00, icon: 'fa-scissors' },
+            { id: 's2', name: 'Barba Completa / Toalha Quente', duration: '30 min', price: 35.00, icon: 'fa-user-ninja' },
+            { id: 's3', name: 'Combo Cabelo + Barba', duration: '60 min', price: 70.00, icon: 'fa-crown' },
+            { id: 's4', name: 'Pigmentação de Barba/Cabelo', duration: '45 min', price: 50.00, icon: 'fa-wand-magic-sparkles' }
         ];
 
-        const grid = document.getElementById('productGrid');
-        
-        products.forEach(product => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <div class="price-tag">
-                    <span class="old-price">${product.oldPrice}</span>
-                    ${product.newPrice}
-                </div>
-                <div class="card-actions-container">
-                    <button class="action-btn" onclick="addToCart('${product.name}')">🛒</button>
-                    <button class="action-btn" onclick="addToFav('${product.name}')">↺</button>
-                </div>
-                <div class="product-name">${product.name}</div>
-                <div class="product-image">
-                    <img src="https://placehold.co/200x350/transparent/${product.color.replace('#','')}?text=Mug&font=Montserrat" alt="${product.name}">
-                </div>
-            `;
-            grid.appendChild(card);
+        // Barbeiros Padrão com Grade de Dias Trabalhados (0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sáb)
+        const barbersData = [
+            { id: 'b0', name: 'Qualquer Profissional', role: 'Sem preferência', avatar: '<i class="fa-solid fa-users"></i>', workingDays: [1, 2, 3, 4, 5, 6] },
+            { id: 'b1', name: 'Marcos Navalha', role: 'Especialista em Fade', avatar: '<i class="fa-solid fa-user"></i>', workingDays: [1, 2, 3, 4, 5] }, // Não trabalha sábado
+            { id: 'b2', name: 'Lucas "Barba"', role: 'Mestre Barbeiro', avatar: '<i class="fa-solid fa-user-tie"></i>', workingDays: [2, 3, 4, 5, 6] }  // Não trabalha segunda
+        ];
+
+        const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+
+        let localAppointments = JSON.parse(localStorage.getItem('barberSaaS_appointments')) || [];
+
+        /* ==========================================================================
+           3. INICIALIZAÇÃO DA INTERFACE
+           ========================================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            renderServices();
+            renderBarbers();
+            updateSummary();
+            listenAuthChanges();
+            renderAppointments();
+            renderAdminDashboard();
         });
 
-        function exploreAction() { alert("Redirecionando para a coleção completa..."); }
-        function shopAction() { alert("Adicionando o Premium Mug ao carrinho!"); }
-        function addToCart(itemName) { alert(itemName + " adicionado ao carrinho!"); }
-        function addToFav(itemName) { alert(itemName + " atualizado/favoritado!"); }
+        /* ==========================================================================
+           4. RENDERIZAÇÃO E LÓGICA DE PASSOS
+           ========================================================================== */
+        function renderServices() {
+            const container = document.getElementById('servicesContainer');
+            container.innerHTML = servicesData.map(s => `
+                <div class="service-card ${selectedService?.id === s.id ? 'selected' : ''}" onclick="selectService('${s.id}')">
+                    <h3>${s.name}</h3>
+                    <div class="duration"><i class="fa-regular fa-clock"></i> ${s.duration}</div>
+                    <div class="price">R$ ${s.price.toFixed(2).replace('.', ',')}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderBarbers() {
+            const container = document.getElementById('barbersContainer');
+            container.innerHTML = barbersData.map(b => `
+                <div class="barber-card ${selectedBarber?.id === b.id ? 'selected' : ''}" onclick="selectBarber('${b.id}')">
+                    <div class="barber-avatar">${b.avatar}</div>
+                    <div class="barber-name">${b.name}</div>
+                    <div class="barber-role">${b.role}</div>
+                </div>
+            `).join('');
+        }
+
+        // Lógica para Gerar as próximas 15 datas úteis do barbeiro selecionado
+        function generateAvailableDates(barber) {
+            let dates = [];
+            let currentDate = new Date();
+            let daysAdded = 0;
+            const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+            while(daysAdded < 15) {
+                let wDay = currentDate.getDay(); 
+                
+                // Checa se o dia da semana está na grade de trabalho do barbeiro
+                if (barber.workingDays.includes(wDay)) {
+                    dates.push({
+                        fullDate: currentDate.toISOString().split('T')[0],
+                        dayNum: currentDate.getDate().toString().padStart(2, '0'),
+                        monthStr: monthNames[currentDate.getMonth()],
+                        weekDayStr: weekDays[wDay]
+                    });
+                    daysAdded++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return dates;
+        }
+
+        function renderDates() {
+            if (!selectedBarber) return;
+            
+            generatedDates = generateAvailableDates(selectedBarber);
+            const container = document.getElementById('datesContainer');
+            
+            container.innerHTML = generatedDates.map(d => `
+                <div class="date-card ${selectedDate === d.fullDate ? 'selected' : ''}" onclick="selectDate('${d.fullDate}')">
+                    <div class="d-week">${d.weekDayStr}</div>
+                    <div class="d-num">${d.dayNum}</div>
+                    <div class="d-month">${d.monthStr}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateTimeSlots() {
+            const container = document.getElementById('timeSlotsContainer');
+            container.innerHTML = availableTimes.map(t => `
+                <div class="time-slot ${selectedTime === t ? 'selected' : ''}" onclick="selectTime('${t}')">
+                    ${t}
+                </div>
+            `).join('');
+        }
+
+        /* ----- Ações dos Cliques ----- */
+        function selectService(id) {
+            selectedService = servicesData.find(s => s.id === id);
+            renderServices();
+            updateSummary();
+            
+            // Avança para Profissionais
+            document.getElementById('step2').classList.add('active-step');
+        }
+
+        function selectBarber(id) {
+            selectedBarber = barbersData.find(b => b.id === id);
+            
+            // Reseta passos seguintes ao trocar barbeiro
+            selectedDate = null;
+            selectedTime = null;
+            document.getElementById('step4').classList.remove('active-step');
+            
+            renderBarbers();
+            renderDates(); // Atualiza os dias trabalhados desse profissional
+            updateSummary();
+            
+            // Avança para Datas
+            document.getElementById('step3').classList.add('active-step');
+        }
+
+        function selectDate(fullDate) {
+            selectedDate = fullDate;
+            
+            // Reseta hora ao trocar data
+            selectedTime = null;
+            
+            renderDates();
+            updateTimeSlots();
+            updateSummary();
+            
+            // Avança para Horários
+            document.getElementById('step4').classList.add('active-step');
+        }
+
+        function selectTime(time) {
+            selectedTime = time;
+            updateTimeSlots();
+            updateSummary();
+        }
+
+        function updateSummary() {
+            document.getElementById('sumService').innerText = selectedService ? selectedService.name : 'Nenhum selecionado';
+            document.getElementById('sumBarber').innerText = selectedBarber ? selectedBarber.name : 'Pendente';
+            
+            if (selectedDate) {
+                const [y, m, d] = selectedDate.split('-');
+                document.getElementById('sumDate').innerText = `${d}/${m}/${y}`;
+            } else {
+                document.getElementById('sumDate').innerText = '--/--/----';
+            }
+
+            document.getElementById('sumTime').innerText = selectedTime || '--:--';
+            
+            const total = selectedService ? selectedService.price : 0;
+            document.getElementById('sumTotal').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+
+            const btn = document.getElementById('btnConfirmBooking');
+            btn.disabled = !(selectedService && selectedBarber && selectedDate && selectedTime);
+        }
+
+        /* ==========================================================================
+           5. FLUXO DE AUTENTICAÇÃO
+           ========================================================================== */
+        function listenAuthChanges() {
+            if (firebaseInitialized && auth) {
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        currentUser = {
+                            uid: user.uid,
+                            name: user.displayName || user.email.split('@')[0],
+                            email: user.email,
+                            photo: user.photoURL
+                        };
+                    } else {
+                        currentUser = null;
+                    }
+                    updateAuthUI();
+                });
+            } else {
+                const savedUser = localStorage.getItem('barberSaaS_demo_user');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                }
+                updateAuthUI();
+            }
+        }
+
+        function updateAuthUI() {
+            const container = document.getElementById('authContainer');
+            if (currentUser) {
+                const firstLetter = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+                container.innerHTML = `
+                    <div class="user-profile-bar">
+                        <div class="user-avatar">${firstLetter}</div>
+                        <span style="font-size:0.85rem; font-weight:700;">${currentUser.name}</span>
+                        <i class="fa-solid fa-right-from-bracket" style="color:var(--text-muted); cursor:pointer; margin-left:8px;" title="Sair" onclick="logout()"></i>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button class="user-auth-btn" onclick="openAuthModal()">
+                        <i class="fa-solid fa-user"></i> Entrar
+                    </button>
+                `;
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function setAuthMode(mode) {
+            currentAuthMode = mode;
+            document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+            document.getElementById('nameGroup').style.display = mode === 'register' ? 'block' : 'none';
+            document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'Entrar na Conta' : 'Criar Conta';
+        }
+
+        async function loginWithGoogle() {
+            if (firebaseInitialized && auth) {
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    await auth.signInWithPopup(provider);
+                    closeAuthModal();
+                    showToast('Login efetuado com sucesso!');
+                } catch (err) {
+                    showToast('Erro: ' + err.message);
+                }
+            } else {
+                currentUser = { uid: 'demo-google-uid', name: 'Cliente Demo', email: 'cliente@gmail.com' };
+                localStorage.setItem('barberSaaS_demo_user', JSON.stringify(currentUser));
+                updateAuthUI();
+                closeAuthModal();
+                showToast('Login simulado efetuado com sucesso!');
+            }
+        }
+
+        async function handleEmailAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const name = document.getElementById('authName').value;
+
+            if (firebaseInitialized && auth) {
+                try {
+                    if (currentAuthMode === 'register') {
+                        const res = await auth.createUserWithEmailAndPassword(email, password);
+                        await res.user.updateProfile({ displayName: name });
+                        showToast('Conta criada com sucesso!');
+                    } else {
+                        await auth.signInWithEmailAndPassword(email, password);
+                        showToast('Bem-vindo de volta!');
+                    }
+                    closeAuthModal();
+                } catch (err) {
+                    showToast('Erro: ' + err.message);
+                }
+            } else {
+                currentUser = { uid: 'demo-email-uid-' + Date.now(), name: name || email.split('@')[0], email: email };
+                localStorage.setItem('barberSaaS_demo_user', JSON.stringify(currentUser));
+                updateAuthUI();
+                closeAuthModal();
+                showToast('Acesso de demonstração ativado!');
+            }
+        }
+
+        function logout() {
+            if (firebaseInitialized && auth) {
+                auth.signOut();
+            } else {
+                currentUser = null;
+                localStorage.removeItem('barberSaaS_demo_user');
+                updateAuthUI();
+            }
+            showToast('Você saiu da sua conta.');
+        }
+
+        /* ==========================================================================
+           6. CRIAR E GERENCIAR AGENDAMENTOS
+           ========================================================================== */
+        async function handleConfirmBooking() {
+            if (!currentUser) {
+                openAuthModal();
+                showToast('Faça login para concluir o agendamento.');
+                return;
+            }
+
+            const appointmentData = {
+                id: 'app-' + Date.now(),
+                userId: currentUser.uid,
+                userName: currentUser.name,
+                userEmail: currentUser.email,
+                serviceName: selectedService.name,
+                servicePrice: selectedService.price,
+                barberName: selectedBarber.name,
+                date: selectedDate,
+                time: selectedTime,
+                status: 'confirmado',
+                createdAt: new Date().toISOString()
+            };
+
+            if (firebaseInitialized && db) {
+                try {
+                    await db.collection('appointments').add(appointmentData);
+                    showToast('Agendamento salvo com sucesso!');
+                } catch (err) {
+                    saveAppointmentLocally(appointmentData);
+                }
+            } else {
+                saveAppointmentLocally(appointmentData);
+            }
+
+            // Reseta o formulário
+            selectedService = null;
+            selectedBarber = null;
+            selectedDate = null;
+            selectedTime = null;
+            
+            renderServices();
+            updateSummary();
+            
+            // Oculta os passos 2, 3 e 4
+            document.getElementById('step2').classList.remove('active-step');
+            document.getElementById('step3').classList.remove('active-step');
+            document.getElementById('step4').classList.remove('active-step');
+            
+            renderAppointments();
+            renderAdminDashboard();
+            switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1]);
+        }
+
+        function saveAppointmentLocally(appointment) {
+            localAppointments.unshift(appointment);
+            localStorage.setItem('barberSaaS_appointments', JSON.stringify(localAppointments));
+            showToast('Agendamento realizado com sucesso!');
+        }
+
+        function renderAppointments() {
+            const container = document.getElementById('myAppointmentsContainer');
+            let list = localAppointments;
+            if (currentUser) {
+                list = list.filter(a => a.userId === currentUser.uid);
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="card-glass" style="text-align:center; padding:3rem;">
+                        <i class="fa-regular fa-calendar-xmark" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:1rem;"></i>
+                        <p style="color:var(--text-secondary);">Você não possui agendamentos.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = list.map(a => {
+                const [y, m, d] = a.date.split('-');
+                const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+                const monthStr = monthNames[parseInt(m) - 1] || m;
+
+                return `
+                    <div class="appointment-card">
+                        <div class="appointment-info">
+                            <div class="appointment-date-badge">
+                                <div class="day">${d}</div>
+                                <div class="month">${monthStr}</div>
+                            </div>
+                            <div>
+                                <h3 style="font-size:1.1rem; font-weight:700;">${a.serviceName}</h3>
+                                <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">
+                                    <i class="fa-solid fa-user-ninja" style="color:var(--accent-gold);"></i> ${a.barberName} &nbsp;|&nbsp; 
+                                    <i class="fa-regular fa-clock" style="color:var(--accent-gold);"></i> ${a.time}
+                                </div>
+                                <div style="font-weight:700; color:var(--accent-gold); margin-top:4px;">
+                                    R$ ${a.servicePrice.toFixed(2).replace('.', ',')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">
+                                ${a.status}
+                            </span>
+                            ${a.status === 'confirmado' ? `
+                                <button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function cancelAppointment(id) {
+            const index = localAppointments.findIndex(a => a.id === id);
+            if (index !== -1) {
+                localAppointments[index].status = 'cancelado';
+                localStorage.setItem('barberSaaS_appointments', JSON.stringify(localAppointments));
+                renderAppointments();
+                renderAdminDashboard();
+                showToast('Agendamento cancelado.');
+            }
+        }
+
+        /* ==========================================================================
+           7. PAINEL ADMINISTRATIVO
+           ========================================================================== */
+        function renderAdminDashboard() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayBookings = localAppointments.filter(a => a.date === todayStr && a.status === 'confirmado');
+            
+            document.getElementById('statTodayBookings').innerText = todayBookings.length;
+
+            const revenue = localAppointments
+                .filter(a => a.status === 'confirmado')
+                .reduce((acc, a) => acc + a.servicePrice, 0);
+
+            document.getElementById('statRevenue').innerText = `R$ ${revenue.toFixed(2).replace('.', ',')}`;
+
+            const uniqueClients = new Set(localAppointments.map(a => a.userId)).size;
+            document.getElementById('statTotalClients').innerText = uniqueClients;
+
+            const tbody = document.getElementById('adminAppointmentsTable');
+            if (localAppointments.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Nenhum agendamento encontrado.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = localAppointments.map(a => `
+                <tr>
+                    <td><strong>${a.userName}</strong></td>
+                    <td>${a.serviceName}</td>
+                    <td>${a.barberName}</td>
+                    <td>${a.date} às ${a.time}</td>
+                    <td>R$ ${a.servicePrice.toFixed(2).replace('.', ',')}</td>
+                    <td>
+                        <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">
+                            ${a.status}
+                        </span>
+                    </td>
+                    <td>
+                        ${a.status === 'confirmado' ? `
+                            <button class="btn-cancel" style="padding:4px 8px; font-size:0.75rem;" onclick="cancelAppointment('${a.id}')">Excluir</button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        /* ==========================================================================
+           8. UTILITÁRIOS
+           ========================================================================== */
+        function switchView(viewId, element) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+            document.getElementById(viewId).classList.add('active');
+            if (element) element.classList.add('active');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
     </script>
 </body>
 </html>
