@@ -8,7 +8,7 @@
     <!-- Google Fonts & Font Awesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Firebase Compat SDKs (v10.8.0) -->
@@ -18,25 +18,23 @@
 
     <style>
         /* ==========================================================================
-           RESET & VARIÁVEIS DE DESIGN (Glassmorphism & Dark Premium Theme)
+           RESET & VARIÁVEIS DE DESIGN (Mugsy's Mugs Style)
            ========================================================================== */
         :root {
-            --bg-primary: #0b0f17;
-            --bg-secondary: #131c2e;
-            --card-bg: rgba(22, 32, 51, 0.65);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --card-border-active: #f59e0b;
-            --accent-gold: #f59e0b;
-            --accent-gold-hover: #d97706;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --accent-main: #234BBA;
+            --accent-gold: #FFCE00;
+            --accent-gold-hover: #e5b800;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F4F5F8;
+            --card-border: #EAEAEA;
+            --text-primary: #111111;
+            --text-secondary: #666666;
+            --text-muted: #999999;
             --danger: #ef4444;
             --success: #10b981;
-            --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
+            --radius-lg: 30px;
+            --radius-md: 20px;
+            --radius-sm: 12px;
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -44,20 +42,22 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
         body {
             background-color: var(--bg-primary);
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
-            background-attachment: fixed;
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+
+        h1, h2 {
+            font-family: 'Anton', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* ==========================================================================
@@ -67,10 +67,11 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(11, 15, 23, 0.8);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--card-border);
-            padding: 1rem 2rem;
+            background: var(--accent-main);
+            border-bottom-left-radius: var(--radius-lg);
+            border-bottom-right-radius: var(--radius-lg);
+            padding: 1.5rem 2rem 1.5rem 250px; /* Padding extra para a logo absoluta */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
         .nav-container {
@@ -81,24 +82,48 @@
             align-items: center;
         }
 
+        /* Aba do Logo - FORMA ORIGINAL COM RADIAL GRADIENT */
         .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--bg-primary);
+            padding: 20px 30px;
+            border-bottom-right-radius: var(--radius-md);
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 1.35rem;
-            font-weight: 800;
+            gap: 10px;
+            font-family: 'Anton', sans-serif;
+            font-size: 24px;
+            letter-spacing: 1px;
             color: var(--text-primary);
             text-decoration: none;
-            letter-spacing: -0.5px;
+            z-index: 20;
         }
 
         .logo i {
             color: var(--accent-gold);
             font-size: 1.5rem;
-            background: rgba(245, 158, 11, 0.15);
-            padding: 10px;
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .logo::before {
+            content: "";
+            position: absolute;
+            bottom: -20px; 
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 100% 100%, transparent 20px, var(--bg-primary) 20.5px);
+        }
+
+        .logo::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -20px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 100% 100%, transparent 20px, var(--bg-primary) 20.5px);
         }
 
         .nav-menu {
@@ -108,10 +133,10 @@
         }
 
         .nav-link {
-            color: var(--text-secondary);
+            color: var(--bg-primary);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
+            font-weight: 500;
+            font-size: 15px;
             padding: 8px 16px;
             border-radius: var(--radius-sm);
             transition: var(--transition);
@@ -120,38 +145,39 @@
 
         .nav-link:hover, .nav-link.active {
             color: var(--accent-gold);
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
 
+        /* Botão Padrão do Estilo Novo */
         .user-auth-btn {
-            background: var(--accent-gold);
-            color: #000;
+            background-color: var(--accent-gold);
+            color: var(--text-primary);
             border: none;
-            padding: 10px 22px;
+            padding: 12px 24px;
             font-weight: 700;
             font-size: 0.9rem;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             cursor: pointer;
-            transition: var(--transition);
+            transition: transform 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+            gap: 10px;
         }
 
         .user-auth-btn:hover {
-            background: var(--accent-gold-hover);
-            transform: translateY(-2px);
+            transform: scale(1.05);
         }
 
         .user-profile-bar {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: var(--card-bg);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
             padding: 6px 14px;
             border-radius: 50px;
-            border: 1px solid var(--card-border);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--bg-primary);
         }
 
         .user-avatar {
@@ -159,12 +185,11 @@
             height: 32px;
             border-radius: 50%;
             background: var(--accent-gold);
-            color: #000;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.85rem;
         }
 
         /* ==========================================================================
@@ -193,40 +218,27 @@
         }
 
         .firebase-alert {
-            background: rgba(245, 158, 11, 0.12);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            background: #fff3cd;
             border-radius: var(--radius-md);
             padding: 1rem 1.25rem;
             margin-bottom: 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1rem;
-            color: var(--text-primary);
-            font-size: 0.9rem;
+            color: #856404;
+            font-weight: 500;
+            border: 1px solid #ffeeba;
         }
 
-        .firebase-alert i {
-            color: var(--accent-gold);
-            font-size: 1.3rem;
-        }
-
-        /* ==========================================================================
-           VIEW DE AGENDAMENTO (CLIENTE)
-           ========================================================================== */
         .page-header {
             margin-bottom: 2rem;
-            text-align: center;
         }
 
         .page-header h1 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+            font-size: 48px;
+            line-height: 1.1;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         .page-header p {
@@ -244,14 +256,23 @@
             .booking-grid {
                 grid-template-columns: 1fr;
             }
+            header {
+                padding-left: 2rem;
+            }
+            .logo {
+                position: relative;
+                padding: 10px;
+                border-radius: 10px;
+                background: transparent;
+                color: var(--bg-primary);
+                margin-bottom: 1rem;
+            }
+            .logo::before, .logo::after { display: none; }
         }
 
-        /* Passos do Agendamento (Lógica Sequencial) */
         .booking-step {
             display: none;
-            opacity: 0;
-            transform: translateY(15px);
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .booking-step.active-step {
@@ -264,200 +285,193 @@
         }
 
         .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-family: 'Anton', sans-serif;
+            font-size: 24px;
             color: var(--text-primary);
             margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            letter-spacing: 0.5px;
         }
 
-        .section-title i {
-            color: var(--accent-gold);
-        }
-
-        .card-glass {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            backdrop-filter: blur(12px);
-            box-shadow: var(--glass-shadow);
-        }
-
-        /* Lista de Serviços */
+        /* Lista de Serviços - Adaptado para o estilo Product Card */
         .services-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1rem;
+            gap: 20px;
         }
 
         .service-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--card-border);
+            background: var(--bg-secondary);
             border-radius: var(--radius-md);
-            padding: 1.25rem;
+            padding: 50px 20px 20px 20px;
             cursor: pointer;
-            transition: var(--transition);
             position: relative;
+            transition: box-shadow 0.3s ease;
+            border: 2px solid transparent;
         }
 
         .service-card:hover {
-            border-color: rgba(245, 158, 11, 0.4);
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
 
         .service-card.selected {
-            border-color: var(--accent-gold);
-            background: rgba(245, 158, 11, 0.08);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+            border-color: var(--accent-main);
+            background: #E8EDFF;
         }
 
         .service-card h3 {
-            font-size: 1.05rem;
+            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 0.3rem;
+            margin-bottom: 8px;
+            z-index: 2;
         }
 
         .service-card .duration {
-            font-size: 0.825rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            font-size: 13px;
+            color: var(--text-secondary);
         }
 
+        /* Etiqueta de Preço Top-Left (Forma Nativa Mugsy) */
         .service-card .price {
-            font-size: 1.2rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--bg-primary);
+            padding: 10px 15px;
+            border-bottom-right-radius: 16px;
+            border-top-left-radius: 20px;
+            font-size: 15px;
             font-weight: 800;
-            color: var(--accent-gold);
+            color: var(--text-primary);
+            z-index: 10;
+            border-bottom: 2px solid var(--bg-secondary);
+            border-right: 2px solid var(--bg-secondary);
+        }
+
+        .service-card.selected .price {
+            border-bottom-color: #E8EDFF;
+            border-right-color: #E8EDFF;
+        }
+
+        .service-card .price::before {
+            content: "";
+            position: absolute;
+            bottom: -16px;
+            left: 0;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px);
+        }
+
+        .service-card .price::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -16px;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px);
         }
 
         /* Seleção de Barbeiros */
         .barbers-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1rem;
+            gap: 15px;
         }
 
         .barber-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--card-border);
+            background: var(--bg-secondary);
             border-radius: var(--radius-md);
-            padding: 1rem;
+            padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
+            border: 2px solid transparent;
         }
 
         .barber-card:hover {
-            border-color: rgba(245, 158, 11, 0.4);
-            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
 
         .barber-card.selected {
-            border-color: var(--accent-gold);
-            background: rgba(245, 158, 11, 0.08);
+            border-color: var(--accent-main);
+            background: #E8EDFF;
         }
 
         .barber-avatar {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            margin: 0 auto 0.75rem auto;
-            background: #1e293b;
+            margin: 0 auto 10px auto;
+            background: var(--accent-main);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            color: var(--accent-gold);
-            border: 2px solid var(--card-border);
+            color: var(--bg-primary);
         }
 
         .barber-card.selected .barber-avatar {
-            border-color: var(--accent-gold);
+            background: var(--accent-gold);
+            color: var(--text-primary);
         }
 
         .barber-name {
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 15px;
         }
 
         .barber-role {
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
-        /* Seleção de Data (Cards Estilizados) */
+        /* Seleção de Data */
         .dates-scroll {
             display: flex;
             gap: 12px;
             overflow-x: auto;
-            padding-bottom: 8px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-gold) var(--card-border);
-        }
-
-        .dates-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .dates-scroll::-webkit-scrollbar-thumb {
-            background: var(--accent-gold);
-            border-radius: 4px;
+            padding-bottom: 12px;
         }
 
         .date-card {
-            flex: 0 0 75px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            padding: 12px 8px;
+            flex: 0 0 80px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            padding: 15px 10px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
-            user-select: none;
+            border: 2px solid transparent;
         }
 
         .date-card:hover {
-            border-color: rgba(245, 158, 11, 0.4);
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-2px);
+            background: #E8EDFF;
         }
 
         .date-card.selected {
-            border-color: var(--accent-gold);
-            background: rgba(245, 158, 11, 0.08);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+            border-color: var(--accent-main);
+            background: var(--accent-main);
+            color: var(--bg-primary);
         }
 
         .date-card .d-week {
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            font-size: 11px;
             font-weight: 700;
-            margin-bottom: 4px;
             text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .date-card .d-num {
-            font-size: 1.4rem;
+            font-size: 24px;
             font-weight: 800;
-            color: var(--text-primary);
             line-height: 1;
         }
 
         .date-card .d-month {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+            font-size: 11px;
             margin-top: 4px;
             font-weight: 600;
-        }
-
-        .date-card.selected .d-num {
-            color: var(--accent-gold);
         }
 
         /* Seleção de Horários */
@@ -465,170 +479,151 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
             gap: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .time-slots::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .time-slots::-webkit-scrollbar-thumb {
-            background: var(--accent-gold);
-            border-radius: 4px;
         }
 
         .time-slot {
-            padding: 12px 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--card-border);
+            padding: 12px;
+            background: var(--bg-secondary);
             border-radius: var(--radius-sm);
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            border: 2px solid transparent;
         }
 
         .time-slot:hover {
-            border-color: var(--accent-gold);
-            background: rgba(255, 255, 255, 0.05);
+            background: #E8EDFF;
         }
 
         .time-slot.selected {
-            background: var(--accent-gold);
-            color: #000;
-            border-color: var(--accent-gold);
-            font-weight: 800;
+            background: var(--accent-main);
+            color: var(--bg-primary);
+            border-color: var(--accent-main);
         }
 
-        /* Resumo da Reserva (Sidebar) */
+        /* Resumo da Reserva (Hero Container Style) */
         .summary-card {
             position: sticky;
-            top: 90px;
+            top: 110px;
+            background-color: var(--accent-main);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            color: var(--bg-primary);
+        }
+
+        .summary-card .section-title {
+            color: var(--bg-primary);
+            margin-bottom: 1.5rem;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
         }
 
         .summary-row .label {
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .summary-row .value {
             font-weight: 600;
-            color: var(--text-primary);
             text-align: right;
         }
 
         .summary-total {
             margin-top: 1.5rem;
             padding-top: 1rem;
-            border-top: 1px dashed var(--card-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .summary-total .total-price {
-            font-size: 1.6rem;
+            font-size: 32px;
             font-weight: 800;
             color: var(--accent-gold);
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 1px;
         }
 
         .btn-confirm {
             width: 100%;
             margin-top: 1.5rem;
-            padding: 14px;
+            padding: 15px;
             background: var(--accent-gold);
-            color: #000;
+            color: var(--text-primary);
             border: none;
-            border-radius: var(--radius-md);
-            font-size: 1rem;
+            border-radius: var(--radius-lg);
+            font-size: 16px;
             font-weight: 800;
             cursor: pointer;
-            transition: var(--transition);
+            transition: transform 0.2s ease;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
         }
 
-        .btn-confirm:hover {
-            background: var(--accent-gold-hover);
-            transform: translateY(-2px);
+        .btn-confirm:hover:not(:disabled) {
+            transform: scale(1.05);
         }
 
         .btn-confirm:disabled {
-            background: #334155;
-            color: #64748b;
+            background: #cccccc;
+            color: #666666;
             cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
         }
 
         /* ==========================================================================
-           VIEW MEUS AGENDAMENTOS
+           VIEW MEUS AGENDAMENTOS & ADMIN
            ========================================================================== */
         .appointments-list {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 15px;
         }
 
         .appointment-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
+            background: var(--bg-secondary);
             border-radius: var(--radius-md);
-            padding: 1.25rem 1.5rem;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1.5rem;
             flex-wrap: wrap;
+            gap: 15px;
         }
 
         .appointment-info {
             display: flex;
             align-items: center;
-            gap: 1.25rem;
+            gap: 20px;
         }
 
         .appointment-date-badge {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: var(--radius-md);
-            padding: 10px 16px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-sm);
+            padding: 10px 20px;
             text-align: center;
-            min-width: 80px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         .appointment-date-badge .day {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--accent-gold);
+            font-size: 28px;
+            font-family: 'Anton', sans-serif;
+            color: var(--accent-main);
             line-height: 1;
         }
 
-        .appointment-date-badge .month {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
         .status-badge {
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 50px;
-            font-size: 0.75rem;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -636,97 +631,78 @@
         .status-confirmed {
             background: rgba(16, 185, 129, 0.15);
             color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .status-canceled {
             background: rgba(239, 68, 68, 0.15);
             color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .btn-cancel {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            font-size: 0.85rem;
+            background: var(--danger);
+            color: var(--bg-primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-lg);
+            font-weight: 700;
+            font-size: 13px;
             cursor: pointer;
             transition: var(--transition);
         }
 
-        .btn-cancel:hover {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        /* ==========================================================================
-           VIEW PAINEL ADMIN
-           ========================================================================== */
+        /* Admin Dashboard */
         .admin-dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
+            background: var(--bg-secondary);
             border-radius: var(--radius-md);
-            padding: 1.25rem;
+            padding: 25px;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 20px;
         }
 
         .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: var(--radius-md);
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-gold);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-main);
+            color: var(--bg-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: 24px;
         }
 
         .stat-val {
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-
-        .stat-label {
-            font-size: 0.825rem;
-            color: var(--text-muted);
-        }
-
-        .admin-table-container {
-            overflow-x: auto;
+            font-size: 32px;
+            font-family: 'Anton', sans-serif;
+            color: var(--text-primary);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
-            font-size: 0.9rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
         }
 
-        th {
-            padding: 12px 16px;
-            background: rgba(15, 23, 42, 0.8);
-            color: var(--text-secondary);
-            font-weight: 600;
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
             border-bottom: 1px solid var(--card-border);
         }
 
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
+        th {
+            background: var(--accent-main);
+            color: var(--bg-primary);
+            font-weight: 600;
         }
 
         /* ==========================================================================
@@ -734,155 +710,117 @@
            ========================================================================== */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
             z-index: 1000;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 1rem;
         }
-
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .auth-modal {
-            background: #131c2e;
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-lg);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
             width: 100%;
             max-width: 420px;
-            padding: 2.25rem;
+            padding: 2.5rem;
             position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
         .modal-close {
             position: absolute;
-            top: 18px;
-            right: 18px;
-            background: none;
+            top: 20px; right: 20px;
+            background: var(--bg-secondary);
             border: none;
-            color: var(--text-muted);
-            font-size: 1.2rem;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            font-size: 14px;
             cursor: pointer;
         }
 
         .auth-tabs {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 0.75rem;
+            gap: 20px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--bg-secondary);
         }
 
         .auth-tab {
             font-weight: 700;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             cursor: pointer;
-            padding-bottom: 0.5rem;
+            padding-bottom: 10px;
             position: relative;
         }
 
         .auth-tab.active {
-            color: var(--accent-gold);
+            color: var(--text-primary);
         }
 
         .auth-tab.active::after {
             content: '';
             position: absolute;
-            bottom: -0.8rem;
-            left: 0;
+            bottom: -2px; left: 0; width: 100%; height: 2px;
+            background: var(--accent-main);
+        }
+
+        .form-control {
             width: 100%;
-            height: 2px;
-            background: var(--accent-gold);
+            padding: 12px 15px;
+            border: 2px solid var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            margin-bottom: 15px;
+            font-family: 'Inter', sans-serif;
+            margin-top: 5px;
         }
 
         .btn-google {
             width: 100%;
             padding: 12px;
-            background: #ffffff;
-            color: #0f172a;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             font-weight: 700;
-            font-size: 0.95rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             margin-bottom: 1.25rem;
-            transition: var(--transition);
         }
 
-        .btn-google:hover {
-            background: #f1f5f9;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin: 1.25rem 0;
-        }
-
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .divider span {
-            padding: 0 10px;
-        }
-
-        /* Notificação Toast */
         .toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #1e293b;
-            color: #fff;
-            border: 1px solid var(--card-border);
-            border-left: 4px solid var(--accent-gold);
-            padding: 1rem 1.25rem;
-            border-radius: var(--radius-md);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            bottom: 20px; right: 20px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
             display: none;
             align-items: center;
             gap: 12px;
             z-index: 2000;
+            font-weight: 500;
         }
 
         .toast.show {
             display: flex;
             animation: slideIn 0.3s ease-out;
         }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
     </style>
 </head>
 <body>
 
-    <!-- ==========================================================================
-       HEADER & NAVEGAÇÃO PRINCIPAL
-       ========================================================================== -->
+    <!-- HEADER & NAVEGAÇÃO PRINCIPAL -->
     <header>
         <div class="nav-container">
             <a href="#" class="logo">
                 <i class="fa-solid fa-scissors"></i>
-                BarberSaaS
+                BARBERSAAS
             </a>
             
             <nav class="nav-menu">
@@ -899,22 +837,14 @@
         </div>
     </header>
 
-    <!-- ==========================================================================
-       CONTEÚDO PRINCIPAL (VIEWS)
-       ========================================================================== -->
+    <!-- CONTEÚDO PRINCIPAL (VIEWS) -->
     <main>
-        <!-- Alerta Educacional de Configuração do Firebase -->
         <div class="firebase-alert" id="firebaseNotice">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fa-solid fa-circle-info"></i>
-                <div>
-                    <strong>Modo Demonstrativo com Fallback Local</strong> - Configure suas credenciais no objeto <code>firebaseConfig</code> do arquivo para habilitar a nuvem em tempo real do Firebase.
-                </div>
-            </div>
-            <button onclick="document.getElementById('firebaseNotice').style.display='none'" style="background:none; border:none; color:var(--text-muted); cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            <div><strong>Aviso:</strong> Modo Demonstrativo Local Ativado. Configure as credenciais do Firebase no código para produção.</div>
+            <button onclick="document.getElementById('firebaseNotice').style.display='none'" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- VIEW 1: FORMULÁRIO DE AGENDAMENTO (CLIENTE) -->
+        <!-- VIEW 1: FORMULÁRIO DE AGENDAMENTO -->
         <section id="bookingView" class="view-section active">
             <div class="page-header">
                 <h1>Agende seu Horário</h1>
@@ -922,59 +852,39 @@
             </div>
 
             <div class="booking-grid">
-                <!-- Coluna Principal (Passos do Agendamento) -->
                 <div>
-                    <!-- Passo 1: Serviços -->
-                    <div class="card-glass booking-step active-step" id="step1">
-                        <div class="section-title">
-                            <i class="fa-solid fa-list-check"></i> 1. Escolha o Serviço
-                        </div>
-                        <div class="services-list" id="servicesContainer">
-                            <!-- Inserido dinamicamente via JS -->
-                        </div>
+                    <!-- Passo 1 -->
+                    <div class="booking-step active-step" id="step1">
+                        <div class="section-title">1. Escolha o Serviço</div>
+                        <div class="services-list" id="servicesContainer"></div>
                     </div>
 
-                    <!-- Passo 2: Barbeiro (Inicialmente Oculto) -->
-                    <div class="card-glass booking-step" id="step2">
-                        <div class="section-title">
-                            <i class="fa-solid fa-user-ninja"></i> 2. Selecione o Profissional
-                        </div>
-                        <div class="barbers-grid" id="barbersContainer">
-                            <!-- Inserido dinamicamente via JS -->
-                        </div>
+                    <!-- Passo 2 -->
+                    <div class="booking-step" id="step2">
+                        <div class="section-title">2. Selecione o Profissional</div>
+                        <div class="barbers-grid" id="barbersContainer"></div>
                     </div>
 
-                    <!-- Passo 3: Data (Inicialmente Oculto) -->
-                    <div class="card-glass booking-step" id="step3">
-                        <div class="section-title">
-                            <i class="fa-regular fa-calendar-days"></i> 3. Escolha a Data
-                        </div>
-                        <div class="dates-scroll" id="datesContainer">
-                            <!-- Inserido dinamicamente via JS limitando a 15 dias úteis -->
-                        </div>
+                    <!-- Passo 3 -->
+                    <div class="booking-step" id="step3">
+                        <div class="section-title">3. Escolha a Data</div>
+                        <div class="dates-scroll" id="datesContainer"></div>
                     </div>
 
-                    <!-- Passo 4: Horário (Inicialmente Oculto) -->
-                    <div class="card-glass booking-step" id="step4">
-                        <div class="section-title">
-                            <i class="fa-regular fa-clock"></i> 4. Selecione o Horário
-                        </div>
-                        <div class="time-slots" id="timeSlotsContainer">
-                            <!-- Inserido dinamicamente via JS -->
-                        </div>
+                    <!-- Passo 4 -->
+                    <div class="booking-step" id="step4">
+                        <div class="section-title">4. Selecione o Horário</div>
+                        <div class="time-slots" id="timeSlotsContainer"></div>
                     </div>
                 </div>
 
-                <!-- Coluna Lateral (Resumo do Agendamento) -->
                 <div>
-                    <div class="card-glass summary-card">
-                        <div class="section-title">
-                            <i class="fa-solid fa-receipt"></i> Resumo da Reserva
-                        </div>
+                    <div class="summary-card">
+                        <div class="section-title" style="font-size: 32px;">RESUMO</div>
                         
                         <div class="summary-row">
                             <span class="label">Serviço</span>
-                            <span class="value" id="sumService">Nenhum selecionado</span>
+                            <span class="value" id="sumService">Nenhum</span>
                         </div>
                         <div class="summary-row">
                             <span class="label">Profissional</span>
@@ -991,7 +901,7 @@
 
                         <div class="summary-total">
                             <div>
-                                <div style="font-size:0.8rem; color:var(--text-muted);">Valor Total</div>
+                                <div style="font-size:12px; color:rgba(255,255,255,0.8); text-transform:uppercase; font-weight:700;">Valor Total</div>
                                 <div class="total-price" id="sumTotal">R$ 0,00</div>
                             </div>
                         </div>
@@ -1004,83 +914,67 @@
             </div>
         </section>
 
-        <!-- VIEW 2: MEUS AGENDAMENTOS (CLIENTE) -->
+        <!-- VIEW 2: MEUS AGENDAMENTOS -->
         <section id="myAppointmentsView" class="view-section">
             <div class="page-header">
                 <h1>Meus Agendamentos</h1>
                 <p>Acompanhe e gerencie todos os seus horários marcados na barbearia.</p>
             </div>
-
-            <div class="appointments-list" id="myAppointmentsContainer">
-                <!-- Inserido dinamicamente via JS -->
-            </div>
+            <div class="appointments-list" id="myAppointmentsContainer"></div>
         </section>
 
-        <!-- VIEW 3: PAINEL ADMINISTRATIVO (BARBEARIA) -->
+        <!-- VIEW 3: PAINEL ADMIN -->
         <section id="adminView" class="view-section">
             <div class="page-header">
                 <h1>Painel da Barbearia</h1>
                 <p>Visão geral dos agendamentos, clientes e faturamento do dia.</p>
             </div>
 
-            <!-- Dashboard Métricas -->
             <div class="admin-dashboard-grid">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
                     <div>
                         <div class="stat-val" id="statTodayBookings">0</div>
-                        <div class="stat-label">Agendamentos Hoje</div>
+                        <div style="color:var(--text-secondary); font-size:14px;">Agendamentos Hoje</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
                     <div>
                         <div class="stat-val" id="statRevenue">R$ 0,00</div>
-                        <div class="stat-label">Faturamento Estimado</div>
+                        <div style="color:var(--text-secondary); font-size:14px;">Faturamento</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
                     <div>
                         <div class="stat-val" id="statTotalClients">0</div>
-                        <div class="stat-label">Clientes Cadastrados</div>
+                        <div style="color:var(--text-secondary); font-size:14px;">Clientes</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tabela de Agenda -->
-            <div class="card-glass">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.25rem;">
-                    <div class="section-title" style="margin:0;">
-                        <i class="fa-solid fa-clock"></i> Agendamentos Gerais
-                    </div>
-                </div>
-
-                <div class="admin-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Serviço</th>
-                                <th>Barbeiro</th>
-                                <th>Data/Hora</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminAppointmentsTable">
-                            <!-- Inserido dinamicamente via JS -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="section-title">Agendamentos Gerais</div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Serviço</th>
+                            <th>Barbeiro</th>
+                            <th>Data/Hora</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminAppointmentsTable"></tbody>
+                </table>
             </div>
         </section>
     </main>
 
-    <!-- ==========================================================================
-       MODAL DE AUTENTICAÇÃO
-       ========================================================================== -->
+    <!-- MODAL AUTH -->
     <div class="modal-overlay" id="authModal">
         <div class="auth-modal">
             <button class="modal-close" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -1090,51 +984,36 @@
                 <div class="auth-tab" id="tabRegister" onclick="setAuthMode('register')">Criar Conta</div>
             </div>
 
-            <!-- Botão Login Google -->
             <button class="btn-google" onclick="loginWithGoogle()">
                 <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.41-1.57-5.13-3.7l-2.9 2.22C2.45 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.87 10.82c-.18-.53-.28-1.1-.28-1.82s.1-1.29.28-1.82L.97 4.96C.35 6.18 0 7.55 0 9s.35 2.82.97 4.04l2.9-2.22z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.45 2.02.97 4.96l2.9 2.22C4.59 5.15 6.62 3.58 9 3.58z"/></svg>
                 Continuar com Google
             </button>
 
-            <div class="divider">
-                <span>OU E-MAIL MANUAL</span>
-            </div>
-
-            <!-- Form E-mail / Senha -->
             <form id="authForm" onsubmit="handleEmailAuth(event)">
-                <div class="form-group" id="nameGroup" style="display:none;">
-                    <label for="authName">Nome Completo</label>
+                <div id="nameGroup" style="display:none;">
+                    <label>Nome Completo</label>
                     <input type="text" id="authName" class="form-control" placeholder="Seu nome">
                 </div>
-                <div class="form-group">
-                    <label for="authEmail">E-mail</label>
+                <div>
+                    <label>E-mail</label>
                     <input type="email" id="authEmail" class="form-control" placeholder="seuemail@exemplo.com" required>
                 </div>
-                <div class="form-group">
-                    <label for="authPassword">Senha</label>
+                <div>
+                    <label>Senha</label>
                     <input type="password" id="authPassword" class="form-control" placeholder="••••••••" required>
                 </div>
-
-                <button type="submit" class="btn-confirm" style="margin-top:1rem;" id="authSubmitBtn">
-                    Entrar na Conta
-                </button>
+                <button type="submit" class="btn-confirm" id="authSubmitBtn" style="margin-top:10px;">Entrar na Conta</button>
             </form>
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div class="toast" id="toast">
-        <i class="fa-solid fa-circle-check" style="color:var(--accent-gold); font-size:1.2rem;"></i>
-        <span id="toastMsg">Mensagem de Notificação</span>
+        <i class="fa-solid fa-circle-check" style="color:var(--accent-gold);"></i>
+        <span id="toastMsg">Mensagem</span>
     </div>
 
-    <!-- ==========================================================================
-       JAVASCRIPT & LÓGICA DO FIREBASE / APLICAÇÃO
-       ========================================================================== -->
+    <!-- JAVASCRIPT & LÓGICA (Mantido Original) -->
     <script>
-        /* ==========================================================================
-           1. CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE
-           ========================================================================== */
         const firebaseConfig = {
             apiKey: "AIzaSyYOUR_API_KEY_HERE",
             authDomain: "seu-projeto.firebaseapp.com",
@@ -1154,46 +1033,35 @@
                 auth = firebase.auth();
                 db = firebase.firestore();
                 firebaseInitialized = true;
-                console.log("Firebase inicializado com sucesso.");
             }
         } catch (e) {
-            console.warn("Firebase executando em modo Fallback/Local. Atualize as credenciais para ativar o Firestore.");
+            console.warn("Firebase executando em modo Fallback/Local.");
         }
 
-        /* ==========================================================================
-           2. ESTADO DA APLICAÇÃO E DADOS MOCK
-           ========================================================================== */
         let currentUser = null;
         let currentAuthMode = 'login'; 
-
         let selectedService = null;
         let selectedBarber = null;
         let selectedDate = null;
         let selectedTime = null;
         let generatedDates = [];
 
-        // Serviços Padrão
         const servicesData = [
             { id: 's1', name: 'Corte Social / Fade', duration: '40 min', price: 45.00, icon: 'fa-scissors' },
-            { id: 's2', name: 'Barba Completa / Toalha Quente', duration: '30 min', price: 35.00, icon: 'fa-user-ninja' },
+            { id: 's2', name: 'Barba Completa', duration: '30 min', price: 35.00, icon: 'fa-user-ninja' },
             { id: 's3', name: 'Combo Cabelo + Barba', duration: '60 min', price: 70.00, icon: 'fa-crown' },
-            { id: 's4', name: 'Pigmentação de Barba/Cabelo', duration: '45 min', price: 50.00, icon: 'fa-wand-magic-sparkles' }
+            { id: 's4', name: 'Pigmentação', duration: '45 min', price: 50.00, icon: 'fa-wand-magic-sparkles' }
         ];
 
-        // Barbeiros Padrão com Grade de Dias Trabalhados (0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sáb)
         const barbersData = [
             { id: 'b0', name: 'Qualquer Profissional', role: 'Sem preferência', avatar: '<i class="fa-solid fa-users"></i>', workingDays: [1, 2, 3, 4, 5, 6] },
-            { id: 'b1', name: 'Marcos Navalha', role: 'Especialista em Fade', avatar: '<i class="fa-solid fa-user"></i>', workingDays: [1, 2, 3, 4, 5] }, // Não trabalha sábado
-            { id: 'b2', name: 'Lucas "Barba"', role: 'Mestre Barbeiro', avatar: '<i class="fa-solid fa-user-tie"></i>', workingDays: [2, 3, 4, 5, 6] }  // Não trabalha segunda
+            { id: 'b1', name: 'Marcos Navalha', role: 'Especialista em Fade', avatar: '<i class="fa-solid fa-user"></i>', workingDays: [1, 2, 3, 4, 5] },
+            { id: 'b2', name: 'Lucas "Barba"', role: 'Mestre Barbeiro', avatar: '<i class="fa-solid fa-user-tie"></i>', workingDays: [2, 3, 4, 5, 6] }
         ];
 
         const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
-
         let localAppointments = JSON.parse(localStorage.getItem('barberSaaS_appointments')) || [];
 
-        /* ==========================================================================
-           3. INICIALIZAÇÃO DA INTERFACE
-           ========================================================================== */
         document.addEventListener('DOMContentLoaded', () => {
             renderServices();
             renderBarbers();
@@ -1203,16 +1071,13 @@
             renderAdminDashboard();
         });
 
-        /* ==========================================================================
-           4. RENDERIZAÇÃO E LÓGICA DE PASSOS
-           ========================================================================== */
         function renderServices() {
             const container = document.getElementById('servicesContainer');
             container.innerHTML = servicesData.map(s => `
                 <div class="service-card ${selectedService?.id === s.id ? 'selected' : ''}" onclick="selectService('${s.id}')">
+                    <div class="price">R$ ${s.price.toFixed(2).replace('.', ',')}</div>
                     <h3>${s.name}</h3>
                     <div class="duration"><i class="fa-regular fa-clock"></i> ${s.duration}</div>
-                    <div class="price">R$ ${s.price.toFixed(2).replace('.', ',')}</div>
                 </div>
             `).join('');
         }
@@ -1228,7 +1093,6 @@
             `).join('');
         }
 
-        // Lógica para Gerar as próximas 15 datas úteis do barbeiro selecionado
         function generateAvailableDates(barber) {
             let dates = [];
             let currentDate = new Date();
@@ -1238,8 +1102,6 @@
 
             while(daysAdded < 15) {
                 let wDay = currentDate.getDay(); 
-                
-                // Checa se o dia da semana está na grade de trabalho do barbeiro
                 if (barber.workingDays.includes(wDay)) {
                     dates.push({
                         fullDate: currentDate.toISOString().split('T')[0],
@@ -1256,10 +1118,8 @@
 
         function renderDates() {
             if (!selectedBarber) return;
-            
             generatedDates = generateAvailableDates(selectedBarber);
             const container = document.getElementById('datesContainer');
-            
             container.innerHTML = generatedDates.map(d => `
                 <div class="date-card ${selectedDate === d.fullDate ? 'selected' : ''}" onclick="selectDate('${d.fullDate}')">
                     <div class="d-week">${d.weekDayStr}</div>
@@ -1272,49 +1132,34 @@
         function updateTimeSlots() {
             const container = document.getElementById('timeSlotsContainer');
             container.innerHTML = availableTimes.map(t => `
-                <div class="time-slot ${selectedTime === t ? 'selected' : ''}" onclick="selectTime('${t}')">
-                    ${t}
-                </div>
+                <div class="time-slot ${selectedTime === t ? 'selected' : ''}" onclick="selectTime('${t}')">${t}</div>
             `).join('');
         }
 
-        /* ----- Ações dos Cliques ----- */
         function selectService(id) {
             selectedService = servicesData.find(s => s.id === id);
             renderServices();
             updateSummary();
-            
-            // Avança para Profissionais
             document.getElementById('step2').classList.add('active-step');
         }
 
         function selectBarber(id) {
             selectedBarber = barbersData.find(b => b.id === id);
-            
-            // Reseta passos seguintes ao trocar barbeiro
             selectedDate = null;
             selectedTime = null;
             document.getElementById('step4').classList.remove('active-step');
-            
             renderBarbers();
-            renderDates(); // Atualiza os dias trabalhados desse profissional
+            renderDates();
             updateSummary();
-            
-            // Avança para Datas
             document.getElementById('step3').classList.add('active-step');
         }
 
         function selectDate(fullDate) {
             selectedDate = fullDate;
-            
-            // Reseta hora ao trocar data
             selectedTime = null;
-            
             renderDates();
             updateTimeSlots();
             updateSummary();
-            
-            // Avança para Horários
             document.getElementById('step4').classList.add('active-step');
         }
 
@@ -1325,16 +1170,14 @@
         }
 
         function updateSummary() {
-            document.getElementById('sumService').innerText = selectedService ? selectedService.name : 'Nenhum selecionado';
+            document.getElementById('sumService').innerText = selectedService ? selectedService.name : 'Nenhum';
             document.getElementById('sumBarber').innerText = selectedBarber ? selectedBarber.name : 'Pendente';
-            
             if (selectedDate) {
                 const [y, m, d] = selectedDate.split('-');
                 document.getElementById('sumDate').innerText = `${d}/${m}/${y}`;
             } else {
                 document.getElementById('sumDate').innerText = '--/--/----';
             }
-
             document.getElementById('sumTime').innerText = selectedTime || '--:--';
             
             const total = selectedService ? selectedService.price : 0;
@@ -1344,19 +1187,11 @@
             btn.disabled = !(selectedService && selectedBarber && selectedDate && selectedTime);
         }
 
-        /* ==========================================================================
-           5. FLUXO DE AUTENTICAÇÃO
-           ========================================================================== */
         function listenAuthChanges() {
             if (firebaseInitialized && auth) {
                 auth.onAuthStateChanged(user => {
                     if (user) {
-                        currentUser = {
-                            uid: user.uid,
-                            name: user.displayName || user.email.split('@')[0],
-                            email: user.email,
-                            photo: user.photoURL
-                        };
+                        currentUser = { uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email };
                     } else {
                         currentUser = null;
                     }
@@ -1364,9 +1199,7 @@
                 });
             } else {
                 const savedUser = localStorage.getItem('barberSaaS_demo_user');
-                if (savedUser) {
-                    currentUser = JSON.parse(savedUser);
-                }
+                if (savedUser) currentUser = JSON.parse(savedUser);
                 updateAuthUI();
             }
         }
@@ -1378,26 +1211,17 @@
                 container.innerHTML = `
                     <div class="user-profile-bar">
                         <div class="user-avatar">${firstLetter}</div>
-                        <span style="font-size:0.85rem; font-weight:700;">${currentUser.name}</span>
-                        <i class="fa-solid fa-right-from-bracket" style="color:var(--text-muted); cursor:pointer; margin-left:8px;" title="Sair" onclick="logout()"></i>
+                        <span style="font-size:14px; font-weight:700;">${currentUser.name}</span>
+                        <i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:8px;" onclick="logout()"></i>
                     </div>
                 `;
             } else {
-                container.innerHTML = `
-                    <button class="user-auth-btn" onclick="openAuthModal()">
-                        <i class="fa-solid fa-user"></i> Entrar
-                    </button>
-                `;
+                container.innerHTML = `<button class="user-auth-btn" onclick="openAuthModal()"><i class="fa-solid fa-user"></i> Entrar</button>`;
             }
         }
 
-        function openAuthModal() {
-            document.getElementById('authModal').classList.add('active');
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.remove('active');
-        }
+        function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
 
         function setAuthMode(mode) {
             currentAuthMode = mode;
@@ -1412,17 +1236,12 @@
                 try {
                     const provider = new firebase.auth.GoogleAuthProvider();
                     await auth.signInWithPopup(provider);
-                    closeAuthModal();
-                    showToast('Login efetuado com sucesso!');
-                } catch (err) {
-                    showToast('Erro: ' + err.message);
-                }
+                    closeAuthModal(); showToast('Login efetuado com sucesso!');
+                } catch (err) { showToast('Erro: ' + err.message); }
             } else {
-                currentUser = { uid: 'demo-google-uid', name: 'Cliente Demo', email: 'cliente@gmail.com' };
+                currentUser = { uid: 'demo-google', name: 'Cliente Demo', email: 'cliente@gmail.com' };
                 localStorage.setItem('barberSaaS_demo_user', JSON.stringify(currentUser));
-                updateAuthUI();
-                closeAuthModal();
-                showToast('Login simulado efetuado com sucesso!');
+                updateAuthUI(); closeAuthModal(); showToast('Login simulado efetuado com sucesso!');
             }
         }
 
@@ -1443,22 +1262,17 @@
                         showToast('Bem-vindo de volta!');
                     }
                     closeAuthModal();
-                } catch (err) {
-                    showToast('Erro: ' + err.message);
-                }
+                } catch (err) { showToast('Erro: ' + err.message); }
             } else {
-                currentUser = { uid: 'demo-email-uid-' + Date.now(), name: name || email.split('@')[0], email: email };
+                currentUser = { uid: 'demo-' + Date.now(), name: name || email.split('@')[0], email: email };
                 localStorage.setItem('barberSaaS_demo_user', JSON.stringify(currentUser));
-                updateAuthUI();
-                closeAuthModal();
-                showToast('Acesso de demonstração ativado!');
+                updateAuthUI(); closeAuthModal(); showToast('Acesso ativado!');
             }
         }
 
         function logout() {
-            if (firebaseInitialized && auth) {
-                auth.signOut();
-            } else {
+            if (firebaseInitialized && auth) auth.signOut();
+            else {
                 currentUser = null;
                 localStorage.removeItem('barberSaaS_demo_user');
                 updateAuthUI();
@@ -1466,57 +1280,29 @@
             showToast('Você saiu da sua conta.');
         }
 
-        /* ==========================================================================
-           6. CRIAR E GERENCIAR AGENDAMENTOS
-           ========================================================================== */
         async function handleConfirmBooking() {
             if (!currentUser) {
-                openAuthModal();
-                showToast('Faça login para concluir o agendamento.');
-                return;
+                openAuthModal(); showToast('Faça login para concluir o agendamento.'); return;
             }
-
             const appointmentData = {
-                id: 'app-' + Date.now(),
-                userId: currentUser.uid,
-                userName: currentUser.name,
-                userEmail: currentUser.email,
-                serviceName: selectedService.name,
-                servicePrice: selectedService.price,
-                barberName: selectedBarber.name,
-                date: selectedDate,
-                time: selectedTime,
-                status: 'confirmado',
-                createdAt: new Date().toISOString()
+                id: 'app-' + Date.now(), userId: currentUser.uid, userName: currentUser.name, userEmail: currentUser.email,
+                serviceName: selectedService.name, servicePrice: selectedService.price, barberName: selectedBarber.name,
+                date: selectedDate, time: selectedTime, status: 'confirmado', createdAt: new Date().toISOString()
             };
-
+            
             if (firebaseInitialized && db) {
                 try {
-                    await db.collection('appointments').add(appointmentData);
-                    showToast('Agendamento salvo com sucesso!');
-                } catch (err) {
-                    saveAppointmentLocally(appointmentData);
-                }
-            } else {
-                saveAppointmentLocally(appointmentData);
-            }
+                    await db.collection('appointments').add(appointmentData); showToast('Agendamento salvo com sucesso!');
+                } catch (err) { saveAppointmentLocally(appointmentData); }
+            } else { saveAppointmentLocally(appointmentData); }
 
-            // Reseta o formulário
-            selectedService = null;
-            selectedBarber = null;
-            selectedDate = null;
-            selectedTime = null;
-            
-            renderServices();
-            updateSummary();
-            
-            // Oculta os passos 2, 3 e 4
+            selectedService = null; selectedBarber = null; selectedDate = null; selectedTime = null;
+            renderServices(); updateSummary();
             document.getElementById('step2').classList.remove('active-step');
             document.getElementById('step3').classList.remove('active-step');
             document.getElementById('step4').classList.remove('active-step');
             
-            renderAppointments();
-            renderAdminDashboard();
+            renderAppointments(); renderAdminDashboard();
             switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1]);
         }
 
@@ -1529,51 +1315,32 @@
         function renderAppointments() {
             const container = document.getElementById('myAppointmentsContainer');
             let list = localAppointments;
-            if (currentUser) {
-                list = list.filter(a => a.userId === currentUser.uid);
-            }
+            if (currentUser) list = list.filter(a => a.userId === currentUser.uid);
 
             if (list.length === 0) {
-                container.innerHTML = `
-                    <div class="card-glass" style="text-align:center; padding:3rem;">
-                        <i class="fa-regular fa-calendar-xmark" style="font-size:2.5rem; color:var(--text-muted); margin-bottom:1rem;"></i>
-                        <p style="color:var(--text-secondary);">Você não possui agendamentos.</p>
-                    </div>
-                `;
+                container.innerHTML = `<div style="text-align:center; padding:3rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p>Você não possui agendamentos.</p></div>`;
                 return;
             }
 
             container.innerHTML = list.map(a => {
                 const [y, m, d] = a.date.split('-');
-                const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-                const monthStr = monthNames[parseInt(m) - 1] || m;
-
+                const monthStr = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m)-1] || m;
                 return `
                     <div class="appointment-card">
                         <div class="appointment-info">
                             <div class="appointment-date-badge">
                                 <div class="day">${d}</div>
-                                <div class="month">${monthStr}</div>
+                                <div style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">${monthStr}</div>
                             </div>
                             <div>
-                                <h3 style="font-size:1.1rem; font-weight:700;">${a.serviceName}</h3>
-                                <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;">
-                                    <i class="fa-solid fa-user-ninja" style="color:var(--accent-gold);"></i> ${a.barberName} &nbsp;|&nbsp; 
-                                    <i class="fa-regular fa-clock" style="color:var(--accent-gold);"></i> ${a.time}
-                                </div>
-                                <div style="font-weight:700; color:var(--accent-gold); margin-top:4px;">
-                                    R$ ${a.servicePrice.toFixed(2).replace('.', ',')}
-                                </div>
+                                <h3 style="font-size:16px; font-weight:700;">${a.serviceName}</h3>
+                                <div style="font-size:13px; color:var(--text-secondary); margin-top:4px;">${a.barberName} | ${a.time}</div>
+                                <div style="font-weight:700; color:var(--accent-main); margin-top:4px;">R$ ${a.servicePrice.toFixed(2).replace('.', ',')}</div>
                             </div>
                         </div>
-
                         <div style="display:flex; align-items:center; gap:12px;">
-                            <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">
-                                ${a.status}
-                            </span>
-                            ${a.status === 'confirmado' ? `
-                                <button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>
-                            ` : ''}
+                            <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
+                            ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -1585,36 +1352,20 @@
             if (index !== -1) {
                 localAppointments[index].status = 'cancelado';
                 localStorage.setItem('barberSaaS_appointments', JSON.stringify(localAppointments));
-                renderAppointments();
-                renderAdminDashboard();
-                showToast('Agendamento cancelado.');
+                renderAppointments(); renderAdminDashboard(); showToast('Agendamento cancelado.');
             }
         }
 
-        /* ==========================================================================
-           7. PAINEL ADMINISTRATIVO
-           ========================================================================== */
         function renderAdminDashboard() {
             const todayStr = new Date().toISOString().split('T')[0];
-            const todayBookings = localAppointments.filter(a => a.date === todayStr && a.status === 'confirmado');
-            
-            document.getElementById('statTodayBookings').innerText = todayBookings.length;
-
-            const revenue = localAppointments
-                .filter(a => a.status === 'confirmado')
-                .reduce((acc, a) => acc + a.servicePrice, 0);
-
-            document.getElementById('statRevenue').innerText = `R$ ${revenue.toFixed(2).replace('.', ',')}`;
-
-            const uniqueClients = new Set(localAppointments.map(a => a.userId)).size;
-            document.getElementById('statTotalClients').innerText = uniqueClients;
+            document.getElementById('statTodayBookings').innerText = localAppointments.filter(a => a.date === todayStr && a.status === 'confirmado').length;
+            document.getElementById('statRevenue').innerText = `R$ ${localAppointments.filter(a => a.status === 'confirmado').reduce((acc, a) => acc + a.servicePrice, 0).toFixed(2).replace('.', ',')}`;
+            document.getElementById('statTotalClients').innerText = new Set(localAppointments.map(a => a.userId)).size;
 
             const tbody = document.getElementById('adminAppointmentsTable');
             if (localAppointments.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Nenhum agendamento encontrado.</td></tr>`;
-                return;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento encontrado.</td></tr>`; return;
             }
-
             tbody.innerHTML = localAppointments.map(a => `
                 <tr>
                     <td><strong>${a.userName}</strong></td>
@@ -1622,27 +1373,15 @@
                     <td>${a.barberName}</td>
                     <td>${a.date} às ${a.time}</td>
                     <td>R$ ${a.servicePrice.toFixed(2).replace('.', ',')}</td>
-                    <td>
-                        <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">
-                            ${a.status}
-                        </span>
-                    </td>
-                    <td>
-                        ${a.status === 'confirmado' ? `
-                            <button class="btn-cancel" style="padding:4px 8px; font-size:0.75rem;" onclick="cancelAppointment('${a.id}')">Excluir</button>
-                        ` : '-'}
-                    </td>
+                    <td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td>
+                    <td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td>
                 </tr>
             `).join('');
         }
 
-        /* ==========================================================================
-           8. UTILITÁRIOS
-           ========================================================================== */
         function switchView(viewId, element) {
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-
             document.getElementById(viewId).classList.add('active');
             if (element) element.classList.add('active');
         }
@@ -1651,9 +1390,7 @@
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
+            setTimeout(() => { toast.classList.remove('show'); }, 3500);
         }
     </script>
 </body>
