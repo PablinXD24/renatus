@@ -916,11 +916,10 @@
             // Chama envio de WhatsApp
             sendWhatsAppNotification(appointment);
 
-            const serviceID = 'SEU_SERVICE_ID';
-            const templateID = 'SEU_TEMPLATE_ID'; 
-            const publicKey = 'SUA_PUBLIC_KEY';
-
-            if(serviceID === 'SEU_SERVICE_ID') return; // EmailJS omitido se não configurado
+            // INSIRA SUAS CREDENCIAIS DO EMAILJS AQUI
+            const serviceID = 'service_w57ntvf';
+            const templateID = 'template_t4vty7l'; 
+            const publicKey = 'K8OklB-cs_yul_jNN';
 
             emailjs.init(publicKey);
             const templateParams = {
@@ -934,8 +933,13 @@
                 price: `R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}`
             };
 
-            try { await emailjs.send(serviceID, templateID, templateParams); } 
-            catch (error) { console.error(error); }
+            try { 
+                await emailjs.send(serviceID, templateID, templateParams); 
+                console.log('E-mail processado pelo EmailJS.');
+            } 
+            catch (error) { 
+                console.error('Erro no EmailJS (verifique se as credenciais foram substituídas corretamente):', error); 
+            }
         }
 
         // === AGENDAMENTO E DB ===
@@ -964,6 +968,7 @@
                 const overlay = document.getElementById('successOverlay');
                 overlay.classList.add('active');
                 
+                // Chamada do envio de e-mail ao confirmar agendamento
                 sendAutomatedNotifications(appointmentData);
                 
                 setTimeout(() => {
@@ -1049,6 +1054,7 @@
                     showToast('Cancelado.');
                     if (selectedDate && selectedBarber) updateTimeSlots(); 
                     
+                    // Chamada do envio de e-mail ao cancelar agendamento
                     sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' });
                 }
             } catch (error) { showToast('Erro ao cancelar.'); }
