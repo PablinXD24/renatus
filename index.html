@@ -269,9 +269,6 @@
         .summary-row .label { color: rgba(255, 255, 255, 0.8); }
         .summary-row .value { font-weight: 600; text-align: right; cursor: pointer; transition: color 0.2s; }
         .summary-row .value:hover { color: var(--accent-gold); text-decoration: underline; }
-        .summary-phone-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 12px 15px; border-radius: var(--radius-sm); margin-top: 8px; font-family: 'Inter', sans-serif; outline: none; transition: var(--transition); }
-        .summary-phone-input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        .summary-phone-input:focus { border-color: var(--accent-gold); }
         .summary-total { margin-top: 1.5rem; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
         .summary-total .total-price { font-size: 32px; font-weight: 800; color: var(--accent-gold); font-family: 'Anton', sans-serif; letter-spacing: 1px; }
 
@@ -411,11 +408,6 @@
                         <div class="summary-row">
                             <span class="label">Horário</span>
                             <span class="value" id="sumTime" onclick="if(selectedDate) openModal('timeModal')" title="Clique para alterar">--:--</span>
-                        </div>
-
-                        <div class="summary-row" style="flex-direction: column; align-items: flex-start; border-bottom: none; margin-top: 10px;">
-                            <span class="label" style="font-size: 13px; font-weight: 600;">Seu WhatsApp (com DDD)</span>
-                            <input type="tel" id="sumPhone" class="summary-phone-input" placeholder="(11) 99999-9999">
                         </div>
 
                         <div class="summary-total">
@@ -877,45 +869,8 @@
             document.getElementById('btnConfirmBooking').disabled = !(selectedServices.length > 0 && selectedBarber && selectedDate && selectedTime);
         }
 
-        // === INTEGRAÇÃO WHATSAPP API & EMAILJS ===
-        async function sendWhatsAppNotification(appointment) {
-            const statusText = appointment.status === 'cancelado' ? '❌ *CANCELADO*' : '✅ *CONFIRMADO*';
-            
-            // Construção da Mensagem / Nota Fiscal
-            const msg = `💈 *BARBERSAAS - AGENDAMENTO* 💈\n\nOlá, *${appointment.userName}*!\nSeu agendamento foi ${statusText}.\n\n🧾 *DETALHES / NOTA FISCAL*\n\n🗓️ *Data:* ${appointment.date.split('-').reverse().join('/')}\n⏰ *Horário:* ${appointment.time}\n✂️ *Profissional:* ${appointment.barberName}\n📌 *Serviço(s):* ${appointment.serviceName}\n\n💰 *Valor Total: R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}*\n\n${appointment.status === 'confirmado' ? 'Para reagendar ou desmarcar, acesse a aba "Meus Agendamentos" no site.' : 'Esperamos ver você em breve!'}`;
-
-            // Exemplo de integração com API (Ex: Evolution API, Z-API, Zeno, UltraMsg)
-            const apiUrl = 'SUA_URL_DA_API_AQUI'; 
-            const apiToken = 'SEU_TOKEN_AQUI';
-
-            // Como é um app JS frontend puro sem gateway configurado pelo usuário, criamos o fallback
-            if (apiUrl === 'SUA_URL_DA_API_AQUI') {
-                console.warn("⚠️ API de WhatsApp não configurada. Imprimindo a nota fiscal no console:");
-                console.log(msg);
-                
-                // Fallback: Abre a tela do WhatsApp Web com a mensagem preenchida para o número do usuário
-                if(appointment.userPhone) {
-                    const phoneOnlyNumbers = "55" + appointment.userPhone.replace(/\D/g, '');
-                    // Descomente a linha abaixo caso queira que o WhatsApp Web abra sozinho no navegador como teste:
-                    // window.open(`https://api.whatsapp.com/send?phone=${phoneOnlyNumbers}&text=${encodeURIComponent(msg)}`, '_blank');
-                }
-                return;
-            }
-
-            try {
-                // Disparo real caso tenha a API vinculada
-                await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiToken}` },
-                    body: JSON.stringify({ phone: "55" + appointment.userPhone.replace(/\D/g, ''), message: msg })
-                });
-            } catch(e) { console.error('Erro ao enviar WPP', e); }
-        }
-
+        // === INTEGRAÇÃO EMAILJS ===
         async function sendAutomatedNotifications(appointment) {
-            // Chama envio de WhatsApp
-            sendWhatsAppNotification(appointment);
-
             // INSIRA SUAS CREDENCIAIS DO EMAILJS AQUI
             const serviceID = 'service_w57ntvf';
             const templateID = 'template_t4vty7l'; 
@@ -938,7 +893,7 @@
                 console.log('E-mail processado pelo EmailJS.');
             } 
             catch (error) { 
-                console.error('Erro no EmailJS (verifique se as credenciais foram substituídas corretamente):', error); 
+                console.error('Erro no EmailJS (verifique as variáveis do seu template):', error); 
             }
         }
 
@@ -946,16 +901,13 @@
         async function handleConfirmBooking() {
             if (!currentUser) { openModal('authModal'); showToast('Faça login para concluir.'); return; }
             
-            const phoneVal = document.getElementById('sumPhone').value;
-            if(!phoneVal || phoneVal.length < 8) { showToast('Informe seu WhatsApp com DDD para confirmar.'); return; }
-
             const btn = document.getElementById('btnConfirmBooking');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Agendando...';
             btn.disabled = true;
 
             const appointmentData = {
                 tenantId: TENANT_ID,
-                userId: currentUser.uid, userName: currentUser.name, userEmail: currentUser.email, userPhone: phoneVal,
+                userId: currentUser.uid, userName: currentUser.name, userEmail: currentUser.email,
                 serviceName: selectedServices.map(s => s.name).join(' + '), 
                 servicePrice: selectedServices.reduce((a, c) => a + parseFloat(c.price), 0), 
                 barberName: selectedBarber.name, barberId: selectedBarber.id,
@@ -975,7 +927,6 @@
                     overlay.classList.remove('active');
                     selectedServices = []; selectedBarber = null; selectedDate = null; selectedTime = null;
                     document.getElementById('btnContinueFromServices').style.display = 'none';
-                    document.getElementById('sumPhone').value = '';
                     renderServices(); updateSummary();
                     btn.innerHTML = 'Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>';
                     switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1]);
