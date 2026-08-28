@@ -337,6 +337,34 @@
         .input-group { flex: 1; min-width: 150px; }
         .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--text-secondary); }
 
+        /* Estilização do Calendário Admin (Estilo Google Agenda) */
+        .admin-calendar-wrapper { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); padding: 25px; margin-bottom: 2rem; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .cal-header-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .cal-nav-btns { display: flex; align-items: center; gap: 10px; }
+        .cal-btn { background: var(--bg-primary); border: 1px solid var(--card-border); color: var(--text-primary); padding: 8px 14px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .cal-btn:hover { background: #eceff5; border-color: var(--accent-main); color: var(--accent-main); }
+        
+        .cal-grid-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; }
+        .cal-grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .cal-day-cell { background: var(--bg-primary); border: 1px solid var(--card-border); border-radius: var(--radius-sm); min-height: 90px; padding: 8px; display: flex; flex-direction: column; justify-content: flex-start; transition: var(--transition); position: relative; }
+        .cal-day-cell.other-month { opacity: 0.4; background: rgba(244, 245, 248, 0.5); }
+        .cal-day-cell.today { border-color: var(--accent-main); background: #f0f4ff; }
+        .cal-day-number { font-size: 13px; font-weight: 700; margin-bottom: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .cal-day-cell.today .cal-day-number { background: var(--accent-main); color: var(--bg-primary); }
+        
+        .cal-events-container { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 65px; scrollbar-width: none; }
+        .cal-events-container::-webkit-scrollbar { display: none; }
+        .cal-event-pill { background: var(--accent-main); color: var(--bg-primary); font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+        .cal-event-pill:hover { opacity: 0.85; }
+        .cal-event-pill.status-canceled { background: var(--danger); text-decoration: line-through; }
+
+        @media (max-width: 768px) {
+            .cal-day-cell { min-height: 70px; padding: 4px; }
+            .cal-day-number { font-size: 11px; width: 20px; height: 20px; }
+            .cal-event-pill { font-size: 9px; padding: 2px 4px; }
+        }
+
         /* Modais */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; }
         .modal-overlay.active { display: flex; }
@@ -496,7 +524,23 @@
                 </form>
             </div>
 
-            <div class="section-title">Agendamentos Recentes</div>
+            <div class="section-title">Agendamentos Recentes (Calendário)</div>
+            
+            <div class="admin-calendar-wrapper">
+                <div class="cal-header">
+                    <div class="cal-header-title" id="calMonthYearLabel">Mês Ano</div>
+                    <div class="cal-nav-btns">
+                        <button class="cal-btn" onclick="changeAdminMonth(-1)"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+                        <button class="cal-btn" onclick="goToCurrentMonth()">Hoje</button>
+                        <button class="cal-btn" onclick="changeAdminMonth(1)">Próximo <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="cal-grid-weekdays">
+                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                </div>
+                <div class="cal-grid-days" id="adminCalendarDaysContainer"></div>
+            </div>
+
             <div style="overflow-x:auto;">
                 <table>
                     <thead>
@@ -691,6 +735,9 @@
         let selectedPeriod = 'manha'; 
         let generatedDates = [];
         let minAdvanceMinutes = 15;
+
+        // Estado do Calendário do Admin
+        let adminCalendarDate = new Date();
 
         const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
         
@@ -908,29 +955,18 @@
         async function sendWhatsAppNotification(appointment) {
             const statusText = appointment.status === 'cancelado' ? '❌ *CANCELADO*' : '✅ *CONFIRMADO*';
             
-            // Construção da Mensagem / Nota Fiscal
             const msg = `💈 *BARBERSAAS - AGENDAMENTO* 💈\n\nOlá, *${appointment.userName}*!\nSeu agendamento foi ${statusText}.\n\n🧾 *DETALHES / NOTA FISCAL*\n\n🗓️ *Data:* ${appointment.date.split('-').reverse().join('/')}\n⏰ *Horário:* ${appointment.time}\n✂️ *Profissional:* ${appointment.barberName}\n📌 *Serviço(s):* ${appointment.serviceName}\n\n💰 *Valor Total: R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}*\n\n${appointment.status === 'confirmado' ? 'Para reagendar ou desmarcar, acesse a aba "Meus Agendamentos" no site.' : 'Esperamos ver você em breve!'}`;
 
-            // Exemplo de integração com API (Ex: Evolution API, Z-API, Zeno, UltraMsg)
             const apiUrl = 'SUA_URL_DA_API_AQUI'; 
             const apiToken = 'SEU_TOKEN_AQUI';
 
-            // Como é um app JS frontend puro sem gateway configurado pelo usuário, criamos o fallback
             if (apiUrl === 'SUA_URL_DA_API_AQUI') {
                 console.warn("⚠️ API de WhatsApp não configurada. Imprimindo a nota fiscal no console:");
                 console.log(msg);
-                
-                // Fallback: Abre a tela do WhatsApp Web com a mensagem preenchida para o número do usuário
-                if(appointment.userPhone) {
-                    const phoneOnlyNumbers = "55" + appointment.userPhone.replace(/\D/g, '');
-                    // Descomente a linha abaixo caso queira que o WhatsApp Web abra sozinho no navegador como teste:
-                    // window.open(`https://api.whatsapp.com/send?phone=${phoneOnlyNumbers}&text=${encodeURIComponent(msg)}`, '_blank');
-                }
                 return;
             }
 
             try {
-                // Disparo real caso tenha a API vinculada
                 await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiToken}` },
@@ -940,10 +976,8 @@
         }
 
         async function sendAutomatedNotifications(appointment) {
-            // Chama envio de WhatsApp
             sendWhatsAppNotification(appointment);
 
-            // INSIRA SUAS CREDENCIAIS DO EMAILJS AQUI
             const serviceID = 'service_w57ntvf';
             const templateID = appointment.status === 'cancelado' ? 'template_0f758dm' : 'template_t4vty7l'; 
             const publicKey = 'K8OklB-cs_yul_jNN';
@@ -965,7 +999,7 @@
                 console.log('E-mail processado pelo EmailJS.');
             } 
             catch (error) { 
-                console.error('Erro no EmailJS (verifique se as credenciais foram substituídas corretamente):', error); 
+                console.error('Erro no EmailJS:', error); 
             }
         }
 
@@ -995,7 +1029,6 @@
                 const overlay = document.getElementById('successOverlay');
                 overlay.classList.add('active');
                 
-                // Chamada do envio de e-mail ao confirmar agendamento
                 sendAutomatedNotifications(appointmentData);
                 
                 setTimeout(() => {
@@ -1070,7 +1103,6 @@
             
             const currentYear = new Date().getFullYear();
 
-            // Filtrar agendamentos do ano atual
             let currentYearApps = list.filter(a => {
                 const parts = a.date.split('-');
                 return parseInt(parts[0], 10) === currentYear;
@@ -1083,7 +1115,6 @@
 
             let htmlContent = '';
 
-            // Seção Superior: Recém Agendados
             htmlContent += `
                 <div>
                     <div class="recent-section-header">Recém agendados</div>
@@ -1124,8 +1155,6 @@
                 </div>
             `;
 
-            // Renderizar caixas estilo aplicativo para cada mês que possui pelo menos 1 agendamento
-            // Ordenados do mês mais antigo para o mais recente (ou conforme os meses existentes)
             let monthsWithBookings = [...new Set(currentYearApps.map(a => parseInt(a.date.split('-')[1], 10)))].sort((a, b) => a - b);
 
             monthsWithBookings.forEach(m => {
@@ -1193,10 +1222,89 @@
                     showToast('Cancelado.');
                     if (selectedDate && selectedBarber) updateTimeSlots(); 
                     
-                    // Chamada do envio de e-mail ao cancelar agendamento
                     sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' });
                 }
             } catch (error) { showToast('Erro ao cancelar.'); }
+        }
+
+        // === CALENDÁRIO ESTILIZADO GOOGLE AGENDA (ADMIN) ===
+        function changeAdminMonth(direction) {
+            adminCalendarDate.setMonth(adminCalendarDate.getMonth() + direction);
+            renderAdminCalendar();
+        }
+
+        function goToCurrentMonth() {
+            adminCalendarDate = new Date();
+            renderAdminCalendar();
+        }
+
+        function renderAdminCalendar() {
+            const container = document.getElementById('adminCalendarDaysContainer');
+            const label = document.getElementById('calMonthYearLabel');
+            if(!container || !label) return;
+
+            const year = adminCalendarDate.getFullYear();
+            const month = adminCalendarDate.getMonth();
+
+            const monthNamesFull = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            label.innerText = `${monthNamesFull[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const prevLastDay = new Date(year, month, 0).getDate();
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            const tenantAppts = localAppointments.filter(a => a.tenantId === TENANT_ID);
+
+            let daysHtml = '';
+
+            // Dias do mês anterior
+            for (let i = firstDayIndex; i > 0; i--) {
+                const dayNum = prevLastDay - i + 1;
+                let prevMonth = month === 0 ? 12 : month;
+                let prevYear = month === 0 ? year - 1 : year;
+                const dateStr = `${prevYear}-${String(prevMonth).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+                
+                daysHtml += renderSingleCalendarCell(dateStr, dayNum, true, tenantAppts, todayStr);
+            }
+
+            // Dias do mês atual
+            for (let i = 1; i <= lastDay; i++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                daysHtml += renderSingleCalendarCell(dateStr, i, false, tenantAppts, todayStr);
+            }
+
+            // Dias do próximo mês para completar a grade de 42 células (6 linhas)
+            const totalCellsSoFar = firstDayIndex + lastDay;
+            const nextDaysCount = totalCellsSoFar <= 35 ? (35 - totalCellsSoFar) : (42 - totalCellsSoFar);
+            for (let i = 1; i <= nextDaysCount; i++) {
+                let nextMonth = month === 11 ? 1 : month + 2;
+                let nextYear = month === 11 ? year + 1 : year;
+                const dateStr = `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                
+                daysHtml += renderSingleCalendarCell(dateStr, i, true, tenantAppts, todayStr);
+            }
+
+            container.innerHTML = daysHtml;
+        }
+
+        function renderSingleCalendarCell(dateStr, dayNum, isOtherMonth, allAppts, todayStr) {
+            const cellAppts = allAppts.filter(a => a.date === dateStr);
+            const isToday = (dateStr === todayStr);
+
+            let eventsHtml = cellAppts.map(a => {
+                const statusClass = a.status === 'cancelado' ? 'status-canceled' : '';
+                return `<div class="cal-event-pill ${statusClass}" title="${a.time} - ${a.userName} (${a.serviceName})"><span>${a.time}</span> <span>${a.userName.split(' ')[0]}</span></div>`;
+            }).join('');
+
+            return `
+                <div class="cal-day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}">
+                    <div class="cal-day-number">${dayNum}</div>
+                    <div class="cal-events-container">
+                        ${eventsHtml}
+                    </div>
+                </div>
+            `;
         }
 
         function renderAdminDashboard() {
@@ -1211,6 +1319,9 @@
             else tbody.innerHTML = tenantAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
 
             document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
+
+            // Renderizar também o calendário estilizado
+            renderAdminCalendar();
         }
 
         // === AUTH & UTIL ===
