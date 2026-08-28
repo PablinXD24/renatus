@@ -13,7 +13,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <style>
@@ -270,6 +269,9 @@
         .summary-row .label { color: rgba(255, 255, 255, 0.8); }
         .summary-row .value { font-weight: 600; text-align: right; cursor: pointer; transition: color 0.2s; }
         .summary-row .value:hover { color: var(--accent-gold); text-decoration: underline; }
+        .summary-phone-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 12px 15px; border-radius: var(--radius-sm); margin-top: 8px; font-family: 'Inter', sans-serif; outline: none; transition: var(--transition); }
+        .summary-phone-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .summary-phone-input:focus { border-color: var(--accent-gold); }
         .summary-total { margin-top: 1.5rem; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
         .summary-total .total-price { font-size: 32px; font-weight: 800; color: var(--accent-gold); font-family: 'Anton', sans-serif; letter-spacing: 1px; }
 
@@ -409,6 +411,11 @@
                         <div class="summary-row">
                             <span class="label">Horário</span>
                             <span class="value" id="sumTime" onclick="if(selectedDate) openModal('timeModal')" title="Clique para alterar">--:--</span>
+                        </div>
+
+                        <div class="summary-row" style="flex-direction: column; align-items: flex-start; border-bottom: none; margin-top: 10px;">
+                            <span class="label" style="font-size: 13px; font-weight: 600;">Seu WhatsApp (com DDD)</span>
+                            <input type="tel" id="sumPhone" class="summary-phone-input" placeholder="(11) 99999-9999">
                         </div>
 
                         <div class="summary-total">
@@ -670,10 +677,12 @@
             initDatabaseListeners();
         });
 
+        // Controles UI
         function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         function showToast(msg) { const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 3500); }
 
+        // === AUTO-SEEDING ===
         async function createDefaultServices() {
             const defaults = [
                 { tenantId: TENANT_ID, name: 'Corte Clássico', duration: '30 min', price: 40.00 },
@@ -691,6 +700,7 @@
             for (let b of defaults) { await db.ref('barbers').push(b); }
         }
 
+        // === REAL-TIME DATABASE LISTENERS ===
         function initDatabaseListeners() {
             db.ref('services').orderByChild('tenantId').equalTo(TENANT_ID).on('value', snap => {
                 if(!snap.exists()) { 
@@ -737,6 +747,7 @@
             });
         }
 
+        // === FRONT-END RENDERING ===
         function renderServices() {
             const container = document.getElementById('servicesContainer');
             if(servicesData.length === 0) { container.innerHTML = "<p>Nenhum serviço cadastrado.</p>"; document.getElementById('adminServicesTable').innerHTML = ''; return; }
@@ -866,23 +877,52 @@
             document.getElementById('btnConfirmBooking').disabled = !(selectedServices.length > 0 && selectedBarber && selectedDate && selectedTime);
         }
 
-        // === NOVO/MODIFICADO: ENVIO DE E-MAILS (VIA EMAILJS) COM TEMPLATES DIFERENTES ===
-        async function sendAutomatedNotifications(appointment, type = 'confirmacao') {
-            // SUBSTITUA ESTAS CREDENCIAIS PELAS SUAS DO EMAILJS (https://www.emailjs.com/)
-            const serviceID = 'SEU_SERVICE_ID';
-            const publicKey = 'SUA_PUBLIC_KEY';
+        // === INTEGRAÇÃO WHATSAPP API & EMAILJS ===
+        async function sendWhatsAppNotification(appointment) {
+            const statusText = appointment.status === 'cancelado' ? '❌ *CANCELADO*' : '✅ *CONFIRMADO*';
             
-            // Templates diferentes para confirmação e cancelamento
-            const templateConfirmacaoID = 'SEU_TEMPLATE_CONFIRMACAO';
-            const templateCancelamentoID = 'SEU_TEMPLATE_CANCELAMENTO'; 
+            // Construção da Mensagem / Nota Fiscal
+            const msg = `💈 *BARBERSAAS - AGENDAMENTO* 💈\n\nOlá, *${appointment.userName}*!\nSeu agendamento foi ${statusText}.\n\n🧾 *DETALHES / NOTA FISCAL*\n\n🗓️ *Data:* ${appointment.date.split('-').reverse().join('/')}\n⏰ *Horário:* ${appointment.time}\n✂️ *Profissional:* ${appointment.barberName}\n📌 *Serviço(s):* ${appointment.serviceName}\n\n💰 *Valor Total: R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}*\n\n${appointment.status === 'confirmado' ? 'Para reagendar ou desmarcar, acesse a aba "Meus Agendamentos" no site.' : 'Esperamos ver você em breve!'}`;
 
-            if(serviceID === 'SEU_SERVICE_ID') {
-                console.warn(`[Aviso EmailJS]: Serviço não configurado. Simulação de email de '${type}' para: ${appointment.userEmail}`);
+            // Exemplo de integração com API (Ex: Evolution API, Z-API, Zeno, UltraMsg)
+            const apiUrl = 'SUA_URL_DA_API_AQUI'; 
+            const apiToken = 'SEU_TOKEN_AQUI';
+
+            // Como é um app JS frontend puro sem gateway configurado pelo usuário, criamos o fallback
+            if (apiUrl === 'SUA_URL_DA_API_AQUI') {
+                console.warn("⚠️ API de WhatsApp não configurada. Imprimindo a nota fiscal no console:");
+                console.log(msg);
+                
+                // Fallback: Abre a tela do WhatsApp Web com a mensagem preenchida para o número do usuário
+                if(appointment.userPhone) {
+                    const phoneOnlyNumbers = "55" + appointment.userPhone.replace(/\D/g, '');
+                    // Descomente a linha abaixo caso queira que o WhatsApp Web abra sozinho no navegador como teste:
+                    // window.open(`https://api.whatsapp.com/send?phone=${phoneOnlyNumbers}&text=${encodeURIComponent(msg)}`, '_blank');
+                }
                 return;
             }
 
-            emailjs.init(publicKey);
+            try {
+                // Disparo real caso tenha a API vinculada
+                await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiToken}` },
+                    body: JSON.stringify({ phone: "55" + appointment.userPhone.replace(/\D/g, ''), message: msg })
+                });
+            } catch(e) { console.error('Erro ao enviar WPP', e); }
+        }
 
+        async function sendAutomatedNotifications(appointment) {
+            // Chama envio de WhatsApp
+            sendWhatsAppNotification(appointment);
+
+            const serviceID = 'SEU_SERVICE_ID';
+            const templateID = 'SEU_TEMPLATE_ID'; 
+            const publicKey = 'SUA_PUBLIC_KEY';
+
+            if(serviceID === 'SEU_SERVICE_ID') return; // EmailJS omitido se não configurado
+
+            emailjs.init(publicKey);
             const templateParams = {
                 to_email: appointment.userEmail,
                 to_name: appointment.userName,
@@ -894,19 +934,16 @@
                 price: `R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}`
             };
 
-            const templateID = type === 'cancelado' ? templateCancelamentoID : templateConfirmacaoID;
-
-            try {
-                await emailjs.send(serviceID, templateID, templateParams);
-                console.log(`Email de ${type} enviado com sucesso!`);
-            } catch (error) { 
-                console.error("Erro ao enviar email: ", error); 
-            }
+            try { await emailjs.send(serviceID, templateID, templateParams); } 
+            catch (error) { console.error(error); }
         }
 
         // === AGENDAMENTO E DB ===
         async function handleConfirmBooking() {
             if (!currentUser) { openModal('authModal'); showToast('Faça login para concluir.'); return; }
+            
+            const phoneVal = document.getElementById('sumPhone').value;
+            if(!phoneVal || phoneVal.length < 8) { showToast('Informe seu WhatsApp com DDD para confirmar.'); return; }
 
             const btn = document.getElementById('btnConfirmBooking');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Agendando...';
@@ -914,7 +951,7 @@
 
             const appointmentData = {
                 tenantId: TENANT_ID,
-                userId: currentUser.uid, userName: currentUser.name, userEmail: currentUser.email,
+                userId: currentUser.uid, userName: currentUser.name, userEmail: currentUser.email, userPhone: phoneVal,
                 serviceName: selectedServices.map(s => s.name).join(' + '), 
                 servicePrice: selectedServices.reduce((a, c) => a + parseFloat(c.price), 0), 
                 barberName: selectedBarber.name, barberId: selectedBarber.id,
@@ -922,18 +959,18 @@
             };
             
             try {
-                await db.ref('appointments').push(appointmentData); // RTDB Push
+                await db.ref('appointments').push(appointmentData); 
                 
                 const overlay = document.getElementById('successOverlay');
                 overlay.classList.add('active');
                 
-                // Dispara o email de confirmação
-                sendAutomatedNotifications(appointmentData, 'confirmacao');
+                sendAutomatedNotifications(appointmentData);
                 
                 setTimeout(() => {
                     overlay.classList.remove('active');
                     selectedServices = []; selectedBarber = null; selectedDate = null; selectedTime = null;
                     document.getElementById('btnContinueFromServices').style.display = 'none';
+                    document.getElementById('sumPhone').value = '';
                     renderServices(); updateSummary();
                     btn.innerHTML = 'Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>';
                     switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1]);
@@ -946,34 +983,12 @@
             }
         }
 
-        // === CANCELAMENTO COM DISPARO DE EMAIL ===
-        async function cancelAppointment(id) {
-            try {
-                const docRef = db.ref('appointments/' + id);
-                const snapshot = await docRef.once('value');
-                
-                if (snapshot.exists()) {
-                    const appointmentData = snapshot.val();
-                    
-                    await docRef.update({ status: 'cancelado' });
-                    showToast('Cancelado com sucesso.');
-                    
-                    if (selectedDate && selectedBarber) updateTimeSlots(); 
-                    
-                    // Dispara o email de cancelamento informando o usuário
-                    sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' }, 'cancelado');
-                }
-            } catch (error) { showToast('Erro ao cancelar.'); }
-        }
-
         // === ADMIN & CRUDS ===
         async function saveSettings(e) {
             e.preventDefault();
             const val = parseInt(document.getElementById('adminMinAdvance').value) || 0;
-            try {
-                await db.ref('settings/' + TENANT_ID).update({ minAdvanceMinutes: val });
-                showToast('Preferências salvas com sucesso!');
-            } catch(e) { showToast('Erro ao salvar as configurações.'); }
+            try { await db.ref('settings/' + TENANT_ID).update({ minAdvanceMinutes: val }); showToast('Preferências salvas com sucesso!'); } 
+            catch(e) { showToast('Erro ao salvar as configurações.'); }
         }
 
         async function addService(e) {
@@ -982,9 +997,7 @@
             try { await db.ref('services').push(newService); e.target.reset(); showToast('Serviço adicionado!'); } catch (error) { showToast('Erro ao salvar serviço.'); }
         }
 
-        async function deleteService(id) {
-            try { await db.ref('services/' + id).remove(); showToast('Serviço removido!'); } catch (error) { showToast('Erro ao remover.'); }
-        }
+        async function deleteService(id) { try { await db.ref('services/' + id).remove(); showToast('Serviço removido!'); } catch (error) { showToast('Erro ao remover.'); } }
 
         async function addBarber(e) {
             e.preventDefault();
@@ -992,9 +1005,7 @@
             try { await db.ref('barbers').push(newBarber); e.target.reset(); showToast('Profissional adicionado!'); } catch (error) { showToast('Erro ao salvar profissional.'); }
         }
 
-        async function deleteBarber(id) {
-            try { await db.ref('barbers/' + id).remove(); showToast('Profissional removido!'); } catch (error) { showToast('Erro ao remover.'); }
-        }
+        async function deleteBarber(id) { try { await db.ref('barbers/' + id).remove(); showToast('Profissional removido!'); } catch (error) { showToast('Erro ao remover.'); } }
 
         async function addBlock(e) {
             e.preventDefault();
@@ -1003,9 +1014,7 @@
             try { await db.ref('blocks').push(newBlock); e.target.reset(); showToast('Horário bloqueado com sucesso!'); } catch (error) { showToast('Erro ao bloquear horário.'); }
         }
 
-        async function deleteBlock(id) {
-            try { await db.ref('blocks/' + id).remove(); showToast('Bloqueio removido!'); } catch (error) { showToast('Erro ao remover bloqueio.'); }
-        }
+        async function deleteBlock(id) { try { await db.ref('blocks/' + id).remove(); showToast('Bloqueio removido!'); } catch (error) { showToast('Erro ao remover bloqueio.'); } }
 
         function renderAppointments() {
             const container = document.getElementById('myAppointmentsContainer');
@@ -1029,6 +1038,22 @@
             `).join('');
         }
 
+        async function cancelAppointment(id) {
+            try {
+                const docRef = db.ref('appointments/' + id);
+                const snapshot = await docRef.once('value');
+                
+                if (snapshot.exists()) {
+                    const appointmentData = snapshot.val();
+                    await docRef.update({ status: 'cancelado' });
+                    showToast('Cancelado.');
+                    if (selectedDate && selectedBarber) updateTimeSlots(); 
+                    
+                    sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' });
+                }
+            } catch (error) { showToast('Erro ao cancelar.'); }
+        }
+
         function renderAdminDashboard() {
             const todayStr = new Date().toISOString().split('T')[0];
             const tenantAppts = localAppointments.filter(a => a.tenantId === TENANT_ID);
@@ -1038,7 +1063,7 @@
 
             const tbody = document.getElementById('adminAppointmentsTable');
             if (tenantAppts.length === 0) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento.</td></tr>`;
-            else tbody.innerHTML = tenantAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir/Cancelar</button>` : '-'}</td></tr>`).join('');
+            else tbody.innerHTML = tenantAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
 
             document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
         }
