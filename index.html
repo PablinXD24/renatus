@@ -647,6 +647,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // 1. Habilitar a persistência offline para resolver perda de dados
+        db.enablePersistence().catch(function(err) {
+            console.warn("Aviso de Persistência:", err.code);
+        });
+
         let currentUser = null;
         let currentAuthMode = 'login'; 
         
@@ -675,16 +680,46 @@
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         function showToast(msg) { const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 3500); }
 
+        // === AUTO-SEEDING (Criação de Estrutura Inicial Automática) ===
+        async function createDefaultServices() {
+            const defaults = [
+                { tenantId: TENANT_ID, name: 'Corte Clássico', duration: '30 min', price: 40.00 },
+                { tenantId: TENANT_ID, name: 'Barba Terapia', duration: '30 min', price: 35.00 },
+                { tenantId: TENANT_ID, name: 'Corte + Barba', duration: '1h', price: 70.00 }
+            ];
+            for (let s of defaults) {
+                try { await db.collection('services').add(s); } catch (e) { console.error(e); }
+            }
+        }
+
+        async function createDefaultBarbers() {
+            const defaults = [
+                { tenantId: TENANT_ID, name: 'João Silva', role: 'Barbeiro Master', workingDays: [1,2,3,4,5,6] },
+                { tenantId: TENANT_ID, name: 'Pedro Alves', role: 'Especialista em Barba', workingDays: [1,2,3,4,5,6] }
+            ];
+            for (let b of defaults) {
+                try { await db.collection('barbers').add(b); } catch (e) { console.error(e); }
+            }
+        }
+
         // === REAL-TIME FIRESTORE DATABASE ===
         function initFirestoreListeners() {
             db.collection('services').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
-                servicesData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderServices();
+                if(snap.empty) { 
+                    createDefaultServices(); 
+                } else {
+                    servicesData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderServices();
+                }
             });
 
             db.collection('barbers').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
-                barbersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderBarbers();
+                if(snap.empty) { 
+                    createDefaultBarbers(); 
+                } else {
+                    barbersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderBarbers();
+                }
             });
 
             db.collection('blocks').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
@@ -704,6 +739,9 @@
                     minAdvanceMinutes = doc.data().minAdvanceMinutes || 15;
                     const adminInput = document.getElementById('adminMinAdvance');
                     if(adminInput) adminInput.value = minAdvanceMinutes;
+                } else {
+                    // Cria a estrutura padrão de configuração se não existir
+                    db.collection('settings').doc(TENANT_ID).set({ minAdvanceMinutes: 15 });
                 }
             });
         }
