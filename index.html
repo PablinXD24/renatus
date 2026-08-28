@@ -14,6 +14,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
     <style>
         /* ==========================================================================
            RESET & VARIÁVEIS DE DESIGN
@@ -654,11 +656,10 @@
         let selectedTime = null;
         let selectedPeriod = 'manha'; 
         let generatedDates = [];
-        let minAdvanceMinutes = 15; // Nova Variável para janela de tempo padrão
+        let minAdvanceMinutes = 15;
 
         const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
         
-        // === DADOS DINÂMICOS (Vindos do Firestore) ===
         let servicesData = [];
         let barbersData = [];
         let scheduleBlocks = [];
@@ -676,25 +677,21 @@
 
         // === REAL-TIME FIRESTORE DATABASE ===
         function initFirestoreListeners() {
-            // Escutar Serviços
             db.collection('services').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
                 servicesData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderServices();
             });
 
-            // Escutar Profissionais
             db.collection('barbers').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
                 barbersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderBarbers();
             });
 
-            // Escutar Bloqueios
             db.collection('blocks').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
                 scheduleBlocks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderAdminDashboard();
             });
 
-            // Escutar Agendamentos
             db.collection('appointments').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
                 localAppointments = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 localAppointments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -702,7 +699,6 @@
                 renderAdminDashboard();
             });
 
-            // Escutar Configurações (Janela de Agendamento)
             db.collection('settings').doc(TENANT_ID).onSnapshot(doc => {
                 if(doc.exists) {
                     minAdvanceMinutes = doc.data().minAdvanceMinutes || 15;
@@ -775,11 +771,8 @@
             updateTimeSlots();
         }
 
-        // === LÓGICA DE BLOQUEIO DE HORÁRIOS ===
         function updateTimeSlots() {
             const container = document.getElementById('timeSlotsContainer');
-            
-            // 1. Aplica filtro de período (manhã/tarde/noite)
             let periodTimes = availableTimes.filter(t => {
                 const hour = parseInt(t.split(':')[0]);
                 if (selectedPeriod === 'manha') return hour < 12;
@@ -787,7 +780,6 @@
                 if (selectedPeriod === 'noite') return hour >= 18;
             });
 
-            // 2. Aplica filtro dinâmico de bloqueios manuais (CRUD Admin)
             const barberBlocks = scheduleBlocks.filter(b => b.barberId === selectedBarber.id && b.date === selectedDate);
             const isFullDayBlocked = barberBlocks.some(b => b.time === 'ALL');
             
@@ -797,15 +789,11 @@
             }
 
             const blockedSpecificTimes = barberBlocks.map(b => b.time);
-            
-            // 3. Aplica filtro de horários JÁ AGENDADOS (Remove horários da agenda)
             const bookedAppointments = localAppointments.filter(a => a.barberId === selectedBarber.id && a.date === selectedDate && a.status === 'confirmado');
             const bookedTimes = bookedAppointments.map(a => a.time);
             
-            // 4. Remove horários bloqueados e horários já agendados
             let finalTimes = periodTimes.filter(t => !blockedSpecificTimes.includes(t) && !bookedTimes.includes(t));
 
-            // 5. Verifica se a data selecionada é hoje e bloqueia horários no passado e com antecedência mínima
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
             
@@ -814,7 +802,6 @@
                 finalTimes = finalTimes.filter(t => {
                     const [h, m] = t.split(':').map(Number);
                     const slotTotalMinutes = h * 60 + m;
-                    // Se o horário for menor que (agora + minutos de janela config), não exibe
                     return slotTotalMinutes >= (currentTotalMinutes + minAdvanceMinutes);
                 });
             }
@@ -828,7 +815,6 @@
             }
         }
 
-        // === FLUXO DE SELEÇÃO ===
         function selectService(id) {
             const service = servicesData.find(s => s.id === id);
             const index = selectedServices.findIndex(s => s.id === id);
@@ -852,8 +838,37 @@
             document.getElementById('btnConfirmBooking').disabled = !(selectedServices.length > 0 && selectedBarber && selectedDate && selectedTime);
         }
 
+        // === ENVIO DE E-MAILS (VIA EMAILJS) ===
         async function sendAutomatedNotifications(appointment) {
-            console.log("🔔 [NOTIFICAÇÃO DISPARADA] Payload enviado: Novo agendamento para", appointment.userName);
+            // Substitua as credenciais abaixo pelas suas no site EmailJS (https://www.emailjs.com/)
+            const serviceID = 'SEU_SERVICE_ID';
+            const templateID = 'SEU_TEMPLATE_ID'; 
+            const publicKey = 'SUA_PUBLIC_KEY';
+
+            if(serviceID === 'SEU_SERVICE_ID') {
+                console.warn("⚠️ EmailJS não configurado. Adicione suas credenciais no código para habilitar o envio de emails.");
+                return;
+            }
+
+            emailjs.init(publicKey);
+
+            const templateParams = {
+                to_email: appointment.userEmail,
+                to_name: appointment.userName,
+                service_name: appointment.serviceName,
+                barber_name: appointment.barberName,
+                date: appointment.date.split('-').reverse().join('/'),
+                time: appointment.time,
+                status: appointment.status === 'cancelado' ? 'Cancelado' : 'Confirmado',
+                price: `R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}`
+            };
+
+            try {
+                await emailjs.send(serviceID, templateID, templateParams);
+                console.log("✉️ Email de notificação enviado para:", appointment.userEmail);
+            } catch (error) {
+                console.error("❌ Erro ao enviar email via EmailJS:", error);
+            }
         }
 
         // === AGENDAMENTO E DB ===
@@ -874,32 +889,26 @@
             };
             
             try {
+                // Salva no banco de dados Firestore
                 await db.collection('appointments').add(appointmentData);
                 
-                // Mostrar Animação de Sucesso
+                // Exibe animação
                 const overlay = document.getElementById('successOverlay');
                 overlay.classList.add('active');
                 
+                // Dispara E-mail
                 sendAutomatedNotifications(appointmentData);
                 
-                // Aguarda 2 segundos para o usuário ver a animação
                 setTimeout(() => {
                     overlay.classList.remove('active');
-                    
-                    // Reseta seleção
                     selectedServices = []; selectedBarber = null; selectedDate = null; selectedTime = null;
                     document.getElementById('btnContinueFromServices').style.display = 'none';
                     renderServices(); updateSummary();
-                    
-                    // Reseta botão
                     btn.innerHTML = 'Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>';
-                    
-                    // Vai direto pra agenda
                     switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1]);
                 }, 2200);
 
             } catch (err) {
-                console.error("Erro ao agendar:", err);
                 showToast('Falha ao registrar agendamento.');
                 btn.innerHTML = 'Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
@@ -918,78 +927,41 @@
 
         async function addService(e) {
             e.preventDefault();
-            const newService = {
-                tenantId: TENANT_ID,
-                name: document.getElementById('crudServiceName').value,
-                duration: document.getElementById('crudServiceDuration').value,
-                price: parseFloat(document.getElementById('crudServicePrice').value)
-            };
-            try {
-                await db.collection('services').add(newService);
-                e.target.reset(); showToast('Serviço adicionado!');
-            } catch (error) { showToast('Erro ao salvar serviço.'); }
+            const newService = { tenantId: TENANT_ID, name: document.getElementById('crudServiceName').value, duration: document.getElementById('crudServiceDuration').value, price: parseFloat(document.getElementById('crudServicePrice').value) };
+            try { await db.collection('services').add(newService); e.target.reset(); showToast('Serviço adicionado!'); } catch (error) { showToast('Erro ao salvar serviço.'); }
         }
 
         async function deleteService(id) {
-            try {
-                await db.collection('services').doc(id).delete();
-                showToast('Serviço removido!');
-            } catch (error) { showToast('Erro ao remover.'); }
+            try { await db.collection('services').doc(id).delete(); showToast('Serviço removido!'); } catch (error) { showToast('Erro ao remover.'); }
         }
 
         async function addBarber(e) {
             e.preventDefault();
-            const newBarber = {
-                tenantId: TENANT_ID,
-                name: document.getElementById('crudBarberName').value,
-                role: document.getElementById('crudBarberRole').value,
-                workingDays: [1,2,3,4,5,6]
-            };
-            try {
-                await db.collection('barbers').add(newBarber);
-                e.target.reset(); showToast('Profissional adicionado!');
-            } catch (error) { showToast('Erro ao salvar profissional.'); }
+            const newBarber = { tenantId: TENANT_ID, name: document.getElementById('crudBarberName').value, role: document.getElementById('crudBarberRole').value, workingDays: [1,2,3,4,5,6] };
+            try { await db.collection('barbers').add(newBarber); e.target.reset(); showToast('Profissional adicionado!'); } catch (error) { showToast('Erro ao salvar profissional.'); }
         }
 
         async function deleteBarber(id) {
-            try {
-                await db.collection('barbers').doc(id).delete();
-                showToast('Profissional removido!');
-            } catch (error) { showToast('Erro ao remover.'); }
+            try { await db.collection('barbers').doc(id).delete(); showToast('Profissional removido!'); } catch (error) { showToast('Erro ao remover.'); }
         }
 
         async function addBlock(e) {
             e.preventDefault();
             const barberSelect = document.getElementById('crudBlockBarber');
-            const newBlock = {
-                tenantId: TENANT_ID,
-                barberId: barberSelect.value,
-                barberName: barberSelect.options[barberSelect.selectedIndex].text,
-                date: document.getElementById('crudBlockDate').value,
-                time: document.getElementById('crudBlockTime').value
-            };
-            try {
-                await db.collection('blocks').add(newBlock);
-                e.target.reset(); showToast('Horário bloqueado com sucesso!');
-            } catch (error) { showToast('Erro ao bloquear horário.'); }
+            const newBlock = { tenantId: TENANT_ID, barberId: barberSelect.value, barberName: barberSelect.options[barberSelect.selectedIndex].text, date: document.getElementById('crudBlockDate').value, time: document.getElementById('crudBlockTime').value };
+            try { await db.collection('blocks').add(newBlock); e.target.reset(); showToast('Horário bloqueado com sucesso!'); } catch (error) { showToast('Erro ao bloquear horário.'); }
         }
 
         async function deleteBlock(id) {
-            try {
-                await db.collection('blocks').doc(id).delete();
-                showToast('Bloqueio removido!');
-            } catch (error) { showToast('Erro ao remover bloqueio.'); }
+            try { await db.collection('blocks').doc(id).delete(); showToast('Bloqueio removido!'); } catch (error) { showToast('Erro ao remover bloqueio.'); }
         }
 
         function renderAppointments() {
             const container = document.getElementById('myAppointmentsContainer');
             let list = localAppointments.filter(a => a.tenantId === TENANT_ID);
             
-            if (currentUser) {
-                list = list.filter(a => a.userId === currentUser.uid);
-            } else {
-                list = [];
-            }
+            if (currentUser) list = list.filter(a => a.userId === currentUser.uid);
+            else list = [];
 
             if (list.length === 0) { container.innerHTML = `<div style="text-align:center; padding:3rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p>Você não possui agendamentos.</p></div>`; return; }
             container.innerHTML = list.map(a => `
@@ -1008,10 +980,21 @@
 
         async function cancelAppointment(id) {
             try {
-                await db.collection('appointments').doc(id).update({ status: 'cancelado' });
-                showToast('Cancelado.');
-                // Atualizar renderização das vagas caso o cliente estivesse tentando agendar algo e cancele
-                if (selectedDate && selectedBarber) updateTimeSlots(); 
+                // Recupera os dados primeiro para poder enviar o email com as informações corretas
+                const docRef = db.collection('appointments').doc(id);
+                const doc = await docRef.get();
+                
+                if (doc.exists) {
+                    const appointmentData = doc.data();
+                    
+                    // Atualiza status no banco para cancelado
+                    await docRef.update({ status: 'cancelado' });
+                    showToast('Cancelado.');
+                    if (selectedDate && selectedBarber) updateTimeSlots(); 
+                    
+                    // Dispara E-mail informando sobre o cancelamento
+                    sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' });
+                }
             } catch (error) { showToast('Erro ao cancelar.'); }
         }
 
@@ -1022,35 +1005,26 @@
             document.getElementById('statTodayBookings').innerText = tenantAppts.filter(a => a.date === todayStr && a.status === 'confirmado').length;
             document.getElementById('statRevenue').innerText = `R$ ${tenantAppts.filter(a => a.date === todayStr && a.status === 'confirmado').reduce((acc, a) => acc + parseFloat(a.servicePrice), 0).toFixed(2).replace('.', ',')}`;
 
-            // Tabela de agendamentos
             const tbody = document.getElementById('adminAppointmentsTable');
             if (tenantAppts.length === 0) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento.</td></tr>`;
             else tbody.innerHTML = tenantAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
 
-            // Tabela de bloqueios
             document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
         }
 
         // === AUTH & UTIL ===
         function listenAuthChanges() {
             auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = { uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email };
-                } else {
-                    currentUser = null;
-                }
-                updateAuthUI();
-                renderAppointments();
+                if (user) currentUser = { uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email };
+                else currentUser = null;
+                updateAuthUI(); renderAppointments();
             });
         }
 
         function updateAuthUI() {
             const container = document.getElementById('authContainer');
-            if (currentUser) {
-                container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:14px; font-weight:700;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:8px;" onclick="logout()"></i></div>`;
-            } else {
-                container.innerHTML = `<button class="user-auth-btn" onclick="openModal('authModal')"><i class="fa-solid fa-user"></i> Entrar</button>`;
-            }
+            if (currentUser) container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:14px; font-weight:700;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:8px;" onclick="logout()"></i></div>`;
+            else container.innerHTML = `<button class="user-auth-btn" onclick="openModal('authModal')"><i class="fa-solid fa-user"></i> Entrar</button>`;
         }
 
         function setAuthMode(mode) { 
@@ -1062,14 +1036,8 @@
         }
 
         async function loginWithGoogle() {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
-                closeModal('authModal');
-                showToast('Login efetuado com sucesso!');
-            } catch (error) {
-                showToast('Erro ao entrar com Google: ' + error.message);
-            }
+            try { const provider = new firebase.auth.GoogleAuthProvider(); await auth.signInWithPopup(provider); closeModal('authModal'); showToast('Login efetuado com sucesso!'); } 
+            catch (error) { showToast('Erro ao entrar com Google: ' + error.message); }
         }
 
         async function handleEmailAuth(e) {
@@ -1084,24 +1052,13 @@
                     await userCredential.user.updateProfile({ displayName: name });
                     currentUser = { uid: userCredential.user.uid, name: name, email: email };
                     showToast('Conta criada com sucesso!');
-                } else {
-                    await auth.signInWithEmailAndPassword(email, password);
-                    showToast('Acesso liberado!');
-                }
-                updateAuthUI();
-                closeModal('authModal');
-            } catch (error) {
-                showToast('Erro: ' + error.message);
-            }
+                } else { await auth.signInWithEmailAndPassword(email, password); showToast('Acesso liberado!'); }
+                updateAuthUI(); closeModal('authModal');
+            } catch (error) { showToast('Erro: ' + error.message); }
         }
 
         async function logout() {
-            try {
-                await auth.signOut();
-                showToast('Você saiu.');
-            } catch (error) {
-                showToast('Erro ao sair.');
-            }
+            try { await auth.signOut(); showToast('Você saiu.'); } catch (error) { showToast('Erro ao sair.'); }
         }
 
         function switchView(viewId, element) { document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active')); document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active')); document.getElementById(viewId).classList.add('active'); if (element) element.classList.add('active'); }
