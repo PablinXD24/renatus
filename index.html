@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Alterado para usar o Realtime Database em vez do Firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -646,7 +645,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.database(); // Alterado para Realtime Database
+        const db = firebase.database(); 
 
         let currentUser = null;
         let currentAuthMode = 'login'; 
@@ -671,12 +670,10 @@
             initDatabaseListeners();
         });
 
-        // Controles UI
         function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         function showToast(msg) { const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 3500); }
 
-        // === AUTO-SEEDING (Criação de Estrutura Inicial Automática no Realtime DB) ===
         async function createDefaultServices() {
             const defaults = [
                 { tenantId: TENANT_ID, name: 'Corte Clássico', duration: '30 min', price: 40.00 },
@@ -694,7 +691,6 @@
             for (let b of defaults) { await db.ref('barbers').push(b); }
         }
 
-        // === REAL-TIME DATABASE LISTENERS ===
         function initDatabaseListeners() {
             db.ref('services').orderByChild('tenantId').equalTo(TENANT_ID).on('value', snap => {
                 if(!snap.exists()) { 
@@ -741,7 +737,6 @@
             });
         }
 
-        // === FRONT-END RENDERING ===
         function renderServices() {
             const container = document.getElementById('servicesContainer');
             if(servicesData.length === 0) { container.innerHTML = "<p>Nenhum serviço cadastrado.</p>"; document.getElementById('adminServicesTable').innerHTML = ''; return; }
@@ -871,14 +866,18 @@
             document.getElementById('btnConfirmBooking').disabled = !(selectedServices.length > 0 && selectedBarber && selectedDate && selectedTime);
         }
 
-        // === ENVIO DE E-MAILS (VIA EMAILJS) ===
-        async function sendAutomatedNotifications(appointment) {
+        // === NOVO/MODIFICADO: ENVIO DE E-MAILS (VIA EMAILJS) COM TEMPLATES DIFERENTES ===
+        async function sendAutomatedNotifications(appointment, type = 'confirmacao') {
+            // SUBSTITUA ESTAS CREDENCIAIS PELAS SUAS DO EMAILJS (https://www.emailjs.com/)
             const serviceID = 'SEU_SERVICE_ID';
-            const templateID = 'SEU_TEMPLATE_ID'; 
             const publicKey = 'SUA_PUBLIC_KEY';
+            
+            // Templates diferentes para confirmação e cancelamento
+            const templateConfirmacaoID = 'SEU_TEMPLATE_CONFIRMACAO';
+            const templateCancelamentoID = 'SEU_TEMPLATE_CANCELAMENTO'; 
 
             if(serviceID === 'SEU_SERVICE_ID') {
-                console.warn("⚠️ EmailJS não configurado.");
+                console.warn(`[Aviso EmailJS]: Serviço não configurado. Simulação de email de '${type}' para: ${appointment.userEmail}`);
                 return;
             }
 
@@ -895,9 +894,14 @@
                 price: `R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}`
             };
 
+            const templateID = type === 'cancelado' ? templateCancelamentoID : templateConfirmacaoID;
+
             try {
                 await emailjs.send(serviceID, templateID, templateParams);
-            } catch (error) { console.error(error); }
+                console.log(`Email de ${type} enviado com sucesso!`);
+            } catch (error) { 
+                console.error("Erro ao enviar email: ", error); 
+            }
         }
 
         // === AGENDAMENTO E DB ===
@@ -923,7 +927,8 @@
                 const overlay = document.getElementById('successOverlay');
                 overlay.classList.add('active');
                 
-                sendAutomatedNotifications(appointmentData);
+                // Dispara o email de confirmação
+                sendAutomatedNotifications(appointmentData, 'confirmacao');
                 
                 setTimeout(() => {
                     overlay.classList.remove('active');
@@ -939,6 +944,26 @@
                 btn.innerHTML = 'Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
             }
+        }
+
+        // === CANCELAMENTO COM DISPARO DE EMAIL ===
+        async function cancelAppointment(id) {
+            try {
+                const docRef = db.ref('appointments/' + id);
+                const snapshot = await docRef.once('value');
+                
+                if (snapshot.exists()) {
+                    const appointmentData = snapshot.val();
+                    
+                    await docRef.update({ status: 'cancelado' });
+                    showToast('Cancelado com sucesso.');
+                    
+                    if (selectedDate && selectedBarber) updateTimeSlots(); 
+                    
+                    // Dispara o email de cancelamento informando o usuário
+                    sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' }, 'cancelado');
+                }
+            } catch (error) { showToast('Erro ao cancelar.'); }
         }
 
         // === ADMIN & CRUDS ===
@@ -1004,23 +1029,6 @@
             `).join('');
         }
 
-        async function cancelAppointment(id) {
-            try {
-                const docRef = db.ref('appointments/' + id);
-                const snapshot = await docRef.once('value');
-                
-                if (snapshot.exists()) {
-                    const appointmentData = snapshot.val();
-                    
-                    await docRef.update({ status: 'cancelado' });
-                    showToast('Cancelado.');
-                    if (selectedDate && selectedBarber) updateTimeSlots(); 
-                    
-                    sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' });
-                }
-            } catch (error) { showToast('Erro ao cancelar.'); }
-        }
-
         function renderAdminDashboard() {
             const todayStr = new Date().toISOString().split('T')[0];
             const tenantAppts = localAppointments.filter(a => a.tenantId === TENANT_ID);
@@ -1030,7 +1038,7 @@
 
             const tbody = document.getElementById('adminAppointmentsTable');
             if (tenantAppts.length === 0) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento.</td></tr>`;
-            else tbody.innerHTML = tenantAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
+            else tbody.innerHTML = tenantAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir/Cancelar</button>` : '-'}</td></tr>`).join('');
 
             document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
         }
