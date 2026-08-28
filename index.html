@@ -347,9 +347,11 @@
         
         .cal-grid-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; }
         .cal-grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .cal-day-cell { background: var(--bg-primary); border: 1px solid var(--card-border); border-radius: var(--radius-sm); min-height: 90px; padding: 8px; display: flex; flex-direction: column; justify-content: flex-start; transition: var(--transition); position: relative; }
+        .cal-day-cell { background: var(--bg-primary); border: 1px solid var(--card-border); border-radius: var(--radius-sm); min-height: 90px; padding: 8px; display: flex; flex-direction: column; justify-content: flex-start; transition: var(--transition); position: relative; cursor: pointer; }
+        .cal-day-cell:hover { border-color: var(--accent-main); box-shadow: 0 4px 12px rgba(35, 75, 186, 0.1); }
         .cal-day-cell.other-month { opacity: 0.4; background: rgba(244, 245, 248, 0.5); }
         .cal-day-cell.today { border-color: var(--accent-main); background: #f0f4ff; }
+        .cal-day-cell.selected-day { border-color: var(--accent-gold); box-shadow: 0 0 0 2px var(--accent-gold); background: #fffdf0; }
         .cal-day-number { font-size: 13px; font-weight: 700; margin-bottom: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
         .cal-day-cell.today .cal-day-number { background: var(--accent-main); color: var(--bg-primary); }
         
@@ -524,8 +526,9 @@
                 </form>
             </div>
 
-            <div class="section-title">Agendamentos Recentes (Calendário)</div>
+            <div class="section-title" id="adminTableTitle">Agendamentos Recentes (Calendário)</div>
             
+            <!-- CALENDÁRIO ESTILIZADO GOOGLE AGENDA -->
             <div class="admin-calendar-wrapper">
                 <div class="cal-header">
                     <div class="cal-header-title" id="calMonthYearLabel">Mês Ano</div>
@@ -738,6 +741,7 @@
 
         // Estado do Calendário do Admin
         let adminCalendarDate = new Date();
+        let selectedAdminDateFilter = null; // null significa exibir todos
 
         const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
         
@@ -1238,6 +1242,19 @@
             renderAdminCalendar();
         }
 
+        function selectAdminDate(dateStr) {
+            if (selectedAdminDateFilter === dateStr) {
+                // Clicar novamente no mesmo dia desmarca o filtro
+                selectedAdminDateFilter = null;
+                showToast('Filtro de data removido.');
+            } else {
+                selectedAdminDateFilter = dateStr;
+                showToast(`Filtrando por: ${dateStr.split('-').reverse().join('/')}`);
+            }
+            renderAdminCalendar();
+            renderAdminDashboard();
+        }
+
         function renderAdminCalendar() {
             const container = document.getElementById('adminCalendarDaysContainer');
             const label = document.getElementById('calMonthYearLabel');
@@ -1291,6 +1308,7 @@
         function renderSingleCalendarCell(dateStr, dayNum, isOtherMonth, allAppts, todayStr) {
             const cellAppts = allAppts.filter(a => a.date === dateStr);
             const isToday = (dateStr === todayStr);
+            const isSelected = (dateStr === selectedAdminDateFilter);
 
             let eventsHtml = cellAppts.map(a => {
                 const statusClass = a.status === 'cancelado' ? 'status-canceled' : '';
@@ -1298,7 +1316,7 @@
             }).join('');
 
             return `
-                <div class="cal-day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}">
+                <div class="cal-day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected-day' : ''}" onclick="selectAdminDate('${dateStr}')">
                     <div class="cal-day-number">${dayNum}</div>
                     <div class="cal-events-container">
                         ${eventsHtml}
@@ -1314,9 +1332,26 @@
             document.getElementById('statTodayBookings').innerText = tenantAppts.filter(a => a.date === todayStr && a.status === 'confirmado').length;
             document.getElementById('statRevenue').innerText = `R$ ${tenantAppts.filter(a => a.date === todayStr && a.status === 'confirmado').reduce((acc, a) => acc + parseFloat(a.servicePrice), 0).toFixed(2).replace('.', ',')}`;
 
+            // Filtragem da tabela com base no dia selecionado no calendário
+            let displayedAppts = tenantAppts;
+            const titleEl = document.getElementById('adminTableTitle');
+            if (selectedAdminDateFilter) {
+                displayedAppts = tenantAppts.filter(a => a.date === selectedAdminDateFilter);
+                if (titleEl) {
+                    titleEl.innerText = `Agendamentos em ${selectedAdminDateFilter.split('-').reverse().join('/')} (Clique no dia novamente para limpar o filtro)`;
+                }
+            } else {
+                if (titleEl) {
+                    titleEl.innerText = "Agendamentos Recentes (Calendário)";
+                }
+            }
+
             const tbody = document.getElementById('adminAppointmentsTable');
-            if (tenantAppts.length === 0) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento.</td></tr>`;
-            else tbody.innerHTML = tenantAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
+            if (displayedAppts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento encontrado para este período/dia.</td></tr>`;
+            } else {
+                tbody.innerHTML = displayedAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date.split('-').reverse().join('/')} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
+            }
 
             document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
 
