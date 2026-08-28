@@ -282,8 +282,8 @@
         .btn-small { padding: 8px 16px; font-size: 13px; margin-top: 0; width: auto; border-radius: var(--radius-sm); }
         .btn-danger { background: var(--danger); color: white; }
 
-        /* Meus Agendamentos - Estilo Grid de Ícones Estilo Celular (Agenda por Meses) */
-        .appointments-container { display: flex; flex-direction: column; gap: 30px; }
+        /* Meus Agendamentos - Estilo Grid de Ícones Estilo Celular (Expansível/Retrátil por Meses) */
+        .appointments-container { display: flex; flex-direction: column; gap: 20px; }
         
         .recent-section-header { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); margin-bottom: 15px; letter-spacing: 0.5px; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 8px; }
         
@@ -292,12 +292,21 @@
         .recent-appointments-scroll::-webkit-scrollbar-track { background: transparent; }
         .recent-appointments-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
 
-        .month-group-container { display: flex; flex-direction: column; gap: 15px; background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 25px; border: 1px solid var(--card-border); }
-        .month-group-title { font-family: 'Anton', sans-serif; font-size: 26px; color: var(--accent-main); text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+        .month-group-container { background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; transition: var(--transition); }
         
-        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .month-group-header { padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--bg-secondary); }
+        .month-group-header:hover { background: #eceff5; }
+        
+        .month-group-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--accent-main); text-transform: uppercase; display: flex; align-items: center; gap: 10px; margin: 0; }
+        .month-group-toggle-icon { font-size: 16px; color: var(--text-secondary); transition: transform 0.3s ease; }
+        .month-group-container.expanded .month-group-toggle-icon { transform: rotate(180deg); }
 
-        .appointment-card { background: var(--bg-primary); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; border: 1px solid var(--card-border); transition: var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .month-group-content { display: none; padding: 0 25px 25px 25px; border-top: 1px solid var(--card-border); background: var(--bg-primary); }
+        .month-group-container.expanded .month-group-content { display: block; }
+        
+        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+
+        .appointment-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; border: 1px solid var(--card-border); transition: var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .appointment-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
         .appointment-info { display: flex; align-items: flex-start; gap: 15px; width: 100%; }
         .appointment-date-badge { background: var(--accent-main); color: var(--bg-primary); border-radius: var(--radius-sm); padding: 10px 14px; text-align: center; box-shadow: 0 4px 10px rgba(35, 75, 186, 0.2); flex-shrink: 0; }
@@ -1039,6 +1048,11 @@
 
         async function deleteBlock(id) { try { await db.ref('blocks/' + id).remove(); showToast('Bloqueio removido!'); } catch (error) { showToast('Erro ao remover bloqueio.'); } }
 
+        function toggleMonthGroup(headerElement) {
+            const container = headerElement.parentElement;
+            container.classList.toggle('expanded');
+        }
+
         function renderAppointments() {
             const container = document.getElementById('myAppointmentsContainer');
             let list = localAppointments.filter(a => a.tenantId === TENANT_ID);
@@ -1067,10 +1081,6 @@
                 return;
             }
 
-            // Encontrar o mês do primeiro agendamento (cronologicamente considerando o array ordenado ou buscando o menor mês)
-            let validMonthsWithApps = currentYearApps.map(a => parseInt(a.date.split('-')[1], 10));
-            let startMonth = Math.min(...validMonthsWithApps);
-
             let htmlContent = '';
 
             // Seção Superior: Recém Agendados
@@ -1080,7 +1090,6 @@
                     <div class="recent-appointments-scroll">
             `;
 
-            // Pegamos até 5 agendamentos mais recentes para a lista superior
             let recentList = [...currentYearApps].slice(0, 5);
             htmlContent += recentList.map(a => {
                 const dateParts = a.date.split('-');
@@ -1115,54 +1124,60 @@
                 </div>
             `;
 
-            // Renderizar caixas estilo ícone/aplicativo para cada mês a partir do mês do primeiro agendamento até dezembro
-            for (let m = startMonth; m <= 12; m++) {
+            // Renderizar caixas estilo aplicativo para cada mês que possui pelo menos 1 agendamento
+            // Ordenados do mês mais antigo para o mais recente (ou conforme os meses existentes)
+            let monthsWithBookings = [...new Set(currentYearApps.map(a => parseInt(a.date.split('-')[1], 10)))].sort((a, b) => a - b);
+
+            monthsWithBookings.forEach(m => {
                 let monthApps = currentYearApps.filter(a => parseInt(a.date.split('-')[1], 10) === m);
                 
                 htmlContent += `
                     <div class="month-group-container">
-                        <div class="month-group-title">
-                            <i class="fa-regular fa-calendar-days"></i> ${monthNamesFull[m - 1]} / ${currentYear}
+                        <div class="month-group-header" onclick="toggleMonthGroup(this)">
+                            <div class="month-group-title">
+                                <i class="fa-regular fa-calendar-days"></i> ${monthNamesFull[m - 1]} / ${currentYear}
+                            </div>
+                            <i class="fa-solid fa-chevron-down month-group-toggle-icon"></i>
                         </div>
+                        <div class="month-group-content">
+                            <div class="month-apps-grid">
                 `;
 
-                if (monthApps.length === 0) {
-                    htmlContent += `<div style="color: var(--text-secondary); font-size: 14px; padding: 10px 0;">Nenhum agendamento para este mês.</div>`;
-                } else {
-                    htmlContent += `<div class="month-apps-grid">`;
-                    htmlContent += monthApps.map(a => {
-                        const dateParts = a.date.split('-');
-                        const dayNum = dateParts[2];
-                        const monthStr = monthNamesShort[m - 1] || '';
+                htmlContent += monthApps.map(a => {
+                    const dateParts = a.date.split('-');
+                    const dayNum = dateParts[2];
+                    const monthStr = monthNamesShort[m - 1] || '';
 
-                        return `
-                        <div class="appointment-card">
-                            <div class="appointment-info">
-                                <div class="appointment-date-badge">
-                                    <div class="day">${dayNum}</div>
-                                    <div class="month-label">${monthStr}</div>
-                                </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <h3 style="font-size:16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                    <div style="font-size:13px; color: var(--text-secondary); margin-bottom: 4px;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                    <div style="font-size:13px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
-                                </div>
+                    return `
+                    <div class="appointment-card">
+                        <div class="appointment-info">
+                            <div class="appointment-date-badge">
+                                <div class="day">${dayNum}</div>
+                                <div class="month-label">${monthStr}</div>
                             </div>
-                            <div class="appointment-card-footer">
-                                <div style="color:var(--accent-main); font-weight:800; font-size: 16px;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
-                                    ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
-                                </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <h3 style="font-size:16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
+                                <div style="font-size:13px; color: var(--text-secondary); margin-bottom: 4px;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
+                                <div style="font-size:13px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
-                    `;
-                    }).join('');
-                    htmlContent += `</div>`;
-                }
+                        <div class="appointment-card-footer">
+                            <div style="color:var(--accent-main); font-weight:800; font-size: 16px;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
+                                ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                }).join('');
 
-                htmlContent += `</div>`;
-            }
+                htmlContent += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
 
             container.innerHTML = htmlContent;
         }
