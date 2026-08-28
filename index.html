@@ -51,6 +51,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
 
         h1, h2 {
@@ -60,7 +61,7 @@
         }
 
         /* ==========================================================================
-           HEADER & NAVEGAÇÃO
+           HEADER & NAVEGAÇÃO MOBILE-FIRST REATIVA
            ========================================================================== */
         header {
             position: sticky;
@@ -69,7 +70,7 @@
             background: var(--accent-main);
             border-bottom-left-radius: var(--radius-lg);
             border-bottom-right-radius: var(--radius-lg);
-            padding: 1.25rem 2rem 1.25rem 220px;
+            padding: 1rem 1.5rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
@@ -79,20 +80,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
         }
 
         .logo {
-            position: absolute;
-            top: 0;
-            left: 0;
             background: var(--bg-primary);
-            padding: 18px 25px;
-            border-bottom-right-radius: var(--radius-md);
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-family: 'Anton', sans-serif;
-            font-size: 22px;
+            font-size: 18px;
             letter-spacing: 1px;
             color: var(--text-primary);
             text-decoration: none;
@@ -101,38 +100,25 @@
 
         .logo i {
             color: var(--accent-gold);
-            font-size: 1.4rem;
-        }
-
-        .logo::before, .logo::after {
-            content: "";
-            position: absolute;
-            width: 20px; height: 20px;
-        }
-        .logo::before {
-            bottom: -20px; left: 0;
-            background: radial-gradient(circle at 100% 100%, transparent 20px, var(--bg-primary) 20.5px);
-        }
-        .logo::after {
-            top: 0; right: -20px;
-            background: radial-gradient(circle at 100% 100%, transparent 20px, var(--bg-primary) 20.5px);
+            font-size: 1.2rem;
         }
 
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
 
         .nav-link {
             color: var(--bg-primary);
             text-decoration: none;
             font-weight: 500;
-            font-size: 15px;
-            padding: 8px 16px;
+            font-size: 14px;
+            padding: 8px 12px;
             border-radius: var(--radius-sm);
             transition: var(--transition);
             cursor: pointer;
+            white-space: nowrap;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -144,15 +130,16 @@
             background-color: var(--accent-gold);
             color: var(--text-primary);
             border: none;
-            padding: 10px 20px;
+            padding: 8px 14px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             border-radius: var(--radius-lg);
             cursor: pointer;
             transition: transform 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            white-space: nowrap;
         }
 
         .user-auth-btn:hover { transform: scale(1.05); }
@@ -160,227 +147,237 @@
         .user-profile-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
-            padding: 6px 14px;
+            padding: 4px 10px;
             border-radius: 50px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: var(--bg-primary);
         }
 
         .user-avatar {
-            width: 32px; height: 32px;
+            width: 28px; height: 28px;
             border-radius: 50%;
             background: var(--accent-gold);
             color: var(--text-primary);
             display: flex; align-items: center; justify-content: center;
             font-weight: 700;
+            font-size: 12px;
         }
 
         /* ==========================================================================
-           CONTAINER PRINCIPAL & VIEWS
+           CONTAINER PRINCIPAL & VIEWS RESPONSIVAS
            ========================================================================== */
         main {
             max-width: 1200px; width: 100%;
-            margin: 2rem auto; padding: 0 1.5rem; flex: 1;
+            margin: 1.5rem auto; padding: 0 1rem; flex: 1;
         }
 
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .page-header { margin-bottom: 2rem; }
-        .page-header h1 { font-size: 48px; line-height: 1.1; color: var(--text-primary); margin-bottom: 0.5rem; }
-        .page-header p { color: var(--text-secondary); font-size: 1rem; }
+        .page-header { margin-bottom: 1.5rem; text-align: left; }
+        .page-header h1 { font-size: 32px; line-height: 1.1; color: var(--text-primary); margin-bottom: 0.3rem; }
+        .page-header p { color: var(--text-secondary); font-size: 0.9rem; }
 
-        .booking-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; }
+        .booking-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 
-        @media (max-width: 900px) {
-            .booking-grid { grid-template-columns: 1fr; }
-            header { padding-left: 1.5rem; }
-            .logo { position: relative; padding: 10px; border-radius: 10px; background: transparent; color: var(--bg-primary); margin-bottom: 1rem; }
-            .logo::before, .logo::after { display: none; }
+        @media (min-width: 900px) {
+            .booking-grid { grid-template-columns: 1fr 360px; }
+            .page-header h1 { font-size: 48px; }
+            header { padding: 1.25rem 2rem; }
+            .logo { font-size: 22px; padding: 18px 25px; border-bottom-right-radius: var(--radius-md); }
         }
 
-        .section-title { font-family: 'Anton', sans-serif; font-size: 24px; color: var(--text-primary); margin-bottom: 1.25rem; letter-spacing: 0.5px; }
-        .title-flex { display: flex; justify-content: space-between; align-items: center; }
+        .section-title { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); margin-bottom: 1rem; letter-spacing: 0.5px; }
+        .title-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 
         /* Lista de Serviços */
-        .services-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-bottom: 2rem; }
+        .services-list { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 1.5rem; }
+        @media(min-width: 550px) {
+            .services-list { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+        }
         .service-card {
             background: var(--bg-secondary); border-radius: var(--radius-md);
-            padding: 50px 20px 20px 20px; cursor: pointer; position: relative;
+            padding: 45px 15px 15px 15px; cursor: pointer; position: relative;
             transition: box-shadow 0.3s ease; border: 2px solid transparent;
         }
         .service-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
         .service-card.selected { border-color: var(--accent-main); background: #E8EDFF; }
-        .service-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; z-index: 2; }
-        .service-card .duration { font-size: 13px; color: var(--text-secondary); }
+        .service-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; z-index: 2; }
+        .service-card .duration { font-size: 12px; color: var(--text-secondary); }
         .service-card .price {
             position: absolute; top: 0; left: 0; background: var(--bg-primary);
-            padding: 10px 15px; border-bottom-right-radius: 16px; border-top-left-radius: 20px;
-            font-size: 15px; font-weight: 800; color: var(--text-primary); z-index: 10;
+            padding: 8px 12px; border-bottom-right-radius: 14px; border-top-left-radius: 20px;
+            font-size: 14px; font-weight: 800; color: var(--text-primary); z-index: 10;
             border-bottom: 2px solid var(--bg-secondary); border-right: 2px solid var(--bg-secondary);
         }
         .service-card.selected .price { border-bottom-color: #E8EDFF; border-right-color: #E8EDFF; }
-        .service-card .price::before { content: ""; position: absolute; bottom: -16px; left: 0; width: 16px; height: 16px; background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px); }
-        .service-card .price::after { content: ""; position: absolute; top: 0; right: -16px; width: 16px; height: 16px; background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px); }
 
         /* Seleção de Barbeiros */
-        .barbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .barbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
         .barber-card {
-            background: var(--bg-secondary); border-radius: var(--radius-md); padding: 20px;
+            background: var(--bg-secondary); border-radius: var(--radius-md); padding: 15px;
             text-align: center; cursor: pointer; transition: var(--transition); border: 2px solid transparent;
         }
         .barber-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
         .barber-card.selected { border-color: var(--accent-main); background: #E8EDFF; }
-        .barber-avatar { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 10px auto; background: var(--accent-main); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--bg-primary); }
+        .barber-avatar { width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 8px auto; background: var(--accent-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--bg-primary); }
         .barber-card.selected .barber-avatar { background: var(--accent-gold); color: var(--text-primary); }
-        .barber-name { font-weight: 700; font-size: 14px; }
-        .barber-role { font-size: 12px; color: var(--text-secondary); }
+        .barber-name { font-weight: 700; font-size: 13px; }
+        .barber-role { font-size: 11px; color: var(--text-secondary); }
 
         /* Seleção de Data */
-        .dates-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
-        .dates-scroll::-webkit-scrollbar { height: 8px; }
+        .dates-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
+        .dates-scroll::-webkit-scrollbar { height: 6px; }
         .dates-scroll::-webkit-scrollbar-track { background: transparent; }
         .dates-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
-        .date-card { flex: 0 0 85px; scroll-snap-align: start; background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 15px 10px; text-align: center; cursor: pointer; transition: var(--transition); border: 2px solid transparent; }
+        .date-card { flex: 0 0 75px; scroll-snap-align: start; background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; cursor: pointer; transition: var(--transition); border: 2px solid transparent; }
         .date-card:hover { background: #E8EDFF; }
         .date-card.selected { border-color: var(--accent-main); background: var(--accent-main); color: var(--bg-primary); }
-        .date-card .d-week { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-        .date-card .d-num { font-size: 24px; font-weight: 800; line-height: 1; }
-        .date-card .d-month { font-size: 11px; margin-top: 4px; font-weight: 600; }
+        .date-card .d-week { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
+        .date-card .d-num { font-size: 20px; font-weight: 800; line-height: 1; }
+        .date-card .d-month { font-size: 10px; margin-top: 3px; font-weight: 600; }
 
         /* Horários */
-        .period-selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .period-btn { flex: 1; padding: 12px 10px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: var(--radius-sm); font-weight: 700; font-size: 13px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-secondary); }
+        .period-selector { display: flex; gap: 8px; margin-bottom: 15px; }
+        .period-btn { flex: 1; padding: 10px 6px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: var(--radius-sm); font-weight: 700; font-size: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text-secondary); }
         .period-btn:hover { background: #E8EDFF; }
         .period-btn.active { background: var(--accent-main); color: var(--bg-primary); border-color: var(--accent-main); }
-        .time-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
-        .time-slot { padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-sm); text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); border: 2px solid transparent; }
+        .time-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; }
+        .time-slot { padding: 10px; background: var(--bg-secondary); border-radius: var(--radius-sm); text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); border: 2px solid transparent; }
         .time-slot:hover { background: #E8EDFF; }
         .time-slot.selected { background: var(--accent-main); color: var(--bg-primary); border-color: var(--accent-main); }
 
         /* Resumo */
-        .summary-card { position: sticky; top: 110px; background-color: var(--accent-main); border-radius: var(--radius-lg); padding: 30px; color: var(--bg-primary); }
-        .summary-card .section-title { color: var(--bg-primary); margin-bottom: 1.5rem; }
-        .summary-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); font-size: 14px; }
+        .summary-card { background-color: var(--accent-main); border-radius: var(--radius-lg); padding: 20px; color: var(--bg-primary); margin-top: 1rem; }
+        @media(min-width: 900px) {
+            .summary-card { position: sticky; top: 100px; padding: 30px; margin-top: 0; }
+        }
+        .summary-card .section-title { color: var(--bg-primary); margin-bottom: 1rem; font-size: 26px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); font-size: 13px; gap: 10px; }
         .summary-row .label { color: rgba(255, 255, 255, 0.8); }
-        .summary-row .value { font-weight: 600; text-align: right; cursor: pointer; transition: color 0.2s; }
+        .summary-row .value { font-weight: 600; text-align: right; cursor: pointer; transition: color 0.2s; word-break: break-word; }
         .summary-row .value:hover { color: var(--accent-gold); text-decoration: underline; }
-        .summary-phone-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 12px 15px; border-radius: var(--radius-sm); margin-top: 8px; font-family: 'Inter', sans-serif; outline: none; transition: var(--transition); }
-        .summary-phone-input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        .summary-phone-input:focus { border-color: var(--accent-gold); }
-        .summary-total { margin-top: 1.5rem; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
-        .summary-total .total-price { font-size: 32px; font-weight: 800; color: var(--accent-gold); font-family: 'Anton', sans-serif; letter-spacing: 1px; }
+        .summary-total { margin-top: 1rem; padding-top: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
+        .summary-total .total-price { font-size: 28px; font-weight: 800; color: var(--accent-gold); font-family: 'Anton', sans-serif; letter-spacing: 1px; }
 
-        .btn-confirm { width: 100%; margin-top: 1.5rem; padding: 15px; background: var(--accent-gold); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-size: 16px; font-weight: 800; cursor: pointer; transition: transform 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .btn-confirm:hover:not(:disabled) { transform: scale(1.05); }
+        .btn-confirm { width: 100%; margin-top: 1.2rem; padding: 14px; background: var(--accent-gold); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-size: 15px; font-weight: 800; cursor: pointer; transition: transform 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-confirm:hover:not(:disabled) { transform: scale(1.02); }
         .btn-confirm:disabled { background: #cccccc; color: #666666; cursor: not-allowed; }
         
-        .btn-small { padding: 8px 16px; font-size: 13px; margin-top: 0; width: auto; border-radius: var(--radius-sm); }
+        .btn-small { padding: 6px 12px; font-size: 12px; margin-top: 0; width: auto; border-radius: var(--radius-sm); }
         .btn-danger { background: var(--danger); color: white; }
 
-        /* Meus Agendamentos - Estilo Grid de Ícones Estilo Celular (Expansível/Retrátil por Meses) */
-        .appointments-container { display: flex; flex-direction: column; gap: 20px; }
+        /* Meus Agendamentos */
+        .appointments-container { display: flex; flex-direction: column; gap: 15px; }
+        .recent-section-header { font-family: 'Anton', sans-serif; font-size: 18px; color: var(--text-primary); margin-bottom: 10px; letter-spacing: 0.5px; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 6px; }
         
-        .recent-section-header { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); margin-bottom: 15px; letter-spacing: 0.5px; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 8px; }
+        .recent-appointments-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
+        .recent-appointments-scroll::-webkit-scrollbar { height: 6px; }
         
-        .recent-appointments-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
-        .recent-appointments-scroll::-webkit-scrollbar { height: 8px; }
-        .recent-appointments-scroll::-webkit-scrollbar-track { background: transparent; }
-        .recent-appointments-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
-
-        .month-group-container { background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; transition: var(--transition); }
-        
-        .month-group-header { padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--bg-secondary); }
+        .month-group-container { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); overflow: hidden; transition: var(--transition); }
+        .month-group-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--bg-secondary); }
         .month-group-header:hover { background: #eceff5; }
-        
-        .month-group-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--accent-main); text-transform: uppercase; display: flex; align-items: center; gap: 10px; margin: 0; }
-        .month-group-toggle-icon { font-size: 16px; color: var(--text-secondary); transition: transform 0.3s ease; }
+        .month-group-title { font-family: 'Anton', sans-serif; font-size: 18px; color: var(--accent-main); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin: 0; }
+        .month-group-toggle-icon { font-size: 14px; color: var(--text-secondary); transition: transform 0.3s ease; }
         .month-group-container.expanded .month-group-toggle-icon { transform: rotate(180deg); }
 
-        .month-group-content { display: none; padding: 0 25px 25px 25px; border-top: 1px solid var(--card-border); background: var(--bg-primary); }
+        .month-group-content { display: none; padding: 0 15px 15px 15px; border-top: 1px solid var(--card-border); background: var(--bg-primary); }
         .month-group-container.expanded .month-group-content { display: block; }
         
-        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+        .month-apps-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; }
+        @media(min-width: 600px) {
+            .month-apps-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        }
 
-        .appointment-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; border: 1px solid var(--card-border); transition: var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .appointment-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
-        .appointment-info { display: flex; align-items: flex-start; gap: 15px; width: 100%; }
-        .appointment-date-badge { background: var(--accent-main); color: var(--bg-primary); border-radius: var(--radius-sm); padding: 10px 14px; text-align: center; box-shadow: 0 4px 10px rgba(35, 75, 186, 0.2); flex-shrink: 0; }
-        .appointment-date-badge .day { font-size: 24px; font-family: 'Anton', sans-serif; line-height: 1; }
-        .appointment-date-badge .month-label { font-size: 10px; text-transform: uppercase; font-weight: 700; margin-top: 2px; opacity: 0.9; }
-        .status-badge { padding: 5px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .appointment-card { background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 15px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; border: 1px solid var(--card-border); transition: var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .appointment-info { display: flex; align-items: flex-start; gap: 12px; width: 100%; }
+        .appointment-date-badge { background: var(--accent-main); color: var(--bg-primary); border-radius: var(--radius-sm); padding: 8px 10px; text-align: center; flex-shrink: 0; }
+        .appointment-date-badge .day { font-size: 20px; font-family: 'Anton', sans-serif; line-height: 1; }
+        .appointment-date-badge .month-label { font-size: 9px; text-transform: uppercase; font-weight: 700; margin-top: 2px; opacity: 0.9; }
+        .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
         .status-confirmed { background: rgba(16, 185, 129, 0.15); color: var(--success); }
         .status-canceled { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-        .btn-cancel { background: var(--danger); color: var(--bg-primary); border: none; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; font-size: 12px; cursor: pointer; transition: var(--transition); }
-        .btn-cancel:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-cancel { background: var(--danger); color: var(--bg-primary); border: none; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 700; font-size: 11px; cursor: pointer; transition: var(--transition); white-space: nowrap; }
         
-        .appointment-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 14px; margin-top: 2px; width: 100%; }
+        .appointment-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 10px; width: 100%; gap: 8px; }
 
         /* Admin Dashboard & CRUD Forms */
-        .admin-dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 25px; display: flex; align-items: center; gap: 20px; }
-        .stat-icon { width: 60px; height: 60px; border-radius: 50%; background: var(--accent-main); color: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .stat-val { font-size: 32px; font-family: 'Anton', sans-serif; color: var(--text-primary); }
+        .admin-dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+        @media(min-width: 550px) {
+            .admin-dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .stat-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 50%; background: var(--accent-main); color: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .stat-val { font-size: 26px; font-family: 'Anton', sans-serif; color: var(--text-primary); }
         
-        table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 2rem; }
-        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid var(--card-border); }
-        th { background: var(--accent-main); color: var(--bg-primary); font-weight: 600; }
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); min-width: 550px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--card-border); font-size: 13px; }
+        th { background: var(--accent-main); color: var(--bg-primary); font-weight: 600; white-space: nowrap; }
         
-        .admin-crud-section { background: #fff; border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 25px; margin-bottom: 2rem; }
-        .crud-form { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; }
-        .form-control { width: 100%; padding: 12px 15px; border: 2px solid var(--bg-secondary); border-radius: var(--radius-sm); margin-bottom: 15px; font-family: 'Inter', sans-serif; margin-top: 5px; }
-        .crud-form .form-control { margin-bottom: 0; }
-        .input-group { flex: 1; min-width: 150px; }
-        .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--text-secondary); }
+        .admin-crud-section { background: #fff; border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 15px; margin-bottom: 1.5rem; }
+        @media(min-width: 768px) { .admin-crud-section { padding: 25px; } }
+        
+        .crud-form { display: flex; gap: 12px; margin-bottom: 15px; flex-direction: column; align-items: stretch; }
+        @media(min-width: 768px) {
+            .crud-form { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
+        }
+        .form-control { width: 100%; padding: 10px 12px; border: 2px solid var(--bg-secondary); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; margin-top: 4px; font-size: 14px; background: #fff; }
+        .input-group { flex: 1; min-width: 140px; margin-bottom: 10px; }
+        @media(min-width: 768px) { .input-group { margin-bottom: 0; } }
+        .input-group label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary); }
 
-        /* Estilização do Calendário Admin (Estilo Google Agenda) */
-        .admin-calendar-wrapper { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); padding: 25px; margin-bottom: 2rem; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .cal-header-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .cal-nav-btns { display: flex; align-items: center; gap: 10px; }
-        .cal-btn { background: var(--bg-primary); border: 1px solid var(--card-border); color: var(--text-primary); padding: 8px 14px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        /* Estilização do Calendário Admin */
+        .admin-calendar-wrapper { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); padding: 15px; margin-bottom: 1.5rem; }
+        @media(min-width: 768px) { .admin-calendar-wrapper { padding: 25px; } }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .cal-header-title { font-family: 'Anton', sans-serif; font-size: 18px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .cal-nav-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .cal-btn { background: var(--bg-primary); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: var(--radius-sm); font-weight: 600; font-size: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; }
         .cal-btn:hover { background: #eceff5; border-color: var(--accent-main); color: var(--accent-main); }
         
-        .cal-grid-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; }
-        .cal-grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .cal-day-cell { background: var(--bg-primary); border: 1px solid var(--card-border); border-radius: var(--radius-sm); min-height: 90px; padding: 8px; display: flex; flex-direction: column; justify-content: flex-start; transition: var(--transition); position: relative; cursor: pointer; }
+        .cal-grid-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; }
+        .cal-grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-day-cell { background: var(--bg-primary); border: 1px solid var(--card-border); border-radius: var(--radius-sm); min-height: 65px; padding: 4px; display: flex; flex-direction: column; justify-content: flex-start; transition: var(--transition); position: relative; cursor: pointer; }
+        @media(min-width: 768px) { .cal-day-cell { min-height: 90px; padding: 8px; } }
         .cal-day-cell:hover { border-color: var(--accent-main); box-shadow: 0 4px 12px rgba(35, 75, 186, 0.1); }
         .cal-day-cell.other-month { opacity: 0.4; background: rgba(244, 245, 248, 0.5); }
         .cal-day-cell.today { border-color: var(--accent-main); background: #f0f4ff; }
         .cal-day-cell.selected-day { border-color: var(--accent-gold); box-shadow: 0 0 0 2px var(--accent-gold); background: #fffdf0; }
-        .cal-day-number { font-size: 13px; font-weight: 700; margin-bottom: 6px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .cal-day-number { font-size: 11px; font-weight: 700; margin-bottom: 4px; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        @media(min-width: 768px) { .cal-day-number { font-size: 13px; width: 24px; height: 24px; } }
         .cal-day-cell.today .cal-day-number { background: var(--accent-main); color: var(--bg-primary); }
         
-        .cal-events-container { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 65px; scrollbar-width: none; }
+        .cal-events-container { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; max-height: 45px; scrollbar-width: none; }
+        @media(min-width: 768px) { .cal-events-container { max-height: 65px; gap: 4px; } }
         .cal-events-container::-webkit-scrollbar { display: none; }
-        .cal-event-pill { background: var(--accent-main); color: var(--bg-primary); font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+        .cal-event-pill { background: var(--accent-main); color: var(--bg-primary); font-size: 9px; padding: 2px 4px; border-radius: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 2px; }
+        @media(min-width: 768px) { .cal-event-pill { font-size: 10px; padding: 3px 6px; } }
         .cal-event-pill:hover { opacity: 0.85; }
         .cal-event-pill.status-canceled { background: var(--danger); text-decoration: line-through; }
 
-        @media (max-width: 768px) {
-            .cal-day-cell { min-height: 70px; padding: 4px; }
-            .cal-day-number { font-size: 11px; width: 20px; height: 20px; }
-            .cal-event-pill { font-size: 9px; padding: 2px 4px; }
-        }
-
-        /* Modais */
+        /* Modais Responsivos */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; }
         .modal-overlay.active { display: flex; }
-        .auth-modal, .selection-modal { background: var(--bg-primary); border-radius: var(--radius-md); width: 100%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        .auth-modal { max-width: 420px; padding: 2.5rem; }
-        .selection-modal { max-width: 550px; padding: 2.5rem; max-height: 90vh; overflow-y: auto; }
-        .modal-close { position: absolute; top: 20px; right: 20px; background: var(--bg-secondary); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; cursor: pointer; transition: var(--transition); }
-        .auth-tabs { display: flex; gap: 20px; margin-bottom: 25px; border-bottom: 2px solid var(--bg-secondary); }
-        .auth-tab { font-weight: 700; color: var(--text-muted); cursor: pointer; padding-bottom: 10px; position: relative; }
+        .auth-modal, .selection-modal { background: var(--bg-primary); border-radius: var(--radius-md); width: 100%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .auth-modal { max-width: 400px; padding: 1.5rem; }
+        .selection-modal { max-width: 500px; padding: 1.5rem; }
+        @media(min-width: 550px) {
+            .auth-modal { padding: 2.5rem; }
+            .selection-modal { padding: 2.5rem; }
+        }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: var(--bg-secondary); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 13px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .auth-tabs { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid var(--bg-secondary); }
+        .auth-tab { font-weight: 700; color: var(--text-muted); cursor: pointer; padding-bottom: 8px; position: relative; font-size: 14px; }
         .auth-tab.active { color: var(--text-primary); }
         .auth-tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--accent-main); }
-        .btn-google { width: 100%; padding: 12px; background: var(--bg-secondary); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1.25rem; }
+        .btn-google { width: 100%; padding: 10px; background: var(--bg-secondary); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1rem; }
         
-        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--text-primary); color: var(--bg-primary); padding: 1rem 1.5rem; border-radius: var(--radius-lg); display: none; align-items: center; gap: 12px; z-index: 2000; font-weight: 500; }
+        .toast { position: fixed; bottom: 20px; left: 20px; right: 20px; margin: 0 auto; max-width: 400px; background: var(--text-primary); color: var(--bg-primary); padding: 0.9rem 1.2rem; border-radius: var(--radius-lg); display: none; align-items: center; gap: 10px; z-index: 2000; font-weight: 500; font-size: 13px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .toast.show { display: flex; animation: slideIn 0.3s ease-out; }
 
         /* Animação de Sucesso ao Agendar */
@@ -388,20 +385,20 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
             z-index: 9999; display: none; flex-direction: column;
-            align-items: center; justify-content: center; text-align: center;
+            align-items: center; justify-content: center; text-align: center; padding: 1.5rem;
         }
         .success-overlay.active { display: flex; }
         .success-icon {
-            font-size: 90px; color: var(--success);
+            font-size: 70px; color: var(--success);
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
         .success-title {
-            margin-top: 25px; font-family: 'Anton', sans-serif;
-            font-size: 36px; color: var(--text-primary); text-transform: uppercase;
+            margin-top: 20px; font-family: 'Anton', sans-serif;
+            font-size: 28px; color: var(--text-primary); text-transform: uppercase;
             animation: slideUpFade 0.5s ease-out 0.2s forwards; opacity: 0;
         }
         .success-subtitle {
-            color: var(--text-secondary); margin-top: 10px; font-size: 16px;
+            color: var(--text-secondary); margin-top: 8px; font-size: 14px;
             animation: slideUpFade 0.5s ease-out 0.3s forwards; opacity: 0;
         }
         @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -413,11 +410,11 @@
         footer {
             background: var(--bg-secondary);
             border-top: 1px solid var(--card-border);
-            padding: 2.5rem 2rem;
-            margin-top: 4rem;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
             text-align: center;
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .footer-container {
@@ -426,28 +423,28 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
         }
 
         .footer-logo {
             font-family: 'Anton', sans-serif;
-            font-size: 20px;
+            font-size: 18px;
             color: var(--accent-main);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             letter-spacing: 1px;
             text-decoration: none;
         }
 
-        .footer-logo i {
-            color: var(--accent-gold);
-        }
+        .footer-logo i { color: var(--accent-gold); }
 
         .footer-links {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             font-weight: 500;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .footer-links a {
@@ -456,14 +453,8 @@
             transition: var(--transition);
         }
 
-        .footer-links a:hover {
-            color: var(--accent-main);
-        }
-
-        .footer-copy {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
+        .footer-links a:hover { color: var(--accent-main); }
+        .footer-copy { font-size: 12px; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -509,7 +500,7 @@
 
                 <div>
                     <div class="summary-card">
-                        <div class="section-title" style="font-size: 32px;">RESUMO</div>
+                        <div class="section-title" style="font-size: 26px;">RESUMO</div>
                         
                         <div class="summary-row">
                             <span class="label">Serviço(s)</span>
@@ -528,14 +519,9 @@
                             <span class="value" id="sumTime" onclick="if(selectedDate) openModal('timeModal')" title="Clique para alterar">--:--</span>
                         </div>
 
-                        <div class="summary-row" style="flex-direction: column; align-items: flex-start; border-bottom: none; margin-top: 10px;">
-                            <span class="label" style="font-size: 13px; font-weight: 600;">Seu WhatsApp (com DDD)</span>
-                            <input type="tel" id="sumPhone" class="summary-phone-input" placeholder="(11) 99999-9999">
-                        </div>
-
                         <div class="summary-total">
                             <div>
-                                <div style="font-size:12px; color:rgba(255,255,255,0.8); text-transform:uppercase; font-weight:700;">Valor Total</div>
+                                <div style="font-size:11px; color:rgba(255,255,255,0.8); text-transform:uppercase; font-weight:700;">Valor Total</div>
                                 <div class="total-price" id="sumTotal">R$ 0,00</div>
                             </div>
                         </div>
@@ -565,11 +551,11 @@
             <div class="admin-dashboard-grid">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                    <div><div class="stat-val" id="statTodayBookings">0</div><div style="color:var(--text-secondary); font-size:14px;">Agendamentos Hoje</div></div>
+                    <div><div class="stat-val" id="statTodayBookings">0</div><div style="color:var(--text-secondary); font-size:13px;">Agendamentos Hoje</div></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
-                    <div><div class="stat-val" id="statRevenue">R$ 0,00</div><div style="color:var(--text-secondary); font-size:14px;">Faturamento (Hoje)</div></div>
+                    <div><div class="stat-val" id="statRevenue">R$ 0,00</div><div style="color:var(--text-secondary); font-size:13px;">Faturamento (Hoje)</div></div>
                 </div>
             </div>
             
@@ -601,7 +587,7 @@
                 <div class="cal-grid-days" id="adminCalendarDaysContainer"></div>
             </div>
 
-            <div style="overflow-x:auto;">
+            <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
@@ -635,10 +621,12 @@
                     </div>
                     <button type="submit" class="btn-confirm btn-small"><i class="fa-solid fa-plus"></i> Adicionar</button>
                 </form>
-                <table>
-                    <thead><tr><th>Serviço</th><th>Duração</th><th>Preço</th><th>Ação</th></tr></thead>
-                    <tbody id="adminServicesTable"></tbody>
-                </table>
+                <div class="table-responsive" style="margin-top: 1rem; margin-bottom: 0;">
+                    <table>
+                        <thead><tr><th>Serviço</th><th>Duração</th><th>Preço</th><th>Ação</th></tr></thead>
+                        <tbody id="adminServicesTable"></tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="admin-crud-section">
@@ -654,10 +642,12 @@
                     </div>
                     <button type="submit" class="btn-confirm btn-small"><i class="fa-solid fa-plus"></i> Adicionar</button>
                 </form>
-                <table>
-                    <thead><tr><th>Nome</th><th>Cargo</th><th>Ação</th></tr></thead>
-                    <tbody id="adminBarbersTable"></tbody>
-                </table>
+                <div class="table-responsive" style="margin-top: 1rem; margin-bottom: 0;">
+                    <table>
+                        <thead><tr><th>Nome</th><th>Cargo</th><th>Ação</th></tr></thead>
+                        <tbody id="adminBarbersTable"></tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="admin-crud-section">
@@ -689,10 +679,12 @@
                     </div>
                     <button type="submit" class="btn-confirm btn-small"><i class="fa-solid fa-lock"></i> Bloquear</button>
                 </form>
-                <table>
-                    <thead><tr><th>Profissional</th><th>Data</th><th>Horário Bloqueado</th><th>Ação</th></tr></thead>
-                    <tbody id="adminBlocksTable"></tbody>
-                </table>
+                <div class="table-responsive" style="margin-top: 1rem; margin-bottom: 0;">
+                    <table>
+                        <thead><tr><th>Profissional</th><th>Data</th><th>Horário Bloqueado</th><th>Ação</th></tr></thead>
+                        <tbody id="adminBlocksTable"></tbody>
+                    </table>
+                </div>
             </div>
 
         </section>
@@ -756,23 +748,23 @@
                 <div class="auth-tab" id="tabRegister" onclick="setAuthMode('register')">Criar Conta</div>
             </div>
             <button class="btn-google" onclick="loginWithGoogle()">
-                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.41-1.57-5.13-3.7l-2.9 2.22C2.45 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.87 10.82c-.18-.53-.28-1.1-.28-1.82s.1-1.29.28-1.82L.97 4.96C.35 6.18 0 7.55 0 9s.35 2.82.97 4.04l2.9-2.22z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.45 2.02.97 4.96l2.9 2.22C4.59 5.15 6.62 3.58 9 3.58z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.41-1.57-5.13-3.7l-2.9 2.22C2.45 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.87 10.82c-.18-.53-.28-1.1-.28-1.82s.1-1.29.28-1.82L.97 4.96C.35 6.18 0 7.55 0 9s.35 2.82.97 4.04l2.9-2.22z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.45 2.02.97 4.96l2.9 2.22C4.59 5.15 6.62 3.58 9 3.58z"/></svg>
                 Continuar com Google
             </button>
             <form id="authForm" onsubmit="handleEmailAuth(event)">
-                <div id="nameGroup" style="display:none;">
-                    <label>Nome Completo</label>
+                <div id="nameGroup" style="display:none; margin-bottom: 10px;">
+                    <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Nome Completo</label>
                     <input type="text" id="authName" class="form-control" placeholder="Seu nome">
                 </div>
-                <div>
-                    <label>E-mail</label>
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">E-mail</label>
                     <input type="email" id="authEmail" class="form-control" placeholder="seuemail@exemplo.com" required>
                 </div>
-                <div>
-                    <label>Senha</label>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Senha</label>
                     <input type="password" id="authPassword" class="form-control" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-confirm" id="authSubmitBtn" style="margin-top:10px;">Entrar na Conta</button>
+                <button type="submit" class="btn-confirm" id="authSubmitBtn" style="margin-top:0;">Entrar na Conta</button>
             </form>
         </div>
     </div>
@@ -813,7 +805,7 @@
 
         // Estado do Calendário do Admin
         let adminCalendarDate = new Date();
-        let selectedAdminDateFilter = null; // null significa exibir todos
+        let selectedAdminDateFilter = null; 
 
         const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
         
@@ -973,7 +965,7 @@
             const isFullDayBlocked = barberBlocks.some(b => b.time === 'ALL');
             
             if (isFullDayBlocked) {
-                container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--danger); font-weight:bold;">Profissional indisponível nesta data.</div>`;
+                container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--danger); font-weight:bold; font-size:13px;">Profissional indisponível nesta data.</div>`;
                 return;
             }
 
@@ -1000,7 +992,7 @@
                     <div class="time-slot ${selectedTime === t ? 'selected' : ''}" onclick="selectTime('${t}')">${t}</div>
                 `).join('') + `</div>`;
             } else {
-                container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-secondary);">Nenhum horário disponível neste período.</div>`;
+                container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-secondary); font-size:13px;">Nenhum horário disponível neste período.</div>`;
             }
         }
 
@@ -1027,33 +1019,8 @@
             document.getElementById('btnConfirmBooking').disabled = !(selectedServices.length > 0 && selectedBarber && selectedDate && selectedTime);
         }
 
-        // === INTEGRAÇÃO WHATSAPP API & EMAILJS ===
-        async function sendWhatsAppNotification(appointment) {
-            const statusText = appointment.status === 'cancelado' ? '❌ *CANCELADO*' : '✅ *CONFIRMADO*';
-            
-            const msg = `💈 *BARBERSAAS - AGENDAMENTO* 💈\n\nOlá, *${appointment.userName}*!\nSeu agendamento foi ${statusText}.\n\n🧾 *DETALHES / NOTA FISCAL*\n\n🗓️ *Data:* ${appointment.date.split('-').reverse().join('/')}\n⏰ *Horário:* ${appointment.time}\n✂️ *Profissional:* ${appointment.barberName}\n📌 *Serviço(s):* ${appointment.serviceName}\n\n💰 *Valor Total: R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}*\n\n${appointment.status === 'confirmado' ? 'Para reagendar ou desmarcar, acesse a aba "Meus Agendamentos" no site.' : 'Esperamos ver você em breve!'}`;
-
-            const apiUrl = 'SUA_URL_DA_API_AQUI'; 
-            const apiToken = 'SEU_TOKEN_AQUI';
-
-            if (apiUrl === 'SUA_URL_DA_API_AQUI') {
-                console.warn("⚠️ API de WhatsApp não configurada. Imprimindo a nota fiscal no console:");
-                console.log(msg);
-                return;
-            }
-
-            try {
-                await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiToken}` },
-                    body: JSON.stringify({ phone: "55" + appointment.userPhone.replace(/\D/g, ''), message: msg })
-                });
-            } catch(e) { console.error('Erro ao enviar WPP', e); }
-        }
-
+        // === EMAILJS INTEGRATION ===
         async function sendAutomatedNotifications(appointment) {
-            sendWhatsAppNotification(appointment);
-
             const serviceID = 'service_w57ntvf';
             const templateID = appointment.status === 'cancelado' ? 'template_0f758dm' : 'template_t4vty7l'; 
             const publicKey = 'K8OklB-cs_yul_jNN';
@@ -1083,16 +1050,13 @@
         async function handleConfirmBooking() {
             if (!currentUser) { openModal('authModal'); showToast('Faça login para concluir.'); return; }
             
-            const phoneVal = document.getElementById('sumPhone').value;
-            if(!phoneVal || phoneVal.length < 8) { showToast('Informe seu WhatsApp com DDD para confirmar.'); return; }
-
             const btn = document.getElementById('btnConfirmBooking');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Agendando...';
             btn.disabled = true;
 
             const appointmentData = {
                 tenantId: TENANT_ID,
-                userId: currentUser.uid, userName: currentUser.name, userEmail: currentUser.email, userPhone: phoneVal,
+                userId: currentUser.uid, userName: currentUser.name, userEmail: currentUser.email, userPhone: currentUser.phone || '',
                 serviceName: selectedServices.map(s => s.name).join(' + '), 
                 servicePrice: selectedServices.reduce((a, c) => a + parseFloat(c.price), 0), 
                 barberName: selectedBarber.name, barberId: selectedBarber.id,
@@ -1111,7 +1075,6 @@
                     overlay.classList.remove('active');
                     selectedServices = []; selectedBarber = null; selectedDate = null; selectedTime = null;
                     document.getElementById('btnContinueFromServices').style.display = 'none';
-                    document.getElementById('sumPhone').value = '';
                     renderServices(); updateSummary();
                     btn.innerHTML = 'Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>';
                     switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1]);
@@ -1170,7 +1133,7 @@
             else list = [];
 
             if (list.length === 0) { 
-                container.innerHTML = `<div style="text-align:center; padding:3rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p>Você não possui agendamentos.</p></div>`; 
+                container.innerHTML = `<div style="text-align:center; padding:2rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p style="font-size:14px;">Você não possui agendamentos.</p></div>`; 
                 return; 
             }
 
@@ -1185,7 +1148,7 @@
             });
 
             if (currentYearApps.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:3rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p>Você não possui agendamentos para o ano de ${currentYear}.</p></div>`;
+                container.innerHTML = `<div style="text-align:center; padding:2rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p style="font-size:14px;">Você não possui agendamentos para o ano de ${currentYear}.</p></div>`;
                 return;
             }
 
@@ -1203,21 +1166,21 @@
                 const dayNum = dateParts[2];
                 const monthStr = monthNamesShort[parseInt(dateParts[1], 10) - 1] || '';
                 return `
-                    <div class="appointment-card" style="flex: 0 0 300px; min-width: 300px;">
+                    <div class="appointment-card" style="flex: 0 0 260px; min-width: 260px;">
                         <div class="appointment-info">
                             <div class="appointment-date-badge">
                                 <div class="day">${dayNum}</div>
                                 <div class="month-label">${monthStr}</div>
                             </div>
                             <div style="flex: 1; min-width: 0;">
-                                <h3 style="font-size:16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:13px; color: var(--text-secondary); margin-bottom: 4px;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                <div style="font-size:13px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
+                                <h3 style="font-size:14px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
+                                <div style="font-size:12px; color: var(--text-secondary); margin-bottom: 2px;"><i class="fa-solid fa-user-tie" style="font-size: 10px; margin-right: 3px;"></i> ${a.barberName}</div>
+                                <div style="font-size:12px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 3px;"></i> ${a.time}</div>
                             </div>
                         </div>
                         <div class="appointment-card-footer">
-                            <div style="color:var(--accent-main); font-weight:800; font-size: 15px;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
-                            <div style="display:flex; align-items:center; gap:8px;">
+                            <div style="color:var(--accent-main); font-weight:800; font-size: 14px;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div style="display:flex; align-items:center; gap:6px;">
                                 <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
                                 ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
                             </div>
@@ -1261,14 +1224,14 @@
                                 <div class="month-label">${monthStr}</div>
                             </div>
                             <div style="flex: 1; min-width: 0;">
-                                <h3 style="font-size:16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:13px; color: var(--text-secondary); margin-bottom: 4px;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                <div style="font-size:13px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
+                                <h3 style="font-size:14px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
+                                <div style="font-size:12px; color: var(--text-secondary); margin-bottom: 2px;"><i class="fa-solid fa-user-tie" style="font-size: 10px; margin-right: 3px;"></i> ${a.barberName}</div>
+                                <div style="font-size:12px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 3px;"></i> ${a.time}</div>
                             </div>
                         </div>
                         <div class="appointment-card-footer">
-                            <div style="color:var(--accent-main); font-weight:800; font-size: 16px;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
-                            <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="color:var(--accent-main); font-weight:800; font-size: 14px;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div style="display:flex; align-items:center; gap:8px;">
                                 <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
                                 ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
                             </div>
@@ -1316,7 +1279,6 @@
 
         function selectAdminDate(dateStr) {
             if (selectedAdminDateFilter === dateStr) {
-                // Clicar novamente no mesmo dia desmarca o filtro
                 selectedAdminDateFilter = null;
                 showToast('Filtro de data removido.');
             } else {
@@ -1347,7 +1309,6 @@
 
             let daysHtml = '';
 
-            // Dias do mês anterior
             for (let i = firstDayIndex; i > 0; i--) {
                 const dayNum = prevLastDay - i + 1;
                 let prevMonth = month === 0 ? 12 : month;
@@ -1357,13 +1318,11 @@
                 daysHtml += renderSingleCalendarCell(dateStr, dayNum, true, tenantAppts, todayStr);
             }
 
-            // Dias do mês atual
             for (let i = 1; i <= lastDay; i++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 daysHtml += renderSingleCalendarCell(dateStr, i, false, tenantAppts, todayStr);
             }
 
-            // Dias do próximo mês para completar a grade de 42 células (6 linhas)
             const totalCellsSoFar = firstDayIndex + lastDay;
             const nextDaysCount = totalCellsSoFar <= 35 ? (35 - totalCellsSoFar) : (42 - totalCellsSoFar);
             for (let i = 1; i <= nextDaysCount; i++) {
@@ -1404,7 +1363,6 @@
             document.getElementById('statTodayBookings').innerText = tenantAppts.filter(a => a.date === todayStr && a.status === 'confirmado').length;
             document.getElementById('statRevenue').innerText = `R$ ${tenantAppts.filter(a => a.date === todayStr && a.status === 'confirmado').reduce((acc, a) => acc + parseFloat(a.servicePrice), 0).toFixed(2).replace('.', ',')}`;
 
-            // Filtragem da tabela com base no dia selecionado no calendário
             let displayedAppts = tenantAppts;
             const titleEl = document.getElementById('adminTableTitle');
             if (selectedAdminDateFilter) {
@@ -1422,12 +1380,11 @@
             if (displayedAppts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento encontrado para este período/dia.</td></tr>`;
             } else {
-                tbody.innerHTML = displayedAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date.split('-').reverse().join('/')} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
+                tbody.innerHTML = displayedAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date.split('-').reverse().join('/')} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:5px 10px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
             }
 
-            document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
+            document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:5px 10px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
 
-            // Renderizar também o calendário estilizado
             renderAdminCalendar();
         }
 
@@ -1442,7 +1399,7 @@
 
         function updateAuthUI() {
             const container = document.getElementById('authContainer');
-            if (currentUser) container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:14px; font-weight:700;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:8px;" onclick="logout()"></i></div>`;
+            if (currentUser) container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:12px; font-weight:700; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:4px; font-size:12px;" onclick="logout()"></i></div>`;
             else container.innerHTML = `<button class="user-auth-btn" onclick="openModal('authModal')"><i class="fa-solid fa-user"></i> Entrar</button>`;
         }
 
@@ -1480,7 +1437,7 @@
             try { await auth.signOut(); showToast('Você saiu.'); } catch (error) { showToast('Erro ao sair.'); }
         }
 
-        function switchView(viewId, element) { document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active')); document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active')); document.getElementById(viewId).classList.add('active'); if (element) element.classList.add('active'); }
+        function switchView(viewId, element) { document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active')); document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active')); document.getElementById(viewId).classList.add('active'); if (element) element.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     </script>
 </body>
 </html>
