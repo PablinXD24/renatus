@@ -10,9 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Alterado para usar o Realtime Database em vez do Firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
@@ -645,12 +646,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // 1. Habilitar a persistência offline para resolver perda de dados
-        db.enablePersistence().catch(function(err) {
-            console.warn("Aviso de Persistência:", err.code);
-        });
+        const db = firebase.database(); // Alterado para Realtime Database
 
         let currentUser = null;
         let currentAuthMode = 'login'; 
@@ -672,7 +668,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             listenAuthChanges();
-            initFirestoreListeners();
+            initDatabaseListeners();
         });
 
         // Controles UI
@@ -680,16 +676,14 @@
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         function showToast(msg) { const toast = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg; toast.classList.add('show'); setTimeout(() => { toast.classList.remove('show'); }, 3500); }
 
-        // === AUTO-SEEDING (Criação de Estrutura Inicial Automática) ===
+        // === AUTO-SEEDING (Criação de Estrutura Inicial Automática no Realtime DB) ===
         async function createDefaultServices() {
             const defaults = [
                 { tenantId: TENANT_ID, name: 'Corte Clássico', duration: '30 min', price: 40.00 },
                 { tenantId: TENANT_ID, name: 'Barba Terapia', duration: '30 min', price: 35.00 },
                 { tenantId: TENANT_ID, name: 'Corte + Barba', duration: '1h', price: 70.00 }
             ];
-            for (let s of defaults) {
-                try { await db.collection('services').add(s); } catch (e) { console.error(e); }
-            }
+            for (let s of defaults) { await db.ref('services').push(s); }
         }
 
         async function createDefaultBarbers() {
@@ -697,51 +691,52 @@
                 { tenantId: TENANT_ID, name: 'João Silva', role: 'Barbeiro Master', workingDays: [1,2,3,4,5,6] },
                 { tenantId: TENANT_ID, name: 'Pedro Alves', role: 'Especialista em Barba', workingDays: [1,2,3,4,5,6] }
             ];
-            for (let b of defaults) {
-                try { await db.collection('barbers').add(b); } catch (e) { console.error(e); }
-            }
+            for (let b of defaults) { await db.ref('barbers').push(b); }
         }
 
-        // === REAL-TIME FIRESTORE DATABASE ===
-        function initFirestoreListeners() {
-            db.collection('services').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
-                if(snap.empty) { 
+        // === REAL-TIME DATABASE LISTENERS ===
+        function initDatabaseListeners() {
+            db.ref('services').orderByChild('tenantId').equalTo(TENANT_ID).on('value', snap => {
+                if(!snap.exists()) { 
                     createDefaultServices(); 
                 } else {
-                    servicesData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    servicesData = [];
+                    snap.forEach(child => { servicesData.push({ id: child.key, ...child.val() }); });
                     renderServices();
                 }
             });
 
-            db.collection('barbers').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
-                if(snap.empty) { 
+            db.ref('barbers').orderByChild('tenantId').equalTo(TENANT_ID).on('value', snap => {
+                if(!snap.exists()) { 
                     createDefaultBarbers(); 
                 } else {
-                    barbersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    barbersData = [];
+                    snap.forEach(child => { barbersData.push({ id: child.key, ...child.val() }); });
                     renderBarbers();
                 }
             });
 
-            db.collection('blocks').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
-                scheduleBlocks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            db.ref('blocks').orderByChild('tenantId').equalTo(TENANT_ID).on('value', snap => {
+                scheduleBlocks = [];
+                if(snap.exists()) snap.forEach(child => { scheduleBlocks.push({ id: child.key, ...child.val() }); });
                 renderAdminDashboard();
             });
 
-            db.collection('appointments').where('tenantId', '==', TENANT_ID).onSnapshot(snap => {
-                localAppointments = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            db.ref('appointments').orderByChild('tenantId').equalTo(TENANT_ID).on('value', snap => {
+                localAppointments = [];
+                if(snap.exists()) snap.forEach(child => { localAppointments.push({ id: child.key, ...child.val() }); });
                 localAppointments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 renderAppointments();
                 renderAdminDashboard();
             });
 
-            db.collection('settings').doc(TENANT_ID).onSnapshot(doc => {
-                if(doc.exists) {
-                    minAdvanceMinutes = doc.data().minAdvanceMinutes || 15;
+            db.ref('settings/' + TENANT_ID).on('value', snap => {
+                if(snap.exists()) {
+                    minAdvanceMinutes = snap.val().minAdvanceMinutes || 15;
                     const adminInput = document.getElementById('adminMinAdvance');
                     if(adminInput) adminInput.value = minAdvanceMinutes;
                 } else {
-                    // Cria a estrutura padrão de configuração se não existir
-                    db.collection('settings').doc(TENANT_ID).set({ minAdvanceMinutes: 15 });
+                    db.ref('settings/' + TENANT_ID).set({ minAdvanceMinutes: 15 });
                 }
             });
         }
@@ -878,13 +873,12 @@
 
         // === ENVIO DE E-MAILS (VIA EMAILJS) ===
         async function sendAutomatedNotifications(appointment) {
-            // Substitua as credenciais abaixo pelas suas no site EmailJS (https://www.emailjs.com/)
             const serviceID = 'SEU_SERVICE_ID';
             const templateID = 'SEU_TEMPLATE_ID'; 
             const publicKey = 'SUA_PUBLIC_KEY';
 
             if(serviceID === 'SEU_SERVICE_ID') {
-                console.warn("⚠️ EmailJS não configurado. Adicione suas credenciais no código para habilitar o envio de emails.");
+                console.warn("⚠️ EmailJS não configurado.");
                 return;
             }
 
@@ -903,10 +897,7 @@
 
             try {
                 await emailjs.send(serviceID, templateID, templateParams);
-                console.log("✉️ Email de notificação enviado para:", appointment.userEmail);
-            } catch (error) {
-                console.error("❌ Erro ao enviar email via EmailJS:", error);
-            }
+            } catch (error) { console.error(error); }
         }
 
         // === AGENDAMENTO E DB ===
@@ -927,14 +918,11 @@
             };
             
             try {
-                // Salva no banco de dados Firestore
-                await db.collection('appointments').add(appointmentData);
+                await db.ref('appointments').push(appointmentData); // RTDB Push
                 
-                // Exibe animação
                 const overlay = document.getElementById('successOverlay');
                 overlay.classList.add('active');
                 
-                // Dispara E-mail
                 sendAutomatedNotifications(appointmentData);
                 
                 setTimeout(() => {
@@ -958,7 +946,7 @@
             e.preventDefault();
             const val = parseInt(document.getElementById('adminMinAdvance').value) || 0;
             try {
-                await db.collection('settings').doc(TENANT_ID).set({ minAdvanceMinutes: val }, { merge: true });
+                await db.ref('settings/' + TENANT_ID).update({ minAdvanceMinutes: val });
                 showToast('Preferências salvas com sucesso!');
             } catch(e) { showToast('Erro ao salvar as configurações.'); }
         }
@@ -966,32 +954,32 @@
         async function addService(e) {
             e.preventDefault();
             const newService = { tenantId: TENANT_ID, name: document.getElementById('crudServiceName').value, duration: document.getElementById('crudServiceDuration').value, price: parseFloat(document.getElementById('crudServicePrice').value) };
-            try { await db.collection('services').add(newService); e.target.reset(); showToast('Serviço adicionado!'); } catch (error) { showToast('Erro ao salvar serviço.'); }
+            try { await db.ref('services').push(newService); e.target.reset(); showToast('Serviço adicionado!'); } catch (error) { showToast('Erro ao salvar serviço.'); }
         }
 
         async function deleteService(id) {
-            try { await db.collection('services').doc(id).delete(); showToast('Serviço removido!'); } catch (error) { showToast('Erro ao remover.'); }
+            try { await db.ref('services/' + id).remove(); showToast('Serviço removido!'); } catch (error) { showToast('Erro ao remover.'); }
         }
 
         async function addBarber(e) {
             e.preventDefault();
             const newBarber = { tenantId: TENANT_ID, name: document.getElementById('crudBarberName').value, role: document.getElementById('crudBarberRole').value, workingDays: [1,2,3,4,5,6] };
-            try { await db.collection('barbers').add(newBarber); e.target.reset(); showToast('Profissional adicionado!'); } catch (error) { showToast('Erro ao salvar profissional.'); }
+            try { await db.ref('barbers').push(newBarber); e.target.reset(); showToast('Profissional adicionado!'); } catch (error) { showToast('Erro ao salvar profissional.'); }
         }
 
         async function deleteBarber(id) {
-            try { await db.collection('barbers').doc(id).delete(); showToast('Profissional removido!'); } catch (error) { showToast('Erro ao remover.'); }
+            try { await db.ref('barbers/' + id).remove(); showToast('Profissional removido!'); } catch (error) { showToast('Erro ao remover.'); }
         }
 
         async function addBlock(e) {
             e.preventDefault();
             const barberSelect = document.getElementById('crudBlockBarber');
             const newBlock = { tenantId: TENANT_ID, barberId: barberSelect.value, barberName: barberSelect.options[barberSelect.selectedIndex].text, date: document.getElementById('crudBlockDate').value, time: document.getElementById('crudBlockTime').value };
-            try { await db.collection('blocks').add(newBlock); e.target.reset(); showToast('Horário bloqueado com sucesso!'); } catch (error) { showToast('Erro ao bloquear horário.'); }
+            try { await db.ref('blocks').push(newBlock); e.target.reset(); showToast('Horário bloqueado com sucesso!'); } catch (error) { showToast('Erro ao bloquear horário.'); }
         }
 
         async function deleteBlock(id) {
-            try { await db.collection('blocks').doc(id).delete(); showToast('Bloqueio removido!'); } catch (error) { showToast('Erro ao remover bloqueio.'); }
+            try { await db.ref('blocks/' + id).remove(); showToast('Bloqueio removido!'); } catch (error) { showToast('Erro ao remover bloqueio.'); }
         }
 
         function renderAppointments() {
@@ -1018,19 +1006,16 @@
 
         async function cancelAppointment(id) {
             try {
-                // Recupera os dados primeiro para poder enviar o email com as informações corretas
-                const docRef = db.collection('appointments').doc(id);
-                const doc = await docRef.get();
+                const docRef = db.ref('appointments/' + id);
+                const snapshot = await docRef.once('value');
                 
-                if (doc.exists) {
-                    const appointmentData = doc.data();
+                if (snapshot.exists()) {
+                    const appointmentData = snapshot.val();
                     
-                    // Atualiza status no banco para cancelado
                     await docRef.update({ status: 'cancelado' });
                     showToast('Cancelado.');
                     if (selectedDate && selectedBarber) updateTimeSlots(); 
                     
-                    // Dispara E-mail informando sobre o cancelamento
                     sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' });
                 }
             } catch (error) { showToast('Erro ao cancelar.'); }
