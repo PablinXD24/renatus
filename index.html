@@ -205,6 +205,150 @@
         .page-header h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.1; color: var(--text-primary); margin-bottom: 0.5rem; }
         .page-header p { color: var(--text-secondary); font-size: 1rem; }
 
+        /* ==========================================================================
+           HOME VIEW (ESTILO INSPIRADO NA REFERÊNCIA)
+           ========================================================================== */
+        .home-hero {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 3rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.7)), url('image_e0c1d0.jpg') center/cover no-repeat;
+        }
+
+        .home-hero-top-nav {
+            position: absolute;
+            top: 25px;
+            left: 3rem;
+            right: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .home-hero-content {
+            position: relative;
+            z-index: 2;
+            color: #fff;
+        }
+
+        .home-hero-subtitle {
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .home-hero-title {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(48px, 8vw, 84px);
+            line-height: 0.95;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .home-hero-btn {
+            background: var(--accent-gold);
+            color: var(--text-primary);
+            padding: 14px 30px;
+            border-radius: var(--radius-lg);
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .home-hero-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .home-carousel-arrows {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .home-carousel-arrow {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: var(--transition);
+        }
+
+        .home-carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .home-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 3rem;
+        }
+
+        .home-feature-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 30px;
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+        }
+
+        .home-feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .home-feature-icon {
+            font-size: 32px;
+            color: var(--accent-main);
+            margin-bottom: 15px;
+        }
+
+        .home-feature-title {
+            font-family: 'Anton', sans-serif;
+            font-size: 20px;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .home-feature-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
         .booking-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; }
 
         @media (max-width: 900px) {
@@ -215,6 +359,8 @@
             .logo::before, .logo::after { display: none; }
             .nav-menu { justify-content: center; gap: 8px; }
             .nav-link { font-size: 13px; padding: 6px 10px; }
+            .home-hero { height: 400px; padding: 1.5rem; }
+            .home-hero-top-nav { display: none; }
         }
 
         .section-title { font-family: 'Anton', sans-serif; font-size: 24px; color: var(--text-primary); margin-bottom: 1.25rem; letter-spacing: 0.5px; }
@@ -488,7 +634,8 @@
             </a>
             
             <nav class="nav-menu">
-                <span class="nav-link active" onclick="switchView('bookingView', this)">Agendar</span>
+                <span class="nav-link active" onclick="switchView('homeView', this)">Home</span>
+                <span class="nav-link" onclick="switchView('bookingView', this)">Agendar</span>
                 <span class="nav-link" onclick="switchView('myAppointmentsView', this)">Meus Agendamentos</span>
                 <span class="nav-link" id="navAdminLink" style="display: none;" onclick="switchView('adminView', this)"><i class="fa-solid fa-chart-line"></i> Painel Admin</span>
                 
@@ -502,7 +649,44 @@
     </header>
 
     <main>
-        <section id="bookingView" class="view-section active">
+        <section id="homeView" class="view-section active">
+            <div class="home-hero">
+                <div class="home-hero-top-nav">
+                    <span>E</span><span>Y</span><span>R</span><span>C</span><span>W</span><span>S</span><span>N</span><span>B</span><span>C</span><span><i class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+                <div class="home-carousel-arrows">
+                    <div class="home-carousel-arrow"><i class="fa-solid fa-chevron-left"></i></div>
+                    <div class="home-carousel-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+                <div class="home-hero-content">
+                    <div class="home-hero-subtitle">Bem-vindo à Renatu's</div>
+                    <h1 class="home-hero-title">Estilo, Tradição e Modernidade</h1>
+                    <a href="#" class="home-hero-btn" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[1])">
+                        Agendar Horário <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="home-features-grid">
+                <div class="home-feature-card">
+                    <div class="home-feature-icon"><i class="fa-solid fa-scissors"></i></div>
+                    <div class="home-feature-title">Cortes Exclusivos</div>
+                    <div class="home-feature-desc">Profissionais altamente capacitados para garantir o corte perfeito alinhado às novas tendências do mercado.</div>
+                </div>
+                <div class="home-feature-card">
+                    <div class="home-feature-icon"><i class="fa-solid fa-clock"></i></div>
+                    <div class="home-feature-title">Agendamento Rápido</div>
+                    <div class="home-feature-desc">Marque seu horário em segundos com confirmação imediata e comodidade total diretamente pela plataforma.</div>
+                </div>
+                <div class="home-feature-card">
+                    <div class="home-feature-icon"><i class="fa-solid fa-medal"></i></div>
+                    <div class="home-feature-title">Ambiente Premium</div>
+                    <div class="home-feature-desc">Desfrute de um espaço confortável, pensado para proporcionar a melhor experiência de cuidado pessoal.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="bookingView" class="view-section">
             <div class="page-header">
                 <h1>Agende seu Horário</h1>
                 <p>Siga os passos abaixo para marcar seu estilo em segundos.</p>
@@ -735,8 +919,9 @@
                 RENATU'S
             </a>
             <div class="footer-links">
-                <a href="#" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[0])">Agendar</a>
-                <a href="#" onclick="switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1])">Meus Agendamentos</a>
+                <a href="#" onclick="switchView('homeView', document.querySelectorAll('.nav-link')[0])">Home</a>
+                <a href="#" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[1])">Agendar</a>
+                <a href="#" onclick="switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[2])">Meus Agendamentos</a>
                 <a href="#" id="footerAdminLink" style="display: none;" onclick="switchView('adminView', document.querySelectorAll('#navAdminLink')[0])">Painel Admin</a>
             </div>
             <div class="footer-copy">&copy; 2026 RENATU'S. Todos os direitos reservados.</div>
@@ -928,7 +1113,7 @@
                     });
                 }
                 renderAdminEmailsTable();
-                updateAuthUI(); // Atualiza visibilidade do painel admin com base na lista atualizada
+                updateAuthUI(); 
             });
 
             db.ref('settings/' + TENANT_ID).on('value', snap => {
@@ -983,7 +1168,6 @@
         function renderAdminEmailsTable() {
             const tbody = document.getElementById('adminEmailsTable');
             if(!tbody) return;
-            // Exclui o superadmin fixo da listagem de exclusão se preferir, ou permite listar todos extras
             db.ref('admin_emails').once('value', snap => {
                 let html = `<tr><td>pablo11ssousa2@gmail.com (Principal)</td><td>-</td></tr>`;
                 if(snap.exists()) {
@@ -1191,7 +1375,7 @@
                     document.getElementById('btnContinueFromServices').style.display = 'none';
                     renderServices(); updateSummary();
                     btn.innerHTML = 'Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>';
-                    switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1]);
+                    switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[2]);
                 }, 2200);
 
             } catch (err) {
@@ -1516,7 +1700,6 @@
             auth.onAuthStateChanged(user => {
                 if (user) {
                     currentUser = { uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email };
-                    // Salva/sincroniza o usuário no banco de dados para credenciais/pesquisas futuras
                     db.ref('users_auth/' + user.uid).set({
                         email: user.email,
                         name: currentUser.name,
@@ -1535,7 +1718,6 @@
             const adminLink = document.getElementById('navAdminLink');
             const footerAdminLink = document.getElementById('footerAdminLink');
 
-            // Verifica permissão de Admin baseada no e-mail atual
             let isAdmin = false;
             if (currentUser && currentUser.email) {
                 isAdmin = authorizedAdminEmails.includes(currentUser.email.trim());
@@ -1544,9 +1726,8 @@
             if (adminLink) adminLink.style.display = isAdmin ? 'inline-block' : 'none';
             if (footerAdminLink) footerAdminLink.style.display = isAdmin ? 'inline-block' : 'none';
 
-            // Se o usuário não é admin e estava com a aba admin aberta, redireciona para agendamento
             if (!isAdmin && document.getElementById('adminView').classList.contains('active')) {
-                switchView('bookingView', document.querySelectorAll('.nav-link')[0]);
+                switchView('homeView', document.querySelectorAll('.nav-link')[0]);
             }
 
             if (currentUser) {
@@ -1604,7 +1785,6 @@
         }
 
         function switchView(viewId, element) { 
-            // Bloqueia acesso programático ao painel se não for admin
             if(viewId === 'adminView') {
                 let isAdmin = currentUser && currentUser.email && authorizedAdminEmails.includes(currentUser.email.trim());
                 if(!isAdmin) {
