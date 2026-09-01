@@ -206,7 +206,7 @@
            ========================================================================== */
         main {
             max-width: 1200px; width: 100%;
-            margin: 2rem auto; padding: 0 1.5rem; flex: 1;
+            margin: 0 auto; padding: 100px 1.5rem 2rem 1.5rem; flex: 1;
         }
 
         /* Faz com que a view da Home escape do limite do main e ocupe 100% da largura */
@@ -221,7 +221,7 @@
             right: 50%;
             margin-left: -50vw;
             margin-right: -50vw;
-            margin-top: -2rem;
+            margin-top: -100px; /* Compensando o padding do main na home */
         }
 
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
@@ -739,7 +739,7 @@
         </section>
 
         <section id="bookingView" class="view-section">
-            <div class="page-header" style="margin-top: 50px;">
+            <div class="page-header">
                 <h1>Agende seu Horário</h1>
                 <p>Siga os passos abaixo para marcar seu estilo em segundos.</p>
             </div>
@@ -792,7 +792,7 @@
         </section>
 
         <section id="myAppointmentsView" class="view-section">
-            <div class="page-header" style="margin-top: 50px;">
+            <div class="page-header">
                 <h1>Meus Agendamentos</h1>
                 <p>Acompanhe e gerencie todos os seus horários marcados.</p>
             </div>
@@ -800,7 +800,7 @@
         </section>
 
         <section id="adminView" class="view-section">
-            <div class="page-header" style="margin-top: 50px;">
+            <div class="page-header">
                 <h1>Painel da Barbearia</h1>
                 <p>Visão geral do Tenant atual, gestão de agenda, serviços e equipe.</p>
             </div>
