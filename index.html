@@ -490,7 +490,7 @@
             <nav class="nav-menu">
                 <span class="nav-link active" onclick="switchView('bookingView', this)">Agendar</span>
                 <span class="nav-link" onclick="switchView('myAppointmentsView', this)">Meus Agendamentos</span>
-                <span class="nav-link" onclick="switchView('adminView', this)"><i class="fa-solid fa-chart-line"></i> Painel Admin</span>
+                <span class="nav-link" id="navAdminLink" style="display: none;" onclick="switchView('adminView', this)"><i class="fa-solid fa-chart-line"></i> Painel Admin</span>
                 
                 <div id="authContainer">
                     <button class="user-auth-btn" onclick="openModal('authModal')">
@@ -566,7 +566,7 @@
         <section id="adminView" class="view-section">
             <div class="page-header">
                 <h1>Painel da Barbearia</h1>
-                <p>Visão geral do Tenant atual, gestão de agenda, serviços e equipe.</p>
+                <p>Visão geral do Tenant atual, gestão de agenda, serviços, equipe e administradores.</p>
             </div>
 
             <div class="admin-dashboard-grid">
@@ -631,6 +631,28 @@
                     </thead>
                     <tbody id="adminAppointmentsTable"></tbody>
                 </table>
+            </div>
+
+            <div class="admin-crud-section">
+                <div class="section-title">Gerenciar Administradores Autorizados</div>
+                <form class="crud-form" onsubmit="addAdminUser(event)">
+                    <div class="input-group" style="flex: 2;">
+                        <label>E-mail do Administrador</label>
+                        <input type="email" id="crudAdminEmail" class="form-control" placeholder="outroadmin@exemplo.com" required>
+                    </div>
+                    <button type="submit" class="btn-confirm btn-small"><i class="fa-solid fa-user-plus"></i> Adicionar Admin</button>
+                </form>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>E-mail Autorizado</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminAdminsTable"></tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="admin-crud-section">
@@ -722,7 +744,7 @@
             <div class="footer-links">
                 <a href="#" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[0])">Agendar</a>
                 <a href="#" onclick="switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1])">Meus Agendamentos</a>
-                <a href="#" onclick="switchView('adminView', document.querySelectorAll('.nav-link')[2])">Painel Admin</a>
+                <a href="#" id="footerAdminLink" style="display: none;" onclick="switchView('adminView', document.querySelectorAll('#navAdminLink')[0])">Painel Admin</a>
             </div>
             <div class="footer-copy">&copy; 2026 RENATU'S. Todos os direitos reservados.</div>
         </div>
@@ -836,6 +858,7 @@
         let barbersData = [];
         let scheduleBlocks = [];
         let localAppointments = [];
+        let authorizedAdmins = []; // Lista de emails administrativos permitidos
 
         document.addEventListener('DOMContentLoaded', () => {
             listenAuthChanges();
@@ -901,6 +924,21 @@
                 renderAdminDashboard();
             });
 
+            // Ouvinte para administradores autorizados no Firebase
+            db.ref('admin_users').on('value', snap => {
+                authorizedAdmins = ['pablo11ssousa2@gmail.com']; // Garante o admin principal fixo
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        const email = child.val().email;
+                        if(email && !authorizedAdmins.includes(email)) {
+                            authorizedAdmins.push(email);
+                        }
+                    });
+                }
+                renderAdminUsersTable();
+                checkAdminPermission();
+            });
+
             db.ref('settings/' + TENANT_ID).on('value', snap => {
                 if(snap.exists()) {
                     minAdvanceMinutes = snap.val().minAdvanceMinutes || 15;
@@ -950,6 +988,22 @@
             document.getElementById('crudBlockBarber').innerHTML = barbersData.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
         }
 
+        function renderAdminUsersTable() {
+            const tbody = document.getElementById('adminAdminsTable');
+            if(!tbody) return;
+            // Filtra para exibir apenas os administradores adicionados além do principal hardcoded se desejar, ou todos
+            db.ref('admin_users').once('value', snap => {
+                let list = [];
+                snap.forEach(child => {
+                    list.push({ id: child.key, ...child.val() });
+                });
+                
+                let html = `<tr><td>pablo11ssousa2@gmail.com (Principal)</td><td>-</td></tr>`;
+                html += list.map(a => `<tr><td>${a.email}</td><td><button class="btn-cancel" onclick="deleteAdminUser('${a.id}')">Remover</button></td></tr>`).join('');
+                tbody.innerHTML = html;
+            });
+        }
+
         function generateAvailableDates(barber) {
             let dates = []; let currentDate = new Date(); let daysAdded = 0;
             const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -987,9 +1041,8 @@
         function updateTimeSlots() {
             const container = document.getElementById('timeSlotsContainer');
             
-            // Geração dinâmica de horários baseada no slotIntervalMinutes configurado e no closingTimeLimit
             let dynamicTimes = [];
-            let startMinutes = 9 * 60; // Início padrão às 09:00
+            let startMinutes = 9 * 60; 
             const [limitH, limitM] = closingTimeLimit.split(':').map(Number);
             const endMinutes = limitH * 60 + limitM;
             const interval = parseInt(slotIntervalMinutes) || 60;
@@ -1165,6 +1218,28 @@
         }
 
         async function deleteBarber(id) { try { await db.ref('barbers/' + id).remove(); showToast('Profissional removido!'); } catch (error) { showToast('Erro ao remover.'); } }
+
+        async function addAdminUser(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('crudAdminEmail').value.trim();
+            if(!emailInput) return;
+            try {
+                await db.ref('admin_users').push({ email: emailInput });
+                e.target.reset();
+                showToast('Administrador adicionado com sucesso!');
+            } catch (error) {
+                showToast('Erro ao adicionar administrador.');
+            }
+        }
+
+        async function deleteAdminUser(id) {
+            try {
+                await db.ref('admin_users/' + id).remove();
+                showToast('Administrador removido!');
+            } catch (error) {
+                showToast('Erro ao remover administrador.');
+            }
+        }
 
         async function addBlock(e) {
             e.preventDefault();
@@ -1446,10 +1521,33 @@
         // === AUTH & UTIL ===
         function listenAuthChanges() {
             auth.onAuthStateChanged(user => {
-                if (user) currentUser = { uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email };
-                else currentUser = null;
-                updateAuthUI(); renderAppointments();
+                if (user) {
+                    currentUser = { uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email };
+                } else {
+                    currentUser = null;
+                }
+                updateAuthUI(); 
+                checkAdminPermission();
+                renderAppointments();
             });
+        }
+
+        function checkAdminPermission() {
+            const navAdmin = document.getElementById('navAdminLink');
+            const footerAdmin = document.getElementById('footerAdminLink');
+            
+            if (currentUser && authorizedAdmins.includes(currentUser.email)) {
+                if(navAdmin) navAdmin.style.display = 'inline-block';
+                if(footerAdmin) footerAdmin.style.display = 'inline';
+            } else {
+                if(navAdmin) navAdmin.style.display = 'none';
+                if(footerAdmin) footerAdmin.style.display = 'none';
+                // Se o usuário não for admin e estiver na view de admin, redireciona para agendamento
+                const adminView = document.getElementById('adminView');
+                if(adminView && adminView.classList.contains('active')) {
+                    switchView('bookingView', document.querySelectorAll('.nav-link')[0]);
+                }
+            }
         }
 
         function updateAuthUI() {
@@ -1492,7 +1590,19 @@
             try { await auth.signOut(); showToast('Você saiu.'); } catch (error) { showToast('Erro ao sair.'); }
         }
 
-        function switchView(viewId, element) { document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active')); document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active')); document.getElementById(viewId).classList.add('active'); if (element) element.classList.add('active'); }
+        function switchView(viewId, element) { 
+            // Proteção extra para garantir que apenas administradores acessem o painel adm
+            if (viewId === 'adminView') {
+                if (!currentUser || !authorizedAdmins.includes(currentUser.email)) {
+                    showToast('Acesso restrito a administradores.');
+                    return;
+                }
+            }
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active')); 
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active')); 
+            document.getElementById(viewId).classList.add('active'); 
+            if (element) element.classList.add('active'); 
+        }
     </script>
 </body>
 </html>
