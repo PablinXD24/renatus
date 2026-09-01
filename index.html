@@ -286,7 +286,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .page-header { margin-bottom: 2rem; }
-        .page-header h1 { font-size: clamp(28px, 5vw, 48px); line-height: 1.1; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .page-header h1 { font-size: clamp(28px, 5vw, 48px); line-height: 1.1; color: var(--text-primary); margin-bottom: 0.5rem; word-break: break-word; }
         .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
 
         /* ==========================================================================
@@ -368,7 +368,7 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            font-size: 15px;
+            font-size: 16px;
             transition: transform 0.2s ease;
             box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
@@ -449,7 +449,7 @@
 
         .home-feature-desc {
             color: var(--text-secondary);
-            font-size: 145px;
+            font-size: 15px;
             line-height: 1.6;
         }
 
@@ -509,44 +509,47 @@
 
             /* Ajuste crucial de espaçamento superior no mobile para evitar sobreposição nos títulos */
             main {
-                padding-top: 90px;
+                padding-top: 95px;
                 padding-bottom: 5rem;
                 padding-left: 1rem;
                 padding-right: 1rem;
             }
             #homeView.active {
-                margin-top: -90px;
+                margin-top: -95px;
             }
 
             .home-hero { min-height: 100vh; padding: 5rem 1.2rem 3rem 1.2rem; justify-content: flex-end; }
             .home-hero-top-nav { display: none; }
             .home-carousel-arrows { display: none; }
-            .booking-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            
+            .booking-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .section-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); margin-bottom: 1.25rem; letter-spacing: 0.5px; }
+        .section-title { font-family: 'Anton', sans-serif; font-size: 24px; color: var(--text-primary); margin-bottom: 1.25rem; letter-spacing: 0.5px; }
         .title-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 
         /* Lista de Serviços */
         .services-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 2rem; }
         .service-card {
             background: var(--bg-secondary); border-radius: var(--radius-md);
-            padding: 45px 15px 15px 15px; cursor: pointer; position: relative;
+            padding: 50px 20px 20px 20px; cursor: pointer; position: relative;
             transition: box-shadow 0.3s ease; border: 2px solid transparent;
         }
         .service-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
         .service-card.selected { border-color: var(--accent-main); background: #E8EDFF; }
         .service-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; z-index: 2; word-break: break-word; }
-        .service-card .duration { font-size: 12px; color: var(--text-secondary); }
+        .service-card .duration { font-size: 13px; color: var(--text-secondary); }
         .service-card .price {
             position: absolute; top: 0; left: 0; background: var(--bg-primary);
-            padding: 8px 12px; border-bottom-right-radius: 14px; border-top-left-radius: 18px;
+            padding: 10px 15px; border-bottom-right-radius: 16px; border-top-left-radius: 20px;
             font-size: 14px; font-weight: 800; color: var(--text-primary); z-index: 10;
             border-bottom: 2px solid var(--bg-secondary); border-right: 2px solid var(--bg-secondary);
         }
         .service-card.selected .price { border-bottom-color: #E8EDFF; border-right-color: #E8EDFF; }
-        .service-card .price::before { content: ""; position: absolute; bottom: -14px; left: 0; width: 14px; height: 14px; background: radial-gradient(circle at 100% 100%, transparent 14px, var(--bg-primary) 14.5px); }
-        .service-card .price::after { content: ""; position: absolute; top: 0; right: -14px; width: 14px; height: 14px; background: radial-gradient(circle at 100% 100%, transparent 14px, var(--bg-primary) 14.5px); }
+        .service-card .price::before { content: ""; position: absolute; bottom: -16px; left: 0; width: 16px; height: 16px; background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px); }
+        .service-card .price::after { content: ""; position: absolute; top: 0; right: -16px; width: 16px; height: 16px; background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px); }
 
         /* Seleção de Barbeiros */
         .barbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
@@ -557,7 +560,7 @@
         }
         .barber-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
         .barber-card.selected { border-color: var(--accent-main); background: #E8EDFF; }
-        .barber-avatar { width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 8px auto; background: var(--accent-main); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--bg-primary); }
+        .barber-avatar { width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 10px auto; background: var(--accent-main); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--bg-primary); }
         .barber-card.selected .barber-avatar { background: var(--accent-gold); color: var(--text-primary); }
         .barber-name { font-weight: 700; font-size: 13px; word-break: break-word; }
         .barber-role { font-size: 11px; color: var(--text-secondary); word-break: break-word; }
@@ -568,7 +571,7 @@
 
         /* Seleção de Data */
         .dates-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
-        .dates-scroll::-webkit-scrollbar { height: 6px; }
+        .dates-scroll::-webkit-scrollbar { height: 8px; }
         .dates-scroll::-webkit-scrollbar-track { background: transparent; }
         .dates-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
         .date-card { flex: 0 0 75px; scroll-snap-align: start; background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; cursor: pointer; transition: var(--transition); border: 2px solid transparent; }
@@ -589,12 +592,12 @@
         .time-slot.selected { background: var(--accent-main); color: var(--bg-primary); border-color: var(--accent-main); }
 
         /* Resumo */
-        .summary-card { background-color: var(--accent-main); border-radius: var(--radius-lg); padding: 20px; color: var(--bg-primary); }
+        .summary-card { background-color: var(--accent-main); border-radius: var(--radius-lg); padding: 22px; color: var(--bg-primary); }
         @media(min-width: 901px) {
             .summary-card { position: sticky; top: 110px; }
         }
-        .summary-card .section-title { color: var(--bg-primary); margin-bottom: 1.2rem; font-size: 26px; }
-        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); font-size: 13.5px; gap: 10px; }
+        .summary-card .section-title { color: var(--bg-primary); margin-bottom: 1.2rem; font-size: 28px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); font-size: 13px; gap: 10px; }
         .summary-row .label { color: rgba(255, 255, 255, 0.8); flex-shrink: 0; }
         .summary-row .value { font-weight: 600; text-align: right; cursor: pointer; transition: color 0.2s; word-break: break-word; overflow-wrap: break-word; }
         .summary-row .value:hover { color: var(--accent-gold); text-decoration: underline; }
@@ -609,22 +612,22 @@
         .btn-danger { background: var(--danger); color: white; }
 
         /* Meus Agendamentos */
-        .appointments-container { display: flex; flex-direction: column; gap: 15px; }
-        .recent-section-header { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 6px; }
+        .appointments-container { display: flex; flex-direction: column; gap: 20px; }
+        .recent-section-header { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 8px; }
         .recent-appointments-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
-        .recent-appointments-scroll::-webkit-scrollbar { height: 6px; }
+        .recent-appointments-scroll::-webkit-scrollbar { height: 8px; }
         .recent-appointments-scroll::-webkit-scrollbar-track { background: transparent; }
         .recent-appointments-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
 
         .month-group-container { background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; transition: var(--transition); }
-        .month-group-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--bg-secondary); }
+        .month-group-header { padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--bg-secondary); }
         .month-group-header:hover { background: #eceff5; }
         .month-group-title { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--accent-main); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin: 0; word-break: break-word; }
-        .month-group-toggle-icon { font-size: 14px; color: var(--text-secondary); transition: transform 0.3s ease; flex-shrink: 0; }
+        .month-group-toggle-icon { font-size: 15px; color: var(--text-secondary); transition: transform 0.3s ease; flex-shrink: 0; }
         .month-group-container.expanded .month-group-toggle-icon { transform: rotate(180deg); }
         .month-group-content { display: none; padding: 0 20px 20px 20px; border-top: 1px solid var(--card-border); background: var(--bg-primary); }
         .month-group-container.expanded .month-group-content { display: block; }
-        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 15px; }
+        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; margin-top: 15px; }
 
         .appointment-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; border: 1px solid var(--card-border); transition: var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .appointment-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
@@ -645,24 +648,24 @@
         .stat-icon { width: 50px; height: 50px; border-radius: 50%; background: var(--accent-main); color: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
         .stat-val { font-size: 28px; font-family: 'Anton', sans-serif; color: var(--text-primary); word-break: break-all; }
         
-        .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 1.5rem; -webkit-overflow-scrolling: touch; }
+        .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 2rem; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); border-radius: var(--radius-md); overflow: hidden; min-width: 550px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--card-border); white-space: nowrap; font-size: 13.5px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--card-border); white-space: nowrap; font-size: 13px; }
         th { background: var(--accent-main); color: var(--bg-primary); font-weight: 600; }
         
-        .admin-crud-section { background: #fff; border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 1.5rem; }
+        .admin-crud-section { background: #fff; border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 2rem; }
         .crud-form { display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; align-items: flex-end; }
-        .form-control { width: 100%; padding: 10px 14px; border: 2px solid var(--bg-secondary); border-radius: var(--radius-sm); margin-bottom: 12px; font-family: 'Inter', sans-serif; margin-top: 4px; background: #fff; font-size: 14px; }
+        .form-control { width: 100%; padding: 11px 14px; border: 2px solid var(--bg-secondary); border-radius: var(--radius-sm); margin-bottom: 12px; font-family: 'Inter', sans-serif; margin-top: 4px; background: #fff; font-size: 14px; }
         .crud-form .form-control { margin-bottom: 0; }
         .input-group { flex: 1; min-width: 180px; }
-        .input-group label { display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary); }
+        .input-group label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary); }
 
         /* Calendário Admin */
-        .admin-calendar-wrapper { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); padding: 20px; margin-bottom: 1.5rem; }
+        .admin-calendar-wrapper { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); padding: 20px; margin-bottom: 2rem; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 12px; }
         .cal-header-title { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; word-break: break-word; }
         .cal-nav-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .cal-btn { background: var(--bg-primary); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; font-size: 13px; }
+        .cal-btn { background: var(--bg-primary); border: 1px solid var(--card-border); color: var(--text-primary); padding: 7px 12px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 5px; font-size: 12px; }
         .cal-btn:hover { background: #eceff5; border-color: var(--accent-main); color: var(--accent-main); }
         
         .cal-grid-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; }
@@ -677,14 +680,14 @@
         
         .cal-events-container { display: flex; flex-direction: column; gap: 3px; overflow-y: auto; max-height: 55px; scrollbar-width: none; }
         .cal-events-container::-webkit-scrollbar { display: none; }
-        .cal-event-pill { background: var(--accent-main); color: var(--bg-primary); font-size: 9.5px; padding: 2px 4px; border-radius: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 3px; }
+        .cal-event-pill { background: var(--accent-main); color: var(--bg-primary); font-size: 9px; padding: 2px 4px; border-radius: 3px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 3px; }
         .cal-event-pill:hover { opacity: 0.85; }
         .cal-event-pill.status-canceled { background: var(--danger); text-decoration: line-through; }
 
         @media (max-width: 768px) {
             .cal-day-cell { min-height: 55px; padding: 3px; }
             .cal-day-number { font-size: 10px; width: 18px; height: 18px; }
-            .cal-event-pill { font-size: 8.5px; padding: 1px 3px; }
+            .cal-event-pill { font-size: 8px; padding: 1px 3px; }
             .admin-calendar-wrapper { padding: 12px; }
             .admin-crud-section { padding: 12px; }
         }
@@ -693,8 +696,8 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
         .modal-overlay.active { display: flex; }
         .auth-modal, .selection-modal { background: var(--bg-primary); border-radius: var(--radius-md); width: 100%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
-        .auth-modal { max-width: 400px; padding: 1.8rem 1.2rem; }
-        .selection-modal { max-width: 500px; padding: 1.8rem 1.2rem; }
+        .auth-modal { max-width: 420px; padding: 2rem 1.5rem; }
+        .selection-modal { max-width: 520px; padding: 1.8rem 1.2rem; }
         .modal-close { position: absolute; top: 12px; right: 12px; background: var(--bg-secondary); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 13px; cursor: pointer; transition: var(--transition); z-index: 10; display: flex; align-items: center; justify-content: center; }
         
         @media(max-width: 900px) {
@@ -705,13 +708,12 @@
             .selection-modal {
                 width: 100%;
                 max-width: 100%;
-                height: 85vh;
                 max-height: 85vh;
                 border-bottom-left-radius: 0;
                 border-bottom-right-radius: 0;
                 border-top-left-radius: var(--radius-lg);
                 border-top-right-radius: var(--radius-lg);
-                padding: 1.5rem 1.2rem 4rem 1.2rem;
+                padding: 1.5rem 1.2rem 4.5rem 1.2rem;
                 animation: slideUpModal 0.3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
             }
             .auth-modal {
@@ -721,7 +723,7 @@
                 border-bottom-right-radius: 0;
                 border-top-left-radius: var(--radius-lg);
                 border-top-right-radius: var(--radius-lg);
-                padding: 1.5rem 1.2rem 2.5rem 1.2rem;
+                padding: 1.5rem 1.2rem 3rem 1.2rem;
             }
         }
         @keyframes slideUpModal {
@@ -733,9 +735,9 @@
         .auth-tab { font-weight: 700; color: var(--text-muted); cursor: pointer; padding-bottom: 8px; position: relative; font-size: 14px; }
         .auth-tab.active { color: var(--text-primary); }
         .auth-tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--accent-main); }
-        .btn-google { width: 100%; padding: 11px; background: var(--bg-secondary); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1rem; font-size: 13.5px; }
+        .btn-google { width: 100%; padding: 11px; background: var(--bg-secondary); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1rem; font-size: 13px; }
         
-        .toast { position: fixed; bottom: 20px; right: 15px; left: 15px; max-width: 380px; margin: 0 auto; background: var(--text-primary); color: var(--bg-primary); padding: 0.9rem 1.2rem; border-radius: var(--radius-lg); display: none; align-items: center; gap: 10px; z-index: 2000; font-weight: 500; font-size: 13.5px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .toast { position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 400px; margin: 0 auto; background: var(--text-primary); color: var(--bg-primary); padding: 0.9rem 1.2rem; border-radius: var(--radius-lg); display: none; align-items: center; gap: 10px; z-index: 2000; font-weight: 500; font-size: 13px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .toast.show { display: flex; animation: slideIn 0.3s ease-out; }
 
         /* Animação de Sucesso ao Agendar */
@@ -743,7 +745,7 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
             z-index: 9999; display: none; flex-direction: column;
-            align-items: center; justify-content: center; text-align: center; padding: 1.2rem;
+            align-items: center; justify-content: center; text-align: center; padding: 1.5rem;
         }
         .success-overlay.active { display: flex; }
         .success-icon {
@@ -756,7 +758,7 @@
             animation: slideUpFade 0.5s ease-out 0.2s forwards; opacity: 0;
         }
         .success-subtitle {
-            color: var(--text-secondary); margin-top: 8px; font-size: 14.5px;
+            color: var(--text-secondary); margin-top: 8px; font-size: 15px;
             animation: slideUpFade 0.5s ease-out 0.3s forwards; opacity: 0;
         }
         .success-actions {
@@ -780,7 +782,7 @@
             margin-top: 3rem;
             text-align: center;
             color: var(--text-secondary);
-            font-size: 13.5px;
+            font-size: 13px;
         }
 
         .footer-container {
@@ -939,7 +941,7 @@
 
                 <div>
                     <div class="summary-card">
-                        <div class="section-title">RESUMO</div>
+                        <div class="section-title" style="font-size: 28px;">RESUMO</div>
                         
                         <div class="summary-row">
                             <span class="label">Serviço(s)</span>
@@ -960,7 +962,7 @@
 
                         <div class="summary-total">
                             <div>
-                                <div style="font-size:11.5px; color:rgba(255,255,255,0.8); text-transform:uppercase; font-weight:700;">Valor Total</div>
+                                <div style="font-size:11px; color:rgba(255,255,255,0.8); text-transform:uppercase; font-weight:700;">Valor Total</div>
                                 <div class="total-price" id="sumTotal">R$ 0,00</div>
                             </div>
                         </div>
@@ -990,11 +992,11 @@
             <div class="admin-dashboard-grid">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                    <div><div class="stat-val" id="statTodayBookings">0</div><div style="color:var(--text-secondary); font-size:13.5px;">Agendamentos Hoje</div></div>
+                    <div><div class="stat-val" id="statTodayBookings">0</div><div style="color:var(--text-secondary); font-size:13px;">Agendamentos Hoje</div></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
-                    <div><div class="stat-val" id="statRevenue">R$ 0,00</div><div style="color:var(--text-secondary); font-size:13.5px;">Faturamento (Hoje)</div></div>
+                    <div><div class="stat-val" id="statRevenue">R$ 0,00</div><div style="color:var(--text-secondary); font-size:13px;">Faturamento (Hoje)</div></div>
                 </div>
             </div>
 
@@ -1222,7 +1224,7 @@
                     <label>Senha</label>
                     <input type="password" id="authPassword" class="form-control" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-confirm" id="authSubmitBtn" style="margin-top:8px;">Entrar na Conta</button>
+                <button type="submit" class="btn-confirm" id="authSubmitBtn" style="margin-top:10px;">Entrar na Conta</button>
             </form>
         </div>
     </div>
@@ -1439,7 +1441,6 @@
         function renderBarbers() {
             const container = document.getElementById('barbersContainer');
             
-            // Filtro inteligente de barbeiros baseado no serviço selecionado
             let displayedBarbers = barbersData;
             const hasBarbaService = selectedServices.some(s => s.name.toLowerCase().includes('barba'));
 
@@ -1625,7 +1626,6 @@
 
         function selectTime(time) { 
             triggerHapticFeedback();
-            // Gestão de Conflitos em Tempo Real: Verificação preventiva antes de fechar
             const isAlreadyBooked = localAppointments.some(a => a.barberId === selectedBarber.id && a.date === selectedDate && a.time === time && a.status === 'confirmado');
             if (isAlreadyBooked) {
                 showToast('Este horário acabou de ser reservado por outro cliente. Escolha outro.');
@@ -1667,7 +1667,6 @@
 
             try { 
                 await emailjs.send(serviceID, templateID, templateParams); 
-                console.log('E-mail processado pelo EmailJS.');
             } 
             catch (error) { 
                 console.error('Erro no EmailJS:', error); 
@@ -1679,7 +1678,6 @@
             const [hour, minute] = appointment.time.split(':');
             const startDate = `${year}${month}${day}T${hour}${minute}00`;
             
-            // Duração padrão estimada de 1 hora
             const endHour = String(Number(hour) + 1).padStart(2, '0');
             const endDate = `${year}${month}${day}T${endHour}${minute}00`;
 
@@ -1712,7 +1710,6 @@
         async function handleConfirmBooking() {
             if (!currentUser) { openModal('authModal'); showToast('Faça login para concluir.'); return; }
             
-            // Verificação final estrita de conflito antes do envio ao DB
             const conflictCheck = localAppointments.some(a => a.barberId === selectedBarber.id && a.date === selectedDate && a.time === selectedTime && a.status === 'confirmado');
             if (conflictCheck) {
                 showToast('Desculpe, este horário acabou de ser ocupado. Selecione outro horário.');
@@ -1863,13 +1860,13 @@
                             </div>
                             <div style="flex: 1; min-width: 0;">
                                 <h3 style="font-size:15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:12.5px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                <div style="font-size:12.5px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
+                                <div style="font-size:12px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 10px; margin-right: 4px;"></i> ${a.barberName}</div>
+                                <div style="font-size:12px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
                         <div class="appointment-card-footer">
-                            <div style="color:var(--accent-main); font-weight:800; font-size: 14.5px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
-                            <div style="display:flex; align-items:center; gap:8px;">
+                            <div style="color:var(--accent-main); font-weight:800; font-size: 14px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div style="display:flex; align-items:center; gap:6px;">
                                 <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
                                 ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
                             </div>
@@ -1914,12 +1911,12 @@
                             </div>
                             <div style="flex: 1; min-width: 0;">
                                 <h3 style="font-size:15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:12.5px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                <div style="font-size:12.5px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
+                                <div style="font-size:12px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 10px; margin-right: 4px;"></i> ${a.barberName}</div>
+                                <div style="font-size:12px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
                         <div class="appointment-card-footer">
-                            <div style="color:var(--accent-main); font-weight:800; font-size: 15px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div style="color:var(--accent-main); font-weight:800; font-size: 14px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
                                 ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
@@ -2069,10 +2066,10 @@
             if (displayedAppts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento encontrado para este período/dia.</td></tr>`;
             } else {
-                tbody.innerHTML = displayedAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date.split('-').reverse().join('/')} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:5px 10px; font-size:10.5px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
+                tbody.innerHTML = displayedAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date.split('-').reverse().join('/')} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:5px 10px; font-size:10px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
             }
 
-            document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:5px 10px; font-size:10.5px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
+            document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:5px 10px; font-size:10px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
 
             renderAdminCalendar();
         }
@@ -2115,7 +2112,7 @@
             }
 
             if (currentUser) {
-                container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:13.5px; font-weight:700;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:6px;" onclick="logout()"></i></div>`;
+                container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:13px; font-weight:700;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:6px;" onclick="logout()"></i></div>`;
             } else {
                 container.innerHTML = `<button class="user-auth-btn" onclick="openModal('authModal')"><i class="fa-solid fa-user"></i> Entrar</button>`;
             }
@@ -2179,7 +2176,6 @@
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active')); 
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active')); 
             
-            // Atualizar botões da barra inferior mobile
             document.querySelectorAll('.bottom-nav-item').forEach((item, idx) => {
                 item.classList.remove('active');
                 if((viewId === 'homeView' && idx === 0) || (viewId === 'bookingView' && idx === 1) || (viewId === 'myAppointmentsView' && idx === 2) || (viewId === 'adminView' && idx === 3)) {
@@ -2190,7 +2186,6 @@
             document.getElementById(viewId).classList.add('active'); 
             if (element && element.classList.contains('nav-link')) element.classList.add('active'); 
 
-            // Se for para a Home, esconde o header fixo no topo até rolar para baixo
             const header = document.getElementById('mainHeader');
             if (viewId === 'homeView') {
                 if (window.scrollY > 120) {
