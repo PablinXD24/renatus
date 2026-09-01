@@ -581,7 +581,7 @@
             </div>
             
             <div class="admin-crud-section">
-                <div class="section-title">Configurações Gerais (Janela de Agendamento e Horários)</div>
+                <div class="section-title">Configurações Gerais (Janela de Agendamento, Horários e Intervalos)</div>
                 <form class="crud-form" onsubmit="saveSettings(event)">
                     <div class="input-group">
                         <label>Antecedência Mínima para Agendar (Minutos)</label>
@@ -589,14 +589,11 @@
                     </div>
                     <div class="input-group">
                         <label>Até que horas os cabeleireiros atendem?</label>
-                        <select id="adminClosingTime" class="form-control" required>
-                            <option value="17:00">17:00</option>
-                            <option value="18:00">18:00</option>
-                            <option value="19:00" selected>19:00</option>
-                            <option value="20:00">20:00</option>
-                            <option value="21:00">21:00</option>
-                            <option value="22:00">22:00</option>
-                        </select>
+                        <input type="time" id="adminClosingTime" class="form-control" value="19:00" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Intervalo dos horários (Minutos)</label>
+                        <input type="number" id="adminSlotInterval" class="form-control" value="60" min="5" step="5" required>
                     </div>
                     <button type="submit" class="btn-confirm btn-small"><i class="fa-solid fa-save"></i> Salvar Preferência</button>
                 </form>
@@ -829,12 +826,11 @@
         let generatedDates = [];
         let minAdvanceMinutes = 15;
         let closingTimeLimit = '19:00';
+        let slotIntervalMinutes = 60; // Intervalo dinâmico configurável
 
         // Estado do Calendário do Admin
         let adminCalendarDate = new Date();
         let selectedAdminDateFilter = null;
-
-        const baseTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'];
         
         let servicesData = [];
         let barbersData = [];
@@ -909,14 +905,18 @@
                 if(snap.exists()) {
                     minAdvanceMinutes = snap.val().minAdvanceMinutes || 15;
                     closingTimeLimit = snap.val().closingTimeLimit || '19:00';
+                    slotIntervalMinutes = snap.val().slotIntervalMinutes || 60;
                     
                     const adminInput = document.getElementById('adminMinAdvance');
                     if(adminInput) adminInput.value = minAdvanceMinutes;
 
                     const adminClosingInput = document.getElementById('adminClosingTime');
                     if(adminClosingInput) adminClosingInput.value = closingTimeLimit;
+
+                    const adminIntervalInput = document.getElementById('adminSlotInterval');
+                    if(adminIntervalInput) adminIntervalInput.value = slotIntervalMinutes;
                 } else {
-                    db.ref('settings/' + TENANT_ID).set({ minAdvanceMinutes: 15, closingTimeLimit: '19:00' });
+                    db.ref('settings/' + TENANT_ID).set({ minAdvanceMinutes: 15, closingTimeLimit: '19:00', slotIntervalMinutes: 60 });
                 }
             });
         }
@@ -987,14 +987,20 @@
         function updateTimeSlots() {
             const container = document.getElementById('timeSlotsContainer');
             
-            // Filtra os horários base com base no limite máximo configurado (closingTimeLimit)
-            const availableTimes = baseTimes.filter(t => {
-                const [h, m] = t.split(':').map(Number);
-                const [limitH, limitM] = closingTimeLimit.split(':').map(Number);
-                return (h * 60 + m) <= (limitH * 60 + limitM);
-            });
+            // Geração dinâmica de horários baseada no slotIntervalMinutes configurado e no closingTimeLimit
+            let dynamicTimes = [];
+            let startMinutes = 9 * 60; // Início padrão às 09:00
+            const [limitH, limitM] = closingTimeLimit.split(':').map(Number);
+            const endMinutes = limitH * 60 + limitM;
+            const interval = parseInt(slotIntervalMinutes) || 60;
 
-            let periodTimes = availableTimes.filter(t => {
+            for (let m = startMinutes; m <= endMinutes; m += interval) {
+                let h = Math.floor(m / 60);
+                let min = m % 60;
+                dynamicTimes.push(`${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`);
+            }
+
+            let periodTimes = dynamicTimes.filter(t => {
                 const hour = parseInt(t.split(':')[0]);
                 if (selectedPeriod === 'manha') return hour < 12;
                 if (selectedPeriod === 'tarde') return hour >= 12 && hour < 18;
@@ -1132,10 +1138,12 @@
             e.preventDefault();
             const val = parseInt(document.getElementById('adminMinAdvance').value) || 0;
             const closingVal = document.getElementById('adminClosingTime').value;
+            const intervalVal = parseInt(document.getElementById('adminSlotInterval').value) || 60;
             try { 
                 await db.ref('settings/' + TENANT_ID).update({ 
                     minAdvanceMinutes: val,
-                    closingTimeLimit: closingVal
+                    closingTimeLimit: closingVal,
+                    slotIntervalMinutes: intervalVal
                 }); 
                 showToast('Preferências salvas com sucesso!'); 
             } 
