@@ -245,13 +245,14 @@
         .home-hero {
             position: relative;
             width: 100vw;
-            height: 100vh;
+            min-height: 100vh;
+            height: auto;
             border-radius: 0;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 4rem;
+            padding: 6rem 4rem 4rem 4rem;
             box-shadow: none;
             background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.75)), url('image_e194e6.jpg') center/cover no-repeat;
         }
@@ -292,11 +293,12 @@
 
         .home-hero-title {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(52px, 9vw, 96px);
-            line-height: 0.95;
+            font-size: clamp(42px, 7vw, 96px);
+            line-height: 1.05;
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 2rem;
+            word-break: break-word;
         }
 
         .home-hero-btn {
@@ -394,7 +396,7 @@
             line-height: 1.6;
         }
 
-        .booking-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; }
+        .booking-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start; }
 
         @media (max-width: 900px) {
             .booking-grid { grid-template-columns: 1fr; }
@@ -404,8 +406,9 @@
             .logo::before, .logo::after { display: none; }
             .nav-menu { justify-content: center; gap: 8px; }
             .nav-link { font-size: 13px; padding: 6px 10px; }
-            .home-hero { min-height: 100vh; padding: 2rem; }
+            .home-hero { min-height: 100vh; padding: 5rem 1.5rem 3rem 1.5rem; justify-content: flex-end; }
             .home-hero-top-nav { display: none; }
+            .home-carousel-arrows { display: none; }
         }
 
         .section-title { font-family: 'Anton', sans-serif; font-size: 24px; color: var(--text-primary); margin-bottom: 1.25rem; letter-spacing: 0.5px; }
@@ -420,7 +423,7 @@
         }
         .service-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
         .service-card.selected { border-color: var(--accent-main); background: #E8EDFF; }
-        .service-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; z-index: 2; }
+        .service-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; z-index: 2; word-break: break-word; }
         .service-card .duration { font-size: 13px; color: var(--text-secondary); }
         .service-card .price {
             position: absolute; top: 0; left: 0; background: var(--bg-primary);
@@ -442,8 +445,8 @@
         .barber-card.selected { border-color: var(--accent-main); background: #E8EDFF; }
         .barber-avatar { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 10px auto; background: var(--accent-main); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--bg-primary); }
         .barber-card.selected .barber-avatar { background: var(--accent-gold); color: var(--text-primary); }
-        .barber-name { font-weight: 700; font-size: 14px; }
-        .barber-role { font-size: 12px; color: var(--text-secondary); }
+        .barber-name { font-weight: 700; font-size: 14px; word-break: break-word; }
+        .barber-role { font-size: 12px; color: var(--text-secondary); word-break: break-word; }
 
         /* Seleção de Data */
         .dates-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
@@ -474,11 +477,11 @@
         }
         .summary-card .section-title { color: var(--bg-primary); margin-bottom: 1.5rem; }
         .summary-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); font-size: 14px; gap: 10px; }
-        .summary-row .label { color: rgba(255, 255, 255, 0.8); }
-        .summary-row .value { font-weight: 600; text-align: right; cursor: pointer; transition: color 0.2s; word-break: break-word; }
+        .summary-row .label { color: rgba(255, 255, 255, 0.8); flex-shrink: 0; }
+        .summary-row .value { font-weight: 600; text-align: right; cursor: pointer; transition: color 0.2s; word-break: break-word; overflow-wrap: break-word; }
         .summary-row .value:hover { color: var(--accent-gold); text-decoration: underline; }
         .summary-total { margin-top: 1.5rem; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
-        .summary-total .total-price { font-size: 32px; font-weight: 800; color: var(--accent-gold); font-family: 'Anton', sans-serif; letter-spacing: 1px; }
+        .summary-total .total-price { font-size: 32px; font-weight: 800; color: var(--accent-gold); font-family: 'Anton', sans-serif; letter-spacing: 1px; word-break: break-word; }
 
         .btn-confirm { width: 100%; margin-top: 1.5rem; padding: 15px; background: var(--accent-gold); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-size: 16px; font-weight: 800; cursor: pointer; transition: transform 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .btn-confirm:hover:not(:disabled) { transform: scale(1.02); }
@@ -498,8 +501,8 @@
         .month-group-container { background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; transition: var(--transition); }
         .month-group-header { padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--bg-secondary); }
         .month-group-header:hover { background: #eceff5; }
-        .month-group-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--accent-main); text-transform: uppercase; display: flex; align-items: center; gap: 10px; margin: 0; }
-        .month-group-toggle-icon { font-size: 16px; color: var(--text-secondary); transition: transform 0.3s ease; }
+        .month-group-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--accent-main); text-transform: uppercase; display: flex; align-items: center; gap: 10px; margin: 0; word-break: break-word; }
+        .month-group-toggle-icon { font-size: 16px; color: var(--text-secondary); transition: transform 0.3s ease; flex-shrink: 0; }
         .month-group-container.expanded .month-group-toggle-icon { transform: rotate(180deg); }
         .month-group-content { display: none; padding: 0 25px 25px 25px; border-top: 1px solid var(--card-border); background: var(--bg-primary); }
         .month-group-container.expanded .month-group-content { display: block; }
@@ -539,7 +542,7 @@
         /* Calendário Admin */
         .admin-calendar-wrapper { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); padding: 25px; margin-bottom: 2rem; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .cal-header-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .cal-header-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; word-break: break-word; }
         .cal-nav-btns { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .cal-btn { background: var(--bg-primary); border: 1px solid var(--card-border); color: var(--text-primary); padding: 8px 14px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
         .cal-btn:hover { background: #eceff5; border-color: var(--accent-main); color: var(--accent-main); }
@@ -694,7 +697,6 @@
     </header>
 
     <main>
-        <!-- HOME VIEW (TELA INTEIRA - BEM-VINDO) -->
         <section id="homeView" class="view-section active">
             <div class="home-fullscreen-wrapper">
                 <div class="home-hero">
@@ -736,7 +738,6 @@
             </div>
         </section>
 
-        <!-- BOOKING VIEW -->
         <section id="bookingView" class="view-section">
             <div class="page-header">
                 <h1>Agende seu Horário</h1>
@@ -790,7 +791,6 @@
             </div>
         </section>
 
-        <!-- MY APPOINTMENTS VIEW -->
         <section id="myAppointmentsView" class="view-section">
             <div class="page-header">
                 <h1>Meus Agendamentos</h1>
@@ -799,7 +799,6 @@
             <div class="appointments-container" id="myAppointmentsContainer"></div>
         </section>
 
-        <!-- ADMIN VIEW -->
         <section id="adminView" class="view-section">
             <div class="page-header">
                 <h1>Painel da Barbearia</h1>
@@ -1551,12 +1550,12 @@
                             </div>
                             <div style="flex: 1; min-width: 0;">
                                 <h3 style="font-size:16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:13px; color: var(--text-secondary); margin-bottom: 4px;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
+                                <div style="font-size:13px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
                                 <div style="font-size:13px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
                         <div class="appointment-card-footer">
-                            <div style="color:var(--accent-main); font-weight:800; font-size: 15px;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div style="color:var(--accent-main); font-weight:800; font-size: 15px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
                                 ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
@@ -1602,12 +1601,12 @@
                             </div>
                             <div style="flex: 1; min-width: 0;">
                                 <h3 style="font-size:16px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:13px; color: var(--text-secondary); margin-bottom: 4px;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
+                                <div style="font-size:13px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
                                 <div style="font-size:13px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
                         <div class="appointment-card-footer">
-                            <div style="color:var(--accent-main); font-weight:800; font-size: 16px;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div style="color:var(--accent-main); font-weight:800; font-size: 16px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
                                 ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
