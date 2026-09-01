@@ -209,6 +209,21 @@
             margin: 2rem auto; padding: 0 1.5rem; flex: 1;
         }
 
+        /* Faz com que a view da Home escape do limite do main e ocupe 100% da largura */
+        #homeView {
+            display: none;
+        }
+        #homeView.active {
+            display: block;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            margin-top: -2rem;
+        }
+
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -220,16 +235,11 @@
         /* ==========================================================================
            HOME VIEW (TELA INTEIRA - ESTILO REFERÊNCIA)
            ========================================================================== */
-        #homeView.active {
-            margin: -2rem -1.5rem 0 -1.5rem;
-            padding: 0;
-            max-width: 100%;
-        }
-
         .home-fullscreen-wrapper {
             display: flex;
             flex-direction: column;
             gap: 2rem;
+            width: 100%;
         }
 
         .home-hero {
@@ -265,7 +275,9 @@
             position: relative;
             z-index: 2;
             color: #fff;
-            max-width: 800px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
             margin-bottom: 2rem;
         }
 
@@ -682,6 +694,7 @@
     </header>
 
     <main>
+        <!-- HOME VIEW (TELA INTEIRA - BEM-VINDO) -->
         <section id="homeView" class="view-section active">
             <div class="home-fullscreen-wrapper">
                 <div class="home-hero">
@@ -723,6 +736,7 @@
             </div>
         </section>
 
+        <!-- BOOKING VIEW -->
         <section id="bookingView" class="view-section">
             <div class="page-header">
                 <h1>Agende seu Horário</h1>
@@ -776,6 +790,7 @@
             </div>
         </section>
 
+        <!-- MY APPOINTMENTS VIEW -->
         <section id="myAppointmentsView" class="view-section">
             <div class="page-header">
                 <h1>Meus Agendamentos</h1>
@@ -784,6 +799,7 @@
             <div class="appointments-container" id="myAppointmentsContainer"></div>
         </section>
 
+        <!-- ADMIN VIEW -->
         <section id="adminView" class="view-section">
             <div class="page-header">
                 <h1>Painel da Barbearia</h1>
