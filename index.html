@@ -206,7 +206,7 @@
            ========================================================================== */
         main {
             max-width: 1200px; width: 100%;
-            margin: 0 auto; padding: 100px 1.5rem 2rem 1.5rem; flex: 1;
+            margin: 0 auto; padding: 130px 1.5rem 2rem 1.5rem; flex: 1;
         }
 
         /* Faz com que a view da Home escape do limite do main e ocupe 100% da largura */
@@ -221,7 +221,7 @@
             right: 50%;
             margin-left: -50vw;
             margin-right: -50vw;
-            margin-top: -100px; /* Compensando o padding do main na home */
+            margin-top: -130px; /* Compensando o padding do main na home */
         }
 
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
@@ -399,13 +399,42 @@
         .booking-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start; }
 
         @media (max-width: 900px) {
-            .booking-grid { grid-template-columns: 1fr; }
-            header { padding: 1rem; border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
-            .nav-container { flex-direction: column; align-items: stretch; gap: 1rem; }
-            .logo { position: relative; padding: 0; background: transparent; color: var(--bg-primary); font-size: 24px; justify-content: center; border-radius: 0; }
+            header { 
+                padding: 0.8rem 1rem; 
+                border-bottom-left-radius: var(--radius-md); 
+                border-bottom-right-radius: var(--radius-md); 
+            }
+            .nav-container { 
+                flex-direction: column; 
+                align-items: stretch; 
+                gap: 0.6rem; 
+            }
+            .logo { 
+                position: relative; 
+                padding: 0; 
+                background: transparent; 
+                color: var(--bg-primary); 
+                font-size: 22px; 
+                justify-content: center; 
+                border-radius: 0; 
+            }
             .logo::before, .logo::after { display: none; }
-            .nav-menu { justify-content: center; gap: 8px; }
-            .nav-link { font-size: 13px; padding: 6px 10px; }
+            .nav-menu { 
+                justify-content: center; 
+                gap: 6px; 
+            }
+            .nav-link { font-size: 12px; padding: 5px 8px; }
+            .user-auth-btn { padding: 6px 12px; font-size: 0.8rem; margin: 0 auto; }
+            .user-profile-bar { max-width: 100%; justify-content: center; margin: 0 auto; }
+            
+            /* Ajuste crucial de espaçamento superior no mobile para evitar sobreposição nos títulos */
+            main {
+                padding-top: 175px;
+            }
+            #homeView.active {
+                margin-top: -175px;
+            }
+
             .home-hero { min-height: 100vh; padding: 5rem 1.5rem 3rem 1.5rem; justify-content: flex-end; }
             .home-hero-top-nav { display: none; }
             .home-carousel-arrows { display: none; }
