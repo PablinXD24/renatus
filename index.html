@@ -61,17 +61,29 @@
         }
 
         /* ==========================================================================
-           HEADER & NAVEGAÇÃO
+           HEADER & NAVEGAÇÃO (COM EFEITO DE REVELAÇÃO AO ROLAR)
            ========================================================================== */
         header {
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
             background: var(--accent-main);
             border-bottom-left-radius: var(--radius-lg);
             border-bottom-right-radius: var(--radius-lg);
             padding: 1.25rem 2rem 1.25rem 220px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        header.visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .nav-container {
@@ -206,34 +218,45 @@
         .page-header p { color: var(--text-secondary); font-size: 1rem; }
 
         /* ==========================================================================
-           HOME VIEW (ESTILO INSPIRADO NA REFERÊNCIA)
+           HOME VIEW (TELA INTEIRA - ESTILO REFERÊNCIA)
            ========================================================================== */
+        #homeView.active {
+            margin-top: -2rem;
+            padding-top: 2rem;
+        }
+
+        .home-fullscreen-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
         .home-hero {
             position: relative;
             width: 100%;
-            height: 520px;
+            min-height: calc(100vh - 4rem);
             border-radius: var(--radius-lg);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 3rem;
+            padding: 4rem;
             box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.7)), url('image_e0c1d0.jpg') center/cover no-repeat;
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.75)), url('image_e0c1d0.jpg') center/cover no-repeat;
         }
 
         .home-hero-top-nav {
             position: absolute;
-            top: 25px;
-            left: 3rem;
-            right: 3rem;
+            top: 35px;
+            left: 4rem;
+            right: 4rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: #fff;
             font-weight: 600;
-            font-size: 13px;
-            letter-spacing: 2px;
+            font-size: 14px;
+            letter-spacing: 3px;
             text-transform: uppercase;
         }
 
@@ -241,38 +264,40 @@
             position: relative;
             z-index: 2;
             color: #fff;
+            max-width: 800px;
         }
 
         .home-hero-subtitle {
-            font-size: 14px;
-            letter-spacing: 3px;
+            font-size: 15px;
+            letter-spacing: 4px;
             text-transform: uppercase;
             color: var(--accent-gold);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 700;
         }
 
         .home-hero-title {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(48px, 8vw, 84px);
+            font-size: clamp(52px, 9vw, 96px);
             line-height: 0.95;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .home-hero-btn {
             background: var(--accent-gold);
             color: var(--text-primary);
-            padding: 14px 30px;
+            padding: 16px 36px;
             border-radius: var(--radius-lg);
             font-weight: 800;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-size: 16px;
             transition: transform 0.2s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         .home-hero-btn:hover {
@@ -283,8 +308,8 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            left: 20px;
-            right: 20px;
+            left: 30px;
+            right: 30px;
             display: flex;
             justify-content: space-between;
             z-index: 3;
@@ -295,8 +320,8 @@
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(5px);
             color: #fff;
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -312,15 +337,15 @@
 
         .home-features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
-            margin-top: 3rem;
+            margin-bottom: 3rem;
         }
 
         .home-feature-card {
             background: var(--bg-secondary);
             border-radius: var(--radius-md);
-            padding: 30px;
+            padding: 35px;
             border: 1px solid var(--card-border);
             transition: var(--transition);
         }
@@ -331,22 +356,22 @@
         }
 
         .home-feature-icon {
-            font-size: 32px;
+            font-size: 36px;
             color: var(--accent-main);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .home-feature-title {
             font-family: 'Anton', sans-serif;
-            font-size: 20px;
-            margin-bottom: 10px;
+            font-size: 22px;
+            margin-bottom: 12px;
             letter-spacing: 0.5px;
         }
 
         .home-feature-desc {
             color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 15px;
+            line-height: 1.6;
         }
 
         .booking-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; }
@@ -359,7 +384,7 @@
             .logo::before, .logo::after { display: none; }
             .nav-menu { justify-content: center; gap: 8px; }
             .nav-link { font-size: 13px; padding: 6px 10px; }
-            .home-hero { height: 400px; padding: 1.5rem; }
+            .home-hero { min-height: 450px; padding: 2rem; }
             .home-hero-top-nav { display: none; }
         }
 
@@ -626,9 +651,9 @@
 </head>
 <body>
 
-    <header>
+    <header id="mainHeader">
         <div class="nav-container">
-            <a href="#" class="logo">
+            <a href="#" class="logo" onclick="switchView('homeView', document.querySelectorAll('.nav-link')[0])">
                 <i class="fa-solid fa-scissors"></i>
                 RENATU'S
             </a>
@@ -649,43 +674,47 @@
     </header>
 
     <main>
+        <!-- HOME VIEW (TELA INTEIRA - BEM-VINDO) -->
         <section id="homeView" class="view-section active">
-            <div class="home-hero">
-                <div class="home-hero-top-nav">
-                    <span>E</span><span>Y</span><span>R</span><span>C</span><span>W</span><span>S</span><span>N</span><span>B</span><span>C</span><span><i class="fa-solid fa-magnifying-glass"></i></span>
+            <div class="home-fullscreen-wrapper">
+                <div class="home-hero">
+                    <div class="home-hero-top-nav">
+                        <span>E</span><span>Y</span><span>R</span><span>C</span><span>W</span><span>S</span><span>N</span><span>B</span><span>C</span><span><i class="fa-solid fa-magnifying-glass"></i></span>
+                    </div>
+                    <div class="home-carousel-arrows">
+                        <div class="home-carousel-arrow"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="home-carousel-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                    </div>
+                    <div class="home-hero-content">
+                        <div class="home-hero-subtitle">Bem-vindo à Renatu's</div>
+                        <h1 class="home-hero-title">Estilo, Tradição e Modernidade</h1>
+                        <a href="#" class="home-hero-btn" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[1])">
+                            Agendar Horário <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="home-carousel-arrows">
-                    <div class="home-carousel-arrow"><i class="fa-solid fa-chevron-left"></i></div>
-                    <div class="home-carousel-arrow"><i class="fa-solid fa-chevron-right"></i></div>
-                </div>
-                <div class="home-hero-content">
-                    <div class="home-hero-subtitle">Bem-vindo à Renatu's</div>
-                    <h1 class="home-hero-title">Estilo, Tradição e Modernidade</h1>
-                    <a href="#" class="home-hero-btn" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[1])">
-                        Agendar Horário <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
 
-            <div class="home-features-grid">
-                <div class="home-feature-card">
-                    <div class="home-feature-icon"><i class="fa-solid fa-scissors"></i></div>
-                    <div class="home-feature-title">Cortes Exclusivos</div>
-                    <div class="home-feature-desc">Profissionais altamente capacitados para garantir o corte perfeito alinhado às novas tendências do mercado.</div>
-                </div>
-                <div class="home-feature-card">
-                    <div class="home-feature-icon"><i class="fa-solid fa-clock"></i></div>
-                    <div class="home-feature-title">Agendamento Rápido</div>
-                    <div class="home-feature-desc">Marque seu horário em segundos com confirmação imediata e comodidade total diretamente pela plataforma.</div>
-                </div>
-                <div class="home-feature-card">
-                    <div class="home-feature-icon"><i class="fa-solid fa-medal"></i></div>
-                    <div class="home-feature-title">Ambiente Premium</div>
-                    <div class="home-feature-desc">Desfrute de um espaço confortável, pensado para proporcionar a melhor experiência de cuidado pessoal.</div>
+                <div class="home-features-grid">
+                    <div class="home-feature-card">
+                        <div class="home-feature-icon"><i class="fa-solid fa-scissors"></i></div>
+                        <div class="home-feature-title">Cortes Exclusivos</div>
+                        <div class="home-feature-desc">Profissionais altamente capacitados para garantir o corte perfeito alinhado às novas tendências do mercado.</div>
+                    </div>
+                    <div class="home-feature-card">
+                        <div class="home-feature-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div class="home-feature-title">Agendamento Rápido</div>
+                        <div class="home-feature-desc">Marque seu horário em segundos com confirmação imediata e comodidade total diretamente pela plataforma.</div>
+                    </div>
+                    <div class="home-feature-card">
+                        <div class="home-feature-icon"><i class="fa-solid fa-medal"></i></div>
+                        <div class="home-feature-title">Ambiente Premium</div>
+                        <div class="home-feature-desc">Desfrute de um espaço confortável, pensado para proporcionar a melhor experiência de cuidado pessoal.</div>
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- BOOKING VIEW -->
         <section id="bookingView" class="view-section">
             <div class="page-header">
                 <h1>Agende seu Horário</h1>
@@ -739,6 +768,7 @@
             </div>
         </section>
 
+        <!-- MY APPOINTMENTS VIEW -->
         <section id="myAppointmentsView" class="view-section">
             <div class="page-header">
                 <h1>Meus Agendamentos</h1>
@@ -747,6 +777,7 @@
             <div class="appointments-container" id="myAppointmentsContainer"></div>
         </section>
 
+        <!-- ADMIN VIEW -->
         <section id="adminView" class="view-section">
             <div class="page-header">
                 <h1>Painel da Barbearia</h1>
@@ -1028,7 +1059,6 @@
         let closingTimeLimit = '19:00';
         let slotIntervalMinutes = 60;
 
-        // Estado do Calendário do Admin
         let adminCalendarDate = new Date();
         let selectedAdminDateFilter = null;
         
@@ -1036,12 +1066,30 @@
         let barbersData = [];
         let scheduleBlocks = [];
         let localAppointments = [];
-        let authorizedAdminEmails = ['pablo11ssousa2@gmail.com']; // Lista base inicial
+        let authorizedAdminEmails = ['pablo11ssousa2@gmail.com'];
 
         document.addEventListener('DOMContentLoaded', () => {
             listenAuthChanges();
             initDatabaseListeners();
+            initScrollHeaderEffect();
         });
+
+        // === EFEITO DE SCROLL PARA MOSTRAR O HEADER NA HOME ===
+        function initScrollHeaderEffect() {
+            const header = document.getElementById('mainHeader');
+            window.addEventListener('scroll', () => {
+                const currentView = document.getElementById('homeView');
+                if (currentView && currentView.classList.contains('active')) {
+                    if (window.scrollY > 120) {
+                        header.classList.add('visible');
+                    } else {
+                        header.classList.remove('visible');
+                    }
+                } else {
+                    header.classList.add('visible');
+                }
+            });
+        }
 
         // Controles UI
         function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
@@ -1796,6 +1844,20 @@
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active')); 
             document.getElementById(viewId).classList.add('active'); 
             if (element) element.classList.add('active'); 
+
+            // Se for para a Home, esconde o header fixo no topo até rolar para baixo
+            const header = document.getElementById('mainHeader');
+            if (viewId === 'homeView') {
+                if (window.scrollY > 120) {
+                    header.classList.add('visible');
+                } else {
+                    header.classList.remove('visible');
+                }
+            } else {
+                header.classList.add('visible');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
