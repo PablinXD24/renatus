@@ -221,8 +221,9 @@
            HOME VIEW (TELA INTEIRA - ESTILO REFERÊNCIA)
            ========================================================================== */
         #homeView.active {
-            margin-top: -2rem;
-            padding-top: 2rem;
+            margin: -2rem -1.5rem 0 -1.5rem;
+            padding: 0;
+            max-width: 100%;
         }
 
         .home-fullscreen-wrapper {
@@ -233,16 +234,16 @@
 
         .home-hero {
             position: relative;
-            width: 100%;
-            min-height: calc(100vh - 4rem);
-            border-radius: var(--radius-lg);
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             padding: 4rem;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.75)), url('image_e0c1d0.jpg') center/cover no-repeat;
+            box-shadow: none;
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.75)), url('image_e194e6.jpg') center/cover no-repeat;
         }
 
         .home-hero-top-nav {
@@ -265,6 +266,7 @@
             z-index: 2;
             color: #fff;
             max-width: 800px;
+            margin-bottom: 2rem;
         }
 
         .home-hero-subtitle {
@@ -335,11 +337,17 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
+        .home-features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            width: 100%;
+        }
+
         .home-features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
-            margin-bottom: 3rem;
         }
 
         .home-feature-card {
@@ -384,7 +392,7 @@
             .logo::before, .logo::after { display: none; }
             .nav-menu { justify-content: center; gap: 8px; }
             .nav-link { font-size: 13px; padding: 6px 10px; }
-            .home-hero { min-height: 450px; padding: 2rem; }
+            .home-hero { min-height: 100vh; padding: 2rem; }
             .home-hero-top-nav { display: none; }
         }
 
@@ -674,7 +682,6 @@
     </header>
 
     <main>
-        <!-- HOME VIEW (TELA INTEIRA - BEM-VINDO) -->
         <section id="homeView" class="view-section active">
             <div class="home-fullscreen-wrapper">
                 <div class="home-hero">
@@ -694,27 +701,28 @@
                     </div>
                 </div>
 
-                <div class="home-features-grid">
-                    <div class="home-feature-card">
-                        <div class="home-feature-icon"><i class="fa-solid fa-scissors"></i></div>
-                        <div class="home-feature-title">Cortes Exclusivos</div>
-                        <div class="home-feature-desc">Profissionais altamente capacitados para garantir o corte perfeito alinhado às novas tendências do mercado.</div>
-                    </div>
-                    <div class="home-feature-card">
-                        <div class="home-feature-icon"><i class="fa-solid fa-clock"></i></div>
-                        <div class="home-feature-title">Agendamento Rápido</div>
-                        <div class="home-feature-desc">Marque seu horário em segundos com confirmação imediata e comodidade total diretamente pela plataforma.</div>
-                    </div>
-                    <div class="home-feature-card">
-                        <div class="home-feature-icon"><i class="fa-solid fa-medal"></i></div>
-                        <div class="home-feature-title">Ambiente Premium</div>
-                        <div class="home-feature-desc">Desfrute de um espaço confortável, pensado para proporcionar a melhor experiência de cuidado pessoal.</div>
+                <div class="home-features-container">
+                    <div class="home-features-grid">
+                        <div class="home-feature-card">
+                            <div class="home-feature-icon"><i class="fa-solid fa-scissors"></i></div>
+                            <div class="home-feature-title">Cortes Exclusivos</div>
+                            <div class="home-feature-desc">Profissionais altamente capacitados para garantir o corte perfeito alinhado às novas tendências do mercado.</div>
+                        </div>
+                        <div class="home-feature-card">
+                            <div class="home-feature-icon"><i class="fa-solid fa-clock"></i></div>
+                            <div class="home-feature-title">Agendamento Rápido</div>
+                            <div class="home-feature-desc">Marque seu horário em segundos com confirmação imediata e comodidade total diretamente pela plataforma.</div>
+                        </div>
+                        <div class="home-feature-card">
+                            <div class="home-feature-icon"><i class="fa-solid fa-medal"></i></div>
+                            <div class="home-feature-title">Ambiente Premium</div>
+                            <div class="home-feature-desc">Desfrute de um espaço confortável, pensado para proporcionar a melhor experiência de cuidado pessoal.</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- BOOKING VIEW -->
         <section id="bookingView" class="view-section">
             <div class="page-header">
                 <h1>Agende seu Horário</h1>
@@ -768,7 +776,6 @@
             </div>
         </section>
 
-        <!-- MY APPOINTMENTS VIEW -->
         <section id="myAppointmentsView" class="view-section">
             <div class="page-header">
                 <h1>Meus Agendamentos</h1>
@@ -777,7 +784,6 @@
             <div class="appointments-container" id="myAppointmentsContainer"></div>
         </section>
 
-        <!-- ADMIN VIEW -->
         <section id="adminView" class="view-section">
             <div class="page-header">
                 <h1>Painel da Barbearia</h1>
