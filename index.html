@@ -579,29 +579,22 @@
                     <div><div class="stat-val" id="statRevenue">R$ 0,00</div><div style="color:var(--text-secondary); font-size:14px;">Faturamento (Hoje)</div></div>
                 </div>
             </div>
-            
+
             <div class="admin-crud-section">
-                <div class="section-title">Gerenciar Administradores</div>
+                <div class="section-title">Gerenciar Administradores Autorizados</div>
                 <form class="crud-form" onsubmit="addAdminEmail(event)">
                     <div class="input-group">
-                        <label>E-mail do Novo Administrador</label>
-                        <input type="email" id="crudAdminEmail" class="form-control" placeholder="email@exemplo.com" required>
+                        <label>E-mail do Administrador</label>
+                        <input type="email" id="crudAdminEmailInput" class="form-control" placeholder="outro@email.com" required>
                     </div>
-                    <button type="submit" class="btn-confirm btn-small"><i class="fa-solid fa-user-plus"></i> Conceder Acesso Admin</button>
+                    <button type="submit" class="btn-confirm btn-small"><i class="fa-solid fa-user-shield"></i> Dar Acesso Admin</button>
                 </form>
                 <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>E-mail Autorizado</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminEmailsTable"></tbody>
-                    </table>
+                    <table><thead><tr><th>E-mail Autorizado</th><th>Ação</th></tr></thead>
+                    <tbody id="adminEmailsTable"></tbody></table>
                 </div>
             </div>
-
+            
             <div class="admin-crud-section">
                 <div class="section-title">Configurações Gerais (Janela de Agendamento, Horários e Intervalos)</div>
                 <form class="crud-form" onsubmit="saveSettings(event)">
@@ -744,7 +737,7 @@
             <div class="footer-links">
                 <a href="#" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[0])">Agendar</a>
                 <a href="#" onclick="switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[1])">Meus Agendamentos</a>
-                <a href="#" id="footerAdminLink" style="display: none;" onclick="switchView('adminView', document.querySelectorAll('.nav-link')[2])">Painel Admin</a>
+                <a href="#" id="footerAdminLink" style="display: none;" onclick="switchView('adminView', document.querySelectorAll('#navAdminLink')[0])">Painel Admin</a>
             </div>
             <div class="footer-copy">&copy; 2026 RENATU'S. Todos os direitos reservados.</div>
         </div>
@@ -848,7 +841,7 @@
         let generatedDates = [];
         let minAdvanceMinutes = 15;
         let closingTimeLimit = '19:00';
-        let slotIntervalMinutes = 60; // Intervalo dinâmico configurável
+        let slotIntervalMinutes = 60;
 
         // Estado do Calendário do Admin
         let adminCalendarDate = new Date();
@@ -858,7 +851,7 @@
         let barbersData = [];
         let scheduleBlocks = [];
         let localAppointments = [];
-        let adminEmailsList = [];
+        let authorizedAdminEmails = ['pablo11ssousa2@gmail.com']; // Lista base inicial
 
         document.addEventListener('DOMContentLoaded', () => {
             listenAuthChanges();
@@ -924,6 +917,20 @@
                 renderAdminDashboard();
             });
 
+            db.ref('admin_emails').on('value', snap => {
+                authorizedAdminEmails = ['pablo11ssousa2@gmail.com'];
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        const emailVal = child.val().email;
+                        if(emailVal && !authorizedAdminEmails.includes(emailVal)) {
+                            authorizedAdminEmails.push(emailVal);
+                        }
+                    });
+                }
+                renderAdminEmailsTable();
+                updateAuthUI(); // Atualiza visibilidade do painel admin com base na lista atualizada
+            });
+
             db.ref('settings/' + TENANT_ID).on('value', snap => {
                 if(snap.exists()) {
                     minAdvanceMinutes = snap.val().minAdvanceMinutes || 15;
@@ -941,23 +948,6 @@
                 } else {
                     db.ref('settings/' + TENANT_ID).set({ minAdvanceMinutes: 15, closingTimeLimit: '19:00', slotIntervalMinutes: 60 });
                 }
-            });
-
-            db.ref('admin_emails/' + TENANT_ID).on('value', snap => {
-                adminEmailsList = ["pablo11ssousa2@gmail.com"];
-                if (snap.exists()) {
-                    snap.forEach(child => {
-                        const emailVal = child.val().email;
-                        if (emailVal && !adminEmailsList.includes(emailVal)) {
-                            adminEmailsList.push(emailVal);
-                        }
-                    });
-                } else {
-                    // Garante o registro inicial no banco se não existir
-                    db.ref('admin_emails/' + TENANT_ID).push({ email: "pablo11ssousa2@gmail.com" });
-                }
-                updateAuthUI();
-                renderAdminEmailsTable();
             });
         }
 
@@ -988,6 +978,45 @@
 
             document.getElementById('adminBarbersTable').innerHTML = barbersData.map(b => `<tr><td>${b.name}</td><td>${b.role}</td><td><button class="btn-cancel" onclick="deleteBarber('${b.id}')">Remover</button></td></tr>`).join('');
             document.getElementById('crudBlockBarber').innerHTML = barbersData.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+        }
+
+        function renderAdminEmailsTable() {
+            const tbody = document.getElementById('adminEmailsTable');
+            if(!tbody) return;
+            // Exclui o superadmin fixo da listagem de exclusão se preferir, ou permite listar todos extras
+            db.ref('admin_emails').once('value', snap => {
+                let html = `<tr><td>pablo11ssousa2@gmail.com (Principal)</td><td>-</td></tr>`;
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        const key = child.key;
+                        const val = child.val().email;
+                        html += `<tr><td>${val}</td><td><button class="btn-cancel" onclick="removeAdminEmail('${key}')">Remover</button></td></tr>`;
+                    });
+                }
+                tbody.innerHTML = html;
+            });
+        }
+
+        async function addAdminEmail(e) {
+            e.preventDefault();
+            const inputVal = document.getElementById('crudAdminEmailInput').value.trim();
+            if(!inputVal) return;
+            try {
+                await db.ref('admin_emails').push({ email: inputVal });
+                document.getElementById('crudAdminEmailInput').value = '';
+                showToast('Acesso de admin adicionado!');
+            } catch (err) {
+                showToast('Erro ao adicionar e-mail admin.');
+            }
+        }
+
+        async function removeAdminEmail(key) {
+            try {
+                await db.ref('admin_emails/' + key).remove();
+                showToast('Acesso de admin removido!');
+            } catch(err) {
+                showToast('Erro ao remover e-mail admin.');
+            }
         }
 
         function generateAvailableDates(barber) {
@@ -1027,9 +1056,8 @@
         function updateTimeSlots() {
             const container = document.getElementById('timeSlotsContainer');
             
-            // Geração dinâmica de horários baseada no slotIntervalMinutes configurado e no closingTimeLimit
             let dynamicTimes = [];
-            let startMinutes = 9 * 60; // Início padrão às 09:00
+            let startMinutes = 9 * 60; 
             const [limitH, limitM] = closingTimeLimit.split(':').map(Number);
             const endMinutes = limitH * 60 + limitM;
             const interval = parseInt(slotIntervalMinutes) || 60;
@@ -1214,57 +1242,6 @@
         }
 
         async function deleteBlock(id) { try { await db.ref('blocks/' + id).remove(); showToast('Bloqueio removido!'); } catch (error) { showToast('Erro ao remover bloqueio.'); } }
-
-        async function addAdminEmail(e) {
-            e.preventDefault();
-            const emailInput = document.getElementById('crudAdminEmail').value.trim();
-            if (!emailInput) return;
-            if (adminEmailsList.includes(emailInput)) {
-                showToast('Este e-mail já possui acesso de Administrador.');
-                return;
-            }
-            try {
-                await db.ref('admin_emails/' + TENANT_ID).push({ email: emailInput });
-                document.getElementById('crudAdminEmail').value = '';
-                showToast('Administrador adicionado com sucesso!');
-            } catch (error) {
-                showToast('Erro ao adicionar administrador.');
-            }
-        }
-
-        async function deleteAdminEmail(id, emailVal) {
-            if (emailVal === "pablo11ssousa2@gmail.com") {
-                showToast('O administrador principal não pode ser removido.');
-                return;
-            }
-            try {
-                await db.ref('admin_emails/' + TENANT_ID + '/' + id).remove();
-                showToast('Acesso de administrador removido!');
-            } catch (error) {
-                showToast('Erro ao remover administrador.');
-            }
-        }
-
-        function renderAdminEmailsTable() {
-            const tbody = document.getElementById('adminEmailsTable');
-            if (!tbody) return;
-            
-            db.ref('admin_emails/' + TENANT_ID).once('value', snap => {
-                let rows = [];
-                snap.forEach(child => {
-                    const id = child.key;
-                    const email = child.val().email;
-                    const isMaster = (email === "pablo11ssousa2@gmail.com");
-                    rows.push(`
-                        <tr>
-                            <td><strong>${email}</strong> ${isMaster ? '<span style="font-size:11px; background:var(--accent-main); color:#fff; padding:2px 6px; border-radius:4px; margin-left:6px;">Principal</span>' : ''}</td>
-                            <td>${!isMaster ? `<button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="deleteAdminEmail('${id}', '${email}')">Remover</button>` : '-'}</td>
-                        </tr>
-                    `);
-                });
-                tbody.innerHTML = rows.join('') || `<tr><td colspan="2" style="text-align:center;">Nenhum admin secundário.</td></tr>`;
-            });
-        }
 
         function toggleMonthGroup(headerElement) {
             const container = headerElement.parentElement;
@@ -1532,7 +1509,6 @@
             document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:6px 12px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
 
             renderAdminCalendar();
-            renderAdminEmailsTable();
         }
 
         // === AUTH & UTIL ===
@@ -1540,9 +1516,12 @@
             auth.onAuthStateChanged(user => {
                 if (user) {
                     currentUser = { uid: user.uid, name: user.displayName || user.email.split('@')[0], email: user.email };
-                    // Persiste dados do usuário logado pelo Google para sincronização com login convencional
-                    localStorage.setItem('saved_user_email', user.email);
-                    localStorage.setItem('saved_user_name', user.displayName || user.email.split('@')[0]);
+                    // Salva/sincroniza o usuário no banco de dados para credenciais/pesquisas futuras
+                    db.ref('users_auth/' + user.uid).set({
+                        email: user.email,
+                        name: currentUser.name,
+                        lastLogin: new Date().toISOString()
+                    });
                 } else {
                     currentUser = null;
                 }
@@ -1553,25 +1532,21 @@
 
         function updateAuthUI() {
             const container = document.getElementById('authContainer');
-            const navAdmin = document.getElementById('navAdminLink');
-            const footerAdmin = document.getElementById('footerAdminLink');
+            const adminLink = document.getElementById('navAdminLink');
+            const footerAdminLink = document.getElementById('footerAdminLink');
 
+            // Verifica permissão de Admin baseada no e-mail atual
             let isAdmin = false;
             if (currentUser && currentUser.email) {
-                isAdmin = adminEmailsList.includes(currentUser.email);
+                isAdmin = authorizedAdminEmails.includes(currentUser.email.trim());
             }
 
-            if (isAdmin) {
-                if (navAdmin) navAdmin.style.display = 'inline-block';
-                if (footerAdmin) footerAdmin.style.display = 'inline-block';
-            } else {
-                if (navAdmin) navAdmin.style.display = 'none';
-                if (footerAdmin) footerAdmin.style.display = 'none';
-                // Se o usuário não for admin e estiver visualizando o painel admin, força redirecionar para 'bookingView'
-                const adminSection = document.getElementById('adminView');
-                if (adminSection && adminSection.classList.contains('active')) {
-                    switchView('bookingView', document.querySelectorAll('.nav-link')[0]);
-                }
+            if (adminLink) adminLink.style.display = isAdmin ? 'inline-block' : 'none';
+            if (footerAdminLink) footerAdminLink.style.display = isAdmin ? 'inline-block' : 'none';
+
+            // Se o usuário não é admin e estava com a aba admin aberta, redireciona para agendamento
+            if (!isAdmin && document.getElementById('adminView').classList.contains('active')) {
+                switchView('bookingView', document.querySelectorAll('.nav-link')[0]);
             }
 
             if (currentUser) {
@@ -1587,27 +1562,12 @@
             document.getElementById('tabRegister').classList.toggle('active', mode === 'register'); 
             document.getElementById('nameGroup').style.display = mode === 'register' ? 'block' : 'none'; 
             document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'Entrar na Conta' : 'Criar Conta'; 
-            
-            if (mode === 'login') {
-                const savedEmail = localStorage.getItem('saved_user_email');
-                if (savedEmail) {
-                    document.getElementById('authEmail').value = savedEmail;
-                }
-            }
         }
 
         async function loginWithGoogle() {
             try { 
                 const provider = new firebase.auth.GoogleAuthProvider(); 
-                const result = await auth.signInWithPopup(provider); 
-                
-                if (result.user) {
-                    const email = result.user.email;
-                    const name = result.user.displayName || email.split('@')[0];
-                    localStorage.setItem('saved_user_email', email);
-                    localStorage.setItem('saved_user_name', name);
-                }
-
+                await auth.signInWithPopup(provider); 
                 closeModal('authModal'); 
                 showToast('Login efetuado com sucesso!'); 
             } 
@@ -1627,18 +1587,9 @@
                     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                     await userCredential.user.updateProfile({ displayName: name });
                     currentUser = { uid: userCredential.user.uid, name: name, email: email };
-                    
-                    localStorage.setItem('saved_user_email', email);
-                    localStorage.setItem('saved_user_name', name);
-                    
                     showToast('Conta criada com sucesso!');
                 } else { 
                     const userCredential = await auth.signInWithEmailAndPassword(email, password); 
-                    const uName = userCredential.user.displayName || email.split('@')[0];
-                    
-                    localStorage.setItem('saved_user_email', email);
-                    localStorage.setItem('saved_user_name', uName);
-
                     showToast('Acesso liberado!'); 
                 }
                 updateAuthUI(); 
@@ -1649,19 +1600,15 @@
         }
 
         async function logout() {
-            try { 
-                await auth.signOut(); 
-                showToast('Você saiu.'); 
-            } catch (error) { 
-                showToast('Erro ao sair.'); 
-            }
+            try { await auth.signOut(); showToast('Você saiu.'); } catch (error) { showToast('Erro ao sair.'); }
         }
 
         function switchView(viewId, element) { 
-            if (viewId === 'adminView') {
-                let isAdmin = currentUser && currentUser.email && adminEmailsList.includes(currentUser.email);
-                if (!isAdmin) {
-                    showToast('Acesso negado.');
+            // Bloqueia acesso programático ao painel se não for admin
+            if(viewId === 'adminView') {
+                let isAdmin = currentUser && currentUser.email && authorizedAdminEmails.includes(currentUser.email.trim());
+                if(!isAdmin) {
+                    showToast('Acesso restrito.');
                     return;
                 }
             }
