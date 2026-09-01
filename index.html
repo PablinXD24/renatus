@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RENATU'S</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,7 +73,7 @@
             background: var(--accent-main);
             border-bottom-left-radius: var(--radius-lg);
             border-bottom-right-radius: var(--radius-lg);
-            padding: 1rem 2rem 1rem 220px;
+            padding: 1.25rem 2rem 1.25rem 220px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             transform: translateY(-100%);
             opacity: 0;
@@ -100,13 +100,13 @@
             top: 0;
             left: 0;
             background: var(--bg-primary);
-            padding: 14px 22px;
+            padding: 18px 25px;
             border-bottom-right-radius: var(--radius-md);
             display: flex;
             align-items: center;
             gap: 10px;
             font-family: 'Anton', sans-serif;
-            font-size: 20px;
+            font-size: 22px;
             letter-spacing: 1px;
             color: var(--text-primary);
             text-decoration: none;
@@ -115,7 +115,7 @@
 
         .logo i {
             color: var(--accent-gold);
-            font-size: 1.2rem;
+            font-size: 1.4rem;
         }
 
         .logo::before, .logo::after {
@@ -135,7 +135,7 @@
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
@@ -143,8 +143,8 @@
             color: var(--bg-primary);
             text-decoration: none;
             font-weight: 500;
-            font-size: 14px;
-            padding: 6px 12px;
+            font-size: 15px;
+            padding: 8px 16px;
             border-radius: var(--radius-sm);
             transition: var(--transition);
             cursor: pointer;
@@ -159,15 +159,15 @@
             background-color: var(--accent-gold);
             color: var(--text-primary);
             border: none;
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             border-radius: var(--radius-lg);
             cursor: pointer;
             transition: transform 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .user-auth-btn:hover { transform: scale(1.05); }
@@ -175,16 +175,15 @@
         .user-profile-bar {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 50px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: var(--bg-primary);
-            max-width: 180px;
+            max-width: 200px;
             overflow: hidden;
-            font-size: 13px;
         }
 
         .user-profile-bar span {
@@ -194,13 +193,12 @@
         }
 
         .user-avatar {
-            width: 28px; height: 28px;
+            width: 32px; height: 32px;
             border-radius: 50%;
             background: var(--accent-gold);
             color: var(--text-primary);
             display: flex; align-items: center; justify-content: center;
             font-weight: 700;
-            font-size: 12px;
             flex-shrink: 0;
         }
 
@@ -210,9 +208,9 @@
             background: rgba(255, 255, 255, 0.15);
             border: none;
             color: #fff;
-            font-size: 18px;
-            width: 36px;
-            height: 36px;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             align-items: center;
             justify-content: center;
@@ -265,7 +263,7 @@
            ========================================================================== */
         main {
             max-width: 1200px; width: 100%;
-            margin: 0 auto; padding: 110px 1.5rem 2rem 1.5rem; flex: 1;
+            margin: 0 auto; padding: 130px 1.5rem 2rem 1.5rem; flex: 1;
         }
 
         /* Faz com que a view da Home escape do limite do main e ocupe 100% da largura */
@@ -280,15 +278,15 @@
             right: 50%;
             margin-left: -50vw;
             margin-right: -50vw;
-            margin-top: -110px; /* Compensando o padding do main na home */
+            margin-top: -130px; /* Compensando o padding do main na home */
         }
 
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .page-header { margin-bottom: 1.5rem; }
-        .page-header h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.1; color: var(--text-primary); margin-bottom: 0.4rem; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h1 { font-size: clamp(28px, 5vw, 48px); line-height: 1.1; color: var(--text-primary); margin-bottom: 0.5rem; }
         .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
 
         /* ==========================================================================
@@ -346,30 +344,30 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             color: var(--accent-gold);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 700;
         }
 
         .home-hero-title {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(36px, 6vw, 84px);
+            font-size: clamp(36px, 7vw, 96px);
             line-height: 1.05;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             word-break: break-word;
         }
 
         .home-hero-btn {
             background: var(--accent-gold);
             color: var(--text-primary);
-            padding: 14px 32px;
+            padding: 16px 36px;
             border-radius: var(--radius-lg);
             font-weight: 800;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-size: 15px;
             transition: transform 0.2s ease;
             box-shadow: 0 5px 20px rgba(0,0,0,0.3);
@@ -395,8 +393,8 @@
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(5px);
             color: #fff;
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -413,20 +411,20 @@
         .home-features-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 3rem 1.5rem;
+            padding: 4rem 1.5rem;
             width: 100%;
         }
 
         .home-features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 25px;
         }
 
         .home-feature-card {
             background: var(--bg-secondary);
             border-radius: var(--radius-md);
-            padding: 30px;
+            padding: 35px;
             border: 1px solid var(--card-border);
             transition: var(--transition);
         }
@@ -437,25 +435,25 @@
         }
 
         .home-feature-icon {
-            font-size: 32px;
+            font-size: 36px;
             color: var(--accent-main);
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .home-feature-title {
             font-family: 'Anton', sans-serif;
-            font-size: 20px;
-            margin-bottom: 10px;
+            font-size: 22px;
+            margin-bottom: 12px;
             letter-spacing: 0.5px;
         }
 
         .home-feature-desc {
             color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 145px;
+            line-height: 1.6;
         }
 
-        .booking-grid { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start; }
+        .booking-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start; }
 
         @media (max-width: 900px) {
             header { 
@@ -485,14 +483,14 @@
                 position: fixed;
                 top: 0;
                 right: -100%;
-                width: 260px;
+                width: 280px;
                 height: 100vh;
                 background: var(--accent-main);
                 flex-direction: column;
                 align-items: flex-start;
                 justify-content: flex-start;
-                padding: 4.5rem 1.5rem 1.5rem 1.5rem;
-                gap: 12px;
+                padding: 5rem 2rem 2rem 2rem;
+                gap: 15px;
                 box-shadow: -5px 0 25px rgba(0,0,0,0.2);
                 transition: right 0.3s ease-in-out;
                 z-index: 104;
@@ -500,42 +498,45 @@
             .nav-menu.mobile-open {
                 right: 0;
             }
-            .nav-link { font-size: 15px; padding: 8px 14px; width: 100%; }
-            .user-auth-btn { padding: 8px 14px; font-size: 0.85rem; width: 100%; justify-content: center; }
+            .nav-link { font-size: 16px; padding: 10px 16px; width: 100%; }
+            .user-auth-btn { padding: 10px 16px; font-size: 0.9rem; width: 100%; justify-content: center; }
             .user-profile-bar { max-width: 100%; justify-content: flex-start; width: 100%; }
             .mobile-menu-toggle { display: flex; }
             
             /* Ativar barra de navegação inferior no mobile e dar espaçamento */
             .bottom-nav { display: flex; }
-            body { padding-bottom: 65px; }
+            body { padding-bottom: 70px; }
 
             /* Ajuste crucial de espaçamento superior no mobile para evitar sobreposição nos títulos */
             main {
                 padding-top: 90px;
-                padding-bottom: 4rem;
+                padding-bottom: 5rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
             }
             #homeView.active {
                 margin-top: -90px;
             }
 
-            .home-hero { min-height: 100vh; padding: 4rem 1.2rem 2.5rem 1.2rem; justify-content: flex-end; }
+            .home-hero { min-height: 100vh; padding: 5rem 1.2rem 3rem 1.2rem; justify-content: flex-end; }
             .home-hero-top-nav { display: none; }
             .home-carousel-arrows { display: none; }
+            .booking-grid { grid-template-columns: 1fr; gap: 1.5rem; }
         }
 
-        .section-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); margin-bottom: 1rem; letter-spacing: 0.5px; }
+        .section-title { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--text-primary); margin-bottom: 1.25rem; letter-spacing: 0.5px; }
         .title-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 
         /* Lista de Serviços */
-        .services-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 1.5rem; }
+        .services-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 2rem; }
         .service-card {
             background: var(--bg-secondary); border-radius: var(--radius-md);
-            padding: 42px 16px 16px 16px; cursor: pointer; position: relative;
+            padding: 45px 15px 15px 15px; cursor: pointer; position: relative;
             transition: box-shadow 0.3s ease; border: 2px solid transparent;
         }
         .service-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
         .service-card.selected { border-color: var(--accent-main); background: #E8EDFF; }
-        .service-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; z-index: 2; word-break: break-word; }
+        .service-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; z-index: 2; word-break: break-word; }
         .service-card .duration { font-size: 12px; color: var(--text-secondary); }
         .service-card .price {
             position: absolute; top: 0; left: 0; background: var(--bg-primary);
@@ -550,7 +551,7 @@
         /* Seleção de Barbeiros */
         .barbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
         .barber-card {
-            background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px;
+            background: var(--bg-secondary); border-radius: var(--radius-md); padding: 15px;
             text-align: center; cursor: pointer; transition: var(--transition); border: 2px solid transparent;
             position: relative;
         }
@@ -566,19 +567,19 @@
         }
 
         /* Seleção de Data */
-        .dates-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
+        .dates-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
         .dates-scroll::-webkit-scrollbar { height: 6px; }
         .dates-scroll::-webkit-scrollbar-track { background: transparent; }
         .dates-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
         .date-card { flex: 0 0 75px; scroll-snap-align: start; background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; cursor: pointer; transition: var(--transition); border: 2px solid transparent; }
         .date-card:hover { background: #E8EDFF; }
         .date-card.selected { border-color: var(--accent-main); background: var(--accent-main); color: var(--bg-primary); }
-        .date-card .d-week { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
+        .date-card .d-week { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
         .date-card .d-num { font-size: 20px; font-weight: 800; line-height: 1; }
-        .date-card .d-month { font-size: 10px; margin-top: 3px; font-weight: 600; }
+        .date-card .d-month { font-size: 10px; margin-top: 4px; font-weight: 600; }
 
         /* Horários */
-        .period-selector { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .period-selector { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .period-btn { flex: 1; min-width: 80px; padding: 10px 8px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: var(--radius-sm); font-weight: 700; font-size: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text-secondary); }
         .period-btn:hover { background: #E8EDFF; }
         .period-btn.active { background: var(--accent-main); color: var(--bg-primary); border-color: var(--accent-main); }
@@ -590,27 +591,27 @@
         /* Resumo */
         .summary-card { background-color: var(--accent-main); border-radius: var(--radius-lg); padding: 20px; color: var(--bg-primary); }
         @media(min-width: 901px) {
-            .summary-card { position: sticky; top: 95px; }
+            .summary-card { position: sticky; top: 110px; }
         }
         .summary-card .section-title { color: var(--bg-primary); margin-bottom: 1.2rem; font-size: 26px; }
-        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); font-size: 13.5px; gap: 8px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); font-size: 13.5px; gap: 10px; }
         .summary-row .label { color: rgba(255, 255, 255, 0.8); flex-shrink: 0; }
         .summary-row .value { font-weight: 600; text-align: right; cursor: pointer; transition: color 0.2s; word-break: break-word; overflow-wrap: break-word; }
         .summary-row .value:hover { color: var(--accent-gold); text-decoration: underline; }
         .summary-total { margin-top: 1.2rem; padding-top: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
         .summary-total .total-price { font-size: 28px; font-weight: 800; color: var(--accent-gold); font-family: 'Anton', sans-serif; letter-spacing: 1px; word-break: break-word; }
 
-        .btn-confirm { width: 100%; margin-top: 1.2rem; padding: 13px; background: var(--accent-gold); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-size: 15px; font-weight: 800; cursor: pointer; transition: transform 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-confirm { width: 100%; margin-top: 1.2rem; padding: 14px; background: var(--accent-gold); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-size: 15px; font-weight: 800; cursor: pointer; transition: transform 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .btn-confirm:hover:not(:disabled) { transform: scale(1.02); }
         .btn-confirm:disabled { background: #cccccc; color: #666666; cursor: not-allowed; }
         
-        .btn-small { padding: 7px 14px; font-size: 12px; margin-top: 0; width: auto; border-radius: var(--radius-sm); }
+        .btn-small { padding: 8px 14px; font-size: 12px; margin-top: 0; width: auto; border-radius: var(--radius-sm); }
         .btn-danger { background: var(--danger); color: white; }
 
         /* Meus Agendamentos */
-        .appointments-container { display: flex; flex-direction: column; gap: 16px; }
+        .appointments-container { display: flex; flex-direction: column; gap: 15px; }
         .recent-section-header { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 6px; }
-        .recent-appointments-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
+        .recent-appointments-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
         .recent-appointments-scroll::-webkit-scrollbar { height: 6px; }
         .recent-appointments-scroll::-webkit-scrollbar-track { background: transparent; }
         .recent-appointments-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
@@ -623,34 +624,34 @@
         .month-group-container.expanded .month-group-toggle-icon { transform: rotate(180deg); }
         .month-group-content { display: none; padding: 0 20px 20px 20px; border-top: 1px solid var(--card-border); background: var(--bg-primary); }
         .month-group-container.expanded .month-group-content { display: block; }
-        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 16px; }
+        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 15px; }
 
         .appointment-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; border: 1px solid var(--card-border); transition: var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .appointment-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
         .appointment-info { display: flex; align-items: flex-start; gap: 12px; width: 100%; }
         .appointment-date-badge { background: var(--accent-main); color: var(--bg-primary); border-radius: var(--radius-sm); padding: 8px 12px; text-align: center; box-shadow: 0 4px 10px rgba(35, 75, 186, 0.2); flex-shrink: 0; }
         .appointment-date-badge .day { font-size: 22px; font-family: 'Anton', sans-serif; line-height: 1; }
-        .appointment-date-badge .month-label { font-size: 9.5px; text-transform: uppercase; font-weight: 700; margin-top: 2px; opacity: 0.9; }
-        .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .appointment-date-badge .month-label { font-size: 9px; text-transform: uppercase; font-weight: 700; margin-top: 2px; opacity: 0.9; }
+        .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
         .status-confirmed { background: rgba(16, 185, 129, 0.15); color: var(--success); }
         .status-canceled { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-        .btn-cancel { background: var(--danger); color: var(--bg-primary); border: none; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 700; font-size: 11.5px; cursor: pointer; transition: var(--transition); white-space: nowrap; }
+        .btn-cancel { background: var(--danger); color: var(--bg-primary); border: none; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 700; font-size: 11px; cursor: pointer; transition: var(--transition); white-space: nowrap; }
         .btn-cancel:hover { opacity: 0.9; transform: scale(1.02); }
-        .appointment-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 12px; margin-top: 2px; width: 100%; flex-wrap: wrap; gap: 8px; }
+        .appointment-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 10px; margin-top: 2px; width: 100%; flex-wrap: wrap; gap: 8px; }
 
         /* Admin Dashboard & Tabelas Responsivas */
-        .admin-dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px; }
+        .admin-dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 15px; }
         .stat-icon { width: 50px; height: 50px; border-radius: 50%; background: var(--accent-main); color: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
         .stat-val { font-size: 28px; font-family: 'Anton', sans-serif; color: var(--text-primary); word-break: break-all; }
         
         .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 1.5rem; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); border-radius: var(--radius-md); overflow: hidden; min-width: 600px; }
-        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--card-border); white-space: nowrap; font-size: 13.5px; }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); border-radius: var(--radius-md); overflow: hidden; min-width: 550px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--card-border); white-space: nowrap; font-size: 13.5px; }
         th { background: var(--accent-main); color: var(--bg-primary); font-weight: 600; }
         
         .admin-crud-section { background: #fff; border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 1.5rem; }
-        .crud-form { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: flex-end; }
+        .crud-form { display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; align-items: flex-end; }
         .form-control { width: 100%; padding: 10px 14px; border: 2px solid var(--bg-secondary); border-radius: var(--radius-sm); margin-bottom: 12px; font-family: 'Inter', sans-serif; margin-top: 4px; background: #fff; font-size: 14px; }
         .crud-form .form-control { margin-bottom: 0; }
         .input-group { flex: 1; min-width: 180px; }
@@ -658,14 +659,14 @@
 
         /* Calendário Admin */
         .admin-calendar-wrapper { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); padding: 20px; margin-bottom: 1.5rem; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 12px; }
         .cal-header-title { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; word-break: break-word; }
         .cal-nav-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .cal-btn { background: var(--bg-primary); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .cal-btn { background: var(--bg-primary); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; font-size: 13px; }
         .cal-btn:hover { background: #eceff5; border-color: var(--accent-main); color: var(--accent-main); }
         
         .cal-grid-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; }
-        .cal-grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .cal-grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .cal-day-cell { background: var(--bg-primary); border: 1px solid var(--card-border); border-radius: var(--radius-sm); min-height: 80px; padding: 6px; display: flex; flex-direction: column; justify-content: flex-start; transition: var(--transition); position: relative; cursor: pointer; }
         .cal-day-cell:hover { border-color: var(--accent-main); box-shadow: 0 4px 12px rgba(35, 75, 186, 0.1); }
         .cal-day-cell.other-month { opacity: 0.4; background: rgba(244, 245, 248, 0.5); }
@@ -676,7 +677,7 @@
         
         .cal-events-container { display: flex; flex-direction: column; gap: 3px; overflow-y: auto; max-height: 55px; scrollbar-width: none; }
         .cal-events-container::-webkit-scrollbar { display: none; }
-        .cal-event-pill { background: var(--accent-main); color: var(--bg-primary); font-size: 9.5px; padding: 2px 5px; border-radius: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 3px; }
+        .cal-event-pill { background: var(--accent-main); color: var(--bg-primary); font-size: 9.5px; padding: 2px 4px; border-radius: 4px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 3px; }
         .cal-event-pill:hover { opacity: 0.85; }
         .cal-event-pill.status-canceled { background: var(--danger); text-decoration: line-through; }
 
@@ -691,8 +692,8 @@
         /* Modais */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
         .modal-overlay.active { display: flex; }
-        .auth-modal, .selection-modal { background: var(--bg-primary); border-radius: var(--radius-md); width: 100%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto; }
-        .auth-modal { max-width: 380px; padding: 1.8rem 1.2rem; }
+        .auth-modal, .selection-modal { background: var(--bg-primary); border-radius: var(--radius-md); width: 100%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .auth-modal { max-width: 400px; padding: 1.8rem 1.2rem; }
         .selection-modal { max-width: 500px; padding: 1.8rem 1.2rem; }
         .modal-close { position: absolute; top: 12px; right: 12px; background: var(--bg-secondary); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 13px; cursor: pointer; transition: var(--transition); z-index: 10; display: flex; align-items: center; justify-content: center; }
         
@@ -710,7 +711,7 @@
                 border-bottom-right-radius: 0;
                 border-top-left-radius: var(--radius-lg);
                 border-top-right-radius: var(--radius-lg);
-                padding: 1.8rem 1.2rem 4.5rem 1.2rem;
+                padding: 1.5rem 1.2rem 4rem 1.2rem;
                 animation: slideUpModal 0.3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
             }
             .auth-modal {
@@ -720,7 +721,7 @@
                 border-bottom-right-radius: 0;
                 border-top-left-radius: var(--radius-lg);
                 border-top-right-radius: var(--radius-lg);
-                padding: 1.8rem 1.2rem 2.5rem 1.2rem;
+                padding: 1.5rem 1.2rem 2.5rem 1.2rem;
             }
         }
         @keyframes slideUpModal {
@@ -728,13 +729,13 @@
             to { transform: translateY(0); }
         }
 
-        .auth-tabs { display: flex; gap: 16px; margin-bottom: 20px; border-bottom: 2px solid var(--bg-secondary); }
+        .auth-tabs { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid var(--bg-secondary); }
         .auth-tab { font-weight: 700; color: var(--text-muted); cursor: pointer; padding-bottom: 8px; position: relative; font-size: 14px; }
         .auth-tab.active { color: var(--text-primary); }
         .auth-tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--accent-main); }
-        .btn-google { width: 100%; padding: 10px; background: var(--bg-secondary); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1rem; font-size: 13.5px; }
+        .btn-google { width: 100%; padding: 11px; background: var(--bg-secondary); color: var(--text-primary); border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1rem; font-size: 13.5px; }
         
-        .toast { position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 380px; margin: 0 auto; background: var(--text-primary); color: var(--bg-primary); padding: 0.9rem 1.2rem; border-radius: var(--radius-lg); display: none; align-items: center; gap: 10px; z-index: 2000; font-weight: 500; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .toast { position: fixed; bottom: 20px; right: 15px; left: 15px; max-width: 380px; margin: 0 auto; background: var(--text-primary); color: var(--bg-primary); padding: 0.9rem 1.2rem; border-radius: var(--radius-lg); display: none; align-items: center; gap: 10px; z-index: 2000; font-weight: 500; font-size: 13.5px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .toast.show { display: flex; animation: slideIn 0.3s ease-out; }
 
         /* Animação de Sucesso ao Agendar */
@@ -751,11 +752,11 @@
         }
         .success-title {
             margin-top: 20px; font-family: 'Anton', sans-serif;
-            font-size: clamp(24px, 4vw, 32px); color: var(--text-primary); text-transform: uppercase;
+            font-size: clamp(24px, 5vw, 32px); color: var(--text-primary); text-transform: uppercase;
             animation: slideUpFade 0.5s ease-out 0.2s forwards; opacity: 0;
         }
         .success-subtitle {
-            color: var(--text-secondary); margin-top: 8px; font-size: 15px;
+            color: var(--text-secondary); margin-top: 8px; font-size: 14.5px;
             animation: slideUpFade 0.5s ease-out 0.3s forwards; opacity: 0;
         }
         .success-actions {
@@ -775,7 +776,7 @@
         footer {
             background: var(--bg-secondary);
             border-top: 1px solid var(--card-border);
-            padding: 2rem 1.5rem;
+            padding: 2rem 1.2rem;
             margin-top: 3rem;
             text-align: center;
             color: var(--text-secondary);
@@ -808,11 +809,10 @@
 
         .footer-links {
             display: flex;
-            gap: 16px;
+            gap: 15px;
             font-weight: 500;
             flex-wrap: wrap;
             justify-content: center;
-            font-size: 13.5px;
         }
 
         .footer-links a {
@@ -826,7 +826,7 @@
         }
 
         .footer-copy {
-            font-size: 12.5px;
+            font-size: 12px;
             color: var(--text-muted);
         }
     </style>
@@ -939,7 +939,7 @@
 
                 <div>
                     <div class="summary-card">
-                        <div class="section-title" style="font-size: 28px;">RESUMO</div>
+                        <div class="section-title">RESUMO</div>
                         
                         <div class="summary-row">
                             <span class="label">Serviço(s)</span>
@@ -1222,7 +1222,7 @@
                     <label>Senha</label>
                     <input type="password" id="authPassword" class="form-control" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-confirm" id="authSubmitBtn" style="margin-top:10px;">Entrar na Conta</button>
+                <button type="submit" class="btn-confirm" id="authSubmitBtn" style="margin-top:8px;">Entrar na Conta</button>
             </form>
         </div>
     </div>
@@ -1822,7 +1822,7 @@
             else list = [];
 
             if (list.length === 0) { 
-                container.innerHTML = `<div style="text-align:center; padding:2.5rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p>Você não possui agendamentos.</p></div>`; 
+                container.innerHTML = `<div style="text-align:center; padding:3rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p>Você não possui agendamentos.</p></div>`; 
                 return; 
             }
 
@@ -1837,7 +1837,7 @@
             });
 
             if (currentYearApps.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:2.5rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p>Você não possui agendamentos para o ano de ${currentYear}.</p></div>`;
+                container.innerHTML = `<div style="text-align:center; padding:3rem; background:var(--bg-secondary); border-radius:var(--radius-md);"><p>Você não possui agendamentos para o ano de ${currentYear}.</p></div>`;
                 return;
             }
 
@@ -1862,14 +1862,14 @@
                                 <div class="month-label">${monthStr}</div>
                             </div>
                             <div style="flex: 1; min-width: 0;">
-                                <h3 style="font-size:15px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:12.5px; color: var(--text-secondary); margin-bottom: 3px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 10px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                <div style="font-size:12.5px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 4px;"></i> ${a.time}</div>
+                                <h3 style="font-size:15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
+                                <div style="font-size:12.5px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
+                                <div style="font-size:12.5px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
                         <div class="appointment-card-footer">
                             <div style="color:var(--accent-main); font-weight:800; font-size: 14.5px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
-                            <div style="display:flex; align-items:center; gap:6px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
                                 <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
                                 ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
                             </div>
@@ -1913,9 +1913,9 @@
                                 <div class="month-label">${monthStr}</div>
                             </div>
                             <div style="flex: 1; min-width: 0;">
-                                <h3 style="font-size:15px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:12.5px; color: var(--text-secondary); margin-bottom: 3px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 10px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                <div style="font-size:12.5px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 4px;"></i> ${a.time}</div>
+                                <h3 style="font-size:15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
+                                <div style="font-size:12.5px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 11px; margin-right: 4px;"></i> ${a.barberName}</div>
+                                <div style="font-size:12.5px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 11px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
                         <div class="appointment-card-footer">
@@ -2069,10 +2069,10 @@
             if (displayedAppts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum agendamento encontrado para este período/dia.</td></tr>`;
             } else {
-                tbody.innerHTML = displayedAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date.split('-').reverse().join('/')} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:5px 10px; font-size:11px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
+                tbody.innerHTML = displayedAppts.map(a => `<tr><td><strong>${a.userName}</strong></td><td>${a.serviceName}</td><td>${a.barberName}</td><td>${a.date.split('-').reverse().join('/')} às ${a.time}</td><td>R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</td><td><span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span></td><td>${a.status === 'confirmado' ? `<button class="btn-cancel" style="padding:5px 10px; font-size:10.5px;" onclick="cancelAppointment('${a.id}')">Excluir</button>` : '-'}</td></tr>`).join('');
             }
 
-            document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:5px 10px; font-size:11px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
+            document.getElementById('adminBlocksTable').innerHTML = scheduleBlocks.map(b => `<tr><td>${b.barberName}</td><td>${b.date.split('-').reverse().join('/')}</td><td>${b.time === 'ALL' ? 'Dia Todo' : b.time}</td><td><button class="btn-cancel" style="padding:5px 10px; font-size:10.5px;" onclick="deleteBlock('${b.id}')">Remover</button></td></tr>`).join('');
 
             renderAdminCalendar();
         }
@@ -2115,7 +2115,7 @@
             }
 
             if (currentUser) {
-                container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:13px; font-weight:700;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:6px;" onclick="logout()"></i></div>`;
+                container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:13.5px; font-weight:700;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:6px;" onclick="logout()"></i></div>`;
             } else {
                 container.innerHTML = `<button class="user-auth-btn" onclick="openModal('authModal')"><i class="fa-solid fa-user"></i> Entrar</button>`;
             }
