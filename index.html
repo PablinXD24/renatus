@@ -1493,6 +1493,9 @@
         let localAppointments = [];
         let authorizedAdminEmails = ['pablo11ssousa2@gmail.com'];
 
+        // Número da barbearia configurado para receber as confirmações automáticas
+        const BARBER_WHATSAPP_NUMBER = "5511933560170";
+
         // Sistema de Slider Animado do Banner Principal (Home)
         let currentHeroIndex = 0;
         let heroInterval = null;
@@ -1529,7 +1532,6 @@
             initHeroSlider();
         });
 
-        // === FEEDBACK TÁTIL (VIBRAÇÃO SUTIL) ===
         function triggerHapticFeedback() {
             if ('vibrate' in navigator) {
                 try {
@@ -1538,7 +1540,6 @@
             }
         }
 
-        // === MENU HAMBÚRGUER MOBILE ===
         function toggleMobileMenu() {
             const drawer = document.getElementById('navMenuDrawer');
             const icon = document.getElementById('mobileMenuIcon');
@@ -1888,35 +1889,51 @@
             document.getElementById('btnConfirmBooking').disabled = !(selectedServices.length > 0 && selectedBarber && selectedDate && selectedTime);
         }
 
-        // === NOTIFICAÇÃO AUTOMÁTICA VIA WHATSAPP (SEM API PAGA) ===
+        // === NOTIFICAÇÃO AUTOMÁTICA VIA WHATSAPP PARA O NÚMERO DA BARBEARIA ===
         function sendWhatsAppConfirmation(appointment) {
             const formattedDate = appointment.date.split('-').reverse().join('/');
             const formattedPrice = `R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}`;
             
-            // Mensagem amigável de confirmação do agendamento
-            const message = `Olá *${appointment.userName}*! 👋 Passando para confirmar seu agendamento na *Renatu's Barbearia*:\n\n` +
+            const message = `🔔 *NOVO AGENDAMENTO CONFIRMADO!*\n\n` +
+                            `👤 *Cliente:* ${appointment.userName} (${appointment.userEmail})\n` +
                             `✂️ *Serviço(s):* ${appointment.serviceName}\n` +
                             `👨‍🦰 *Profissional:* ${appointment.barberName}\n` +
                             `📅 *Data:* ${formattedDate}\n` +
                             `⏰ *Horário:* ${appointment.time}\n` +
-                            `💰 *Total:* ${formattedPrice}\n\n` +
-                            `Te esperamos aqui! Caso precise remarcar ou cancelar, acesse o painel em nosso site.`;
+                            `💰 *Valor:* ${formattedPrice}`;
 
-            // Codifica a mensagem para link web/app do WhatsApp
             const encodedMsg = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${BARBER_WHATSAPP_NUMBER}?text=${encodedMsg}`;
             
-            // Abre o WhatsApp (Utiliza o link universal que abre tanto no app móvel quanto no WhatsApp Web)
-            // Se o usuário estiver no navegador sem número fixo do cliente, usa um link genérico ou dispara para o próprio chat.
-            // Para garantir funcionamento sem erro, disparamos a intent do wa.me
-            const whatsappUrl = `https://wa.me/?text=${encodedMsg}`;
-            
-            // Abre de forma automática numa aba secundária/redirecionamento leve
             setTimeout(() => {
                 window.open(whatsappUrl, '_blank');
-            }, 600);
+            }, 500);
         }
 
-        // === EMAILJS NOTIFICATIONS & CALENDAR EXPORT ===
+        // === ADICIONAR AO GOOGLE AGENDA DIRETAMENTE (LINK WEB) ===
+        function addToGoogleCalendar(appointment) {
+            const [year, month, day] = appointment.date.split('-');
+            const [hour, minute] = appointment.time.split(':');
+            
+            // Formato UTC/ISO para o Google Agenda: YYYYMMDDTHHmm00Z
+            const startDateTime = `${year}${month}${day}T${hour}${minute}00`;
+            
+            // Calcula término (adiciona 1 hora padrão ou baseada na duração)
+            let endHourNum = Number(hour) + 1;
+            const endHour = String(endHourNum).padStart(2, '0');
+            const endDateTime = `${year}${month}${day}T${endHour}${minute}00`;
+
+            const text = encodeURIComponent(`Renatu's - ${appointment.serviceName} (${appointment.barberName})`);
+            const details = encodeURIComponent(`Cliente: ${appointment.userName}\nProfissional: ${appointment.barberName}\nValor: R$ ${parseFloat(appointment.servicePrice).toFixed(2)}`);
+            const location = encodeURIComponent(`Renatu's Barbearia`);
+
+            const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${startDateTime}/${endDateTime}&details=${details}&location=${location}`;
+            
+            window.open(googleUrl, '_blank');
+            showToast('Redirecionando para o Google Agenda...');
+        }
+
+        // === EMAILJS NOTIFICATIONS & CALENDAR EXPORT (.ICS) ===
         async function sendAutomatedNotifications(appointment) {
             const serviceID = 'service_w57ntvf';
             const templateID = appointment.status === 'cancelado' ? 'template_0f758dm' : 'template_t4vty7l'; 
@@ -2007,11 +2024,11 @@
                 const actionsContainer = document.getElementById('successActionsContainer');
                 
                 actionsContainer.innerHTML = `
-                    <button class="btn-confirm btn-small" onclick="sendWhatsAppConfirmation(${JSON.stringify(createdAppointment).replace(/"/g, '&quot;')})" style="background:#25D366; color:#fff;">
-                        <i class="fa-brands fa-whatsapp"></i> Enviar Confirmação no WhatsApp
+                    <button class="btn-confirm btn-small" onclick="addToGoogleCalendar(${JSON.stringify(createdAppointment).replace(/"/g, '&quot;')})" style="background:#4285F4; color:#fff;">
+                        <i class="fa-solid fa-calendar-plus"></i> Adicionar ao Google Agenda
                     </button>
-                    <button class="btn-confirm btn-small" onclick="downloadICSFile(${JSON.stringify(createdAppointment).replace(/"/g, '&quot;')})">
-                        <i class="fa-solid fa-calendar-days"></i> Google Agenda (.ics)
+                    <button class="btn-confirm btn-small" onclick="sendWhatsAppConfirmation(${JSON.stringify(createdAppointment).replace(/"/g, '&quot;')})" style="background:#25D366; color:#fff;">
+                        <i class="fa-brands fa-whatsapp"></i> Reenviar no WhatsApp
                     </button>
                     <button class="btn-confirm btn-small" style="background:var(--accent-main); color:#fff;" onclick="document.getElementById('successOverlay').classList.remove('active'); switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[2]);">
                         Ver Meus Agendamentos
@@ -2020,10 +2037,10 @@
 
                 overlay.classList.add('active');
                 
-                // Dispara automações
+                // Disparos automáticos solicitados
                 sendAutomatedNotifications(appointmentData);
-                sendWhatsAppConfirmation(appointmentData); // Disparo automático do WhatsApp
-                
+                sendWhatsAppConfirmation(appointmentData); // Envia automático para o 11933560170
+
                 setTimeout(() => {
                     selectedServices = []; selectedBarber = null; selectedDate = null; selectedTime = null;
                     document.getElementById('btnContinueFromServices').style.display = 'none';
@@ -2226,7 +2243,6 @@
             } catch (error) { showToast('Erro ao cancelar.'); }
         }
 
-        // === CALENDÁRIO ESTILIZADO GOOGLE AGENDA (ADMIN) ===
         function changeAdminMonth(direction) {
             adminCalendarDate.setMonth(adminCalendarDate.getMonth() + direction);
             renderAdminCalendar();
@@ -2328,7 +2344,7 @@
             if (selectedAdminDateFilter) {
                 displayedAppts = tenantAppts.filter(a => a.date === selectedAdminDateFilter);
                 if (titleEl) {
-                    titleEl.innerText = `Agendamentos em ${selectedAdminDateFilter.split('-').reverse().join('/')} (Clique no dia novamente para limpar el filtro)`;
+                    titleEl.innerText = `Agendamentos em ${selectedAdminDateFilter.split('-').reverse().join('/')} (Clique no dia novamente para limpar o filtro)`;
                 }
             } else {
                 if (titleEl) {
@@ -2348,7 +2364,6 @@
             renderAdminCalendar();
         }
 
-        // === AUTH & UTIL ===
         function listenAuthChanges() {
             auth.onAuthStateChanged(user => {
                 if (user) {
