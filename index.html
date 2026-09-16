@@ -251,7 +251,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        /* Botão do Menu Hambúrguer (Mobile) */
         .mobile-menu-toggle {
             display: none;
             background: rgba(255, 255, 255, 0.15);
@@ -272,7 +271,6 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Bottom Navigation Bar Mobile */
         .bottom-nav {
             display: none;
             position: fixed;
@@ -312,15 +310,11 @@
             color: var(--accent-main);
         }
 
-        /* ==========================================================================
-           CONTAINER PRINCIPAL & VIEWS
-           ========================================================================== */
         main {
             max-width: 1200px; width: 100%;
             margin: 0 auto; padding: 110px 1.5rem 2rem 1.5rem; flex: 1;
         }
 
-        /* Home View em Tela Inteira */
         #homeView {
             display: none;
         }
@@ -343,9 +337,6 @@
         .page-header h1 { font-size: clamp(28px, 5vw, 48px); line-height: 1.1; color: var(--text-primary); margin-bottom: 0.5rem; word-break: break-word; }
         .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
 
-        /* ==========================================================================
-           HOME VIEW & HERO SLIDER ANIMADO
-           ========================================================================== */
         .home-fullscreen-wrapper {
             display: flex;
             flex-direction: column;
@@ -367,7 +358,6 @@
             box-shadow: none;
         }
 
-        /* Camadas de fundo animadas para transição fluida */
         .home-hero-bg {
             position: absolute;
             top: 0;
@@ -387,7 +377,6 @@
             transform: scale(1);
         }
 
-        /* Camada escura de sobreposição para legibilidade */
         .home-hero::after {
             content: '';
             position: absolute;
@@ -572,7 +561,6 @@
                 font-size: 17px; 
             }
             
-            /* Menu retrátil mobile (Sidebar Drawer) */
             .nav-menu { 
                 position: fixed;
                 top: 0;
@@ -613,7 +601,6 @@
                 margin-top: -80px;
             }
 
-            /* Otimização Mobile Específica para a Home Hero */
             .home-hero { 
                 min-height: 88vh; 
                 height: auto;
@@ -641,7 +628,6 @@
         .section-title { font-family: 'Anton', sans-serif; font-size: 24px; color: var(--text-primary); margin-bottom: 1.25rem; letter-spacing: 0.5px; }
         .title-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 
-        /* Lista de Serviços */
         .services-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 2rem; }
         .service-card {
             background: var(--bg-secondary); border-radius: var(--radius-md);
@@ -662,7 +648,6 @@
         .service-card .price::before { content: ""; position: absolute; bottom: -16px; left: 0; width: 16px; height: 16px; background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px); }
         .service-card .price::after { content: ""; position: absolute; top: 0; right: -16px; width: 16px; height: 16px; background: radial-gradient(circle at 100% 100%, transparent 16px, var(--bg-primary) 16.5px); }
 
-        /* Seleção de Barbeiros */
         .barbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
         .barber-card {
             background: var(--bg-secondary); border-radius: var(--radius-md); padding: 15px;
@@ -680,7 +665,6 @@
             font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; text-transform: uppercase;
         }
 
-        /* Seleção de Data */
         .dates-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
         .dates-scroll::-webkit-scrollbar { height: 8px; }
         .dates-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -692,7 +676,6 @@
         .date-card .d-num { font-size: 20px; font-weight: 800; line-height: 1; }
         .date-card .d-month { font-size: 10px; margin-top: 4px; font-weight: 600; }
 
-        /* Horários */
         .period-selector { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .period-btn { flex: 1; min-width: 80px; padding: 10px 8px; background: var(--bg-secondary); border: 2px solid transparent; border-radius: var(--radius-sm); font-weight: 700; font-size: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text-secondary); }
         .period-btn:hover { background: #E8EDFF; }
@@ -702,7 +685,6 @@
         .time-slot:hover { background: #E8EDFF; }
         .time-slot.selected { background: var(--accent-main); color: var(--bg-primary); border-color: var(--accent-main); }
 
-        /* Resumo */
         .summary-card { background-color: var(--accent-main); border-radius: var(--radius-lg); padding: 22px; color: var(--bg-primary); }
         @media(min-width: 901px) {
             .summary-card { position: sticky; top: 110px; }
@@ -722,10 +704,12 @@
         .btn-small { padding: 8px 14px; font-size: 12px; margin-top: 0; width: auto; border-radius: var(--radius-sm); }
         .btn-danger { background: var(--danger); color: white; }
 
-        /* Meus Agendamentos */
+        /* ==========================================================================
+           ESTILIZAÇÃO TIPO GOOGLE CARTEIRA (GOOGLE WALLET) PARA AGENDAMENTOS
+           ========================================================================== */
         .appointments-container { display: flex; flex-direction: column; gap: 20px; }
         .recent-section-header { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 8px; }
-        .recent-appointments-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
+        .recent-appointments-scroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
         .recent-appointments-scroll::-webkit-scrollbar { height: 8px; }
         .recent-appointments-scroll::-webkit-scrollbar-track { background: transparent; }
         .recent-appointments-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
@@ -738,20 +722,167 @@
         .month-group-container.expanded .month-group-toggle-icon { transform: rotate(180deg); }
         .month-group-content { display: none; padding: 0 20px 20px 20px; border-top: 1px solid var(--card-border); background: var(--bg-primary); }
         .month-group-container.expanded .month-group-content { display: block; }
-        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; margin-top: 15px; }
+        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-top: 15px; }
 
-        .appointment-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; border: 1px solid var(--card-border); transition: var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .appointment-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
-        .appointment-info { display: flex; align-items: flex-start; gap: 12px; width: 100%; }
-        .appointment-date-badge { background: var(--accent-main); color: var(--bg-primary); border-radius: var(--radius-sm); padding: 8px 12px; text-align: center; box-shadow: 0 4px 10px rgba(35, 75, 186, 0.2); flex-shrink: 0; }
-        .appointment-date-badge .day { font-size: 22px; font-family: 'Anton', sans-serif; line-height: 1; }
-        .appointment-date-badge .month-label { font-size: 9px; text-transform: uppercase; font-weight: 700; margin-top: 2px; opacity: 0.9; }
-        .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-        .status-confirmed { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-        .status-canceled { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-        .btn-cancel { background: var(--danger); color: var(--bg-primary); border: none; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 700; font-size: 11px; cursor: pointer; transition: var(--transition); white-space: nowrap; }
-        .btn-cancel:hover { opacity: 0.9; transform: scale(1.02); }
-        .appointment-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 10px; margin-top: 2px; width: 100%; flex-wrap: wrap; gap: 8px; }
+        /* Card estilo Google Wallet Pass */
+        .wallet-pass-card {
+            background: linear-gradient(135deg, #1b2a47 0%, #0f172a 100%);
+            color: #ffffff;
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 16px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.22);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+        .wallet-pass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.32);
+            border-color: rgba(255, 206, 0, 0.4);
+        }
+        .wallet-pass-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 12px;
+        }
+        .wallet-pass-brand {
+            font-family: 'Anton', sans-serif;
+            font-size: 15px;
+            letter-spacing: 1.5px;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .wallet-pass-body {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+        .wallet-date-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 10px 14px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            flex-shrink: 0;
+        }
+        .wallet-date-box .day {
+            font-size: 24px;
+            font-family: 'Anton', sans-serif;
+            line-height: 1;
+            color: #fff;
+        }
+        .wallet-date-box .month {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 3px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .wallet-info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+        }
+        .wallet-service-title {
+            font-family: 'Anton', sans-serif;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .wallet-detail-row {
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .wallet-pass-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 12px;
+            gap: 10px;
+        }
+        .wallet-price {
+            font-family: 'Anton', sans-serif;
+            font-size: 20px;
+            color: var(--accent-gold);
+            letter-spacing: 0.5px;
+        }
+        .wallet-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .status-badge-wallet {
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-badge-wallet.confirmed {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+        .status-badge-wallet.canceled {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+        .btn-wallet-action {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .btn-wallet-action:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+        .btn-wallet-google {
+            background: #4285F4;
+            border-color: #4285F4;
+        }
+        .btn-wallet-google:hover {
+            background: #3367d6;
+        }
+        .btn-wallet-cancel {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+        .btn-wallet-cancel:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
 
         /* Admin Dashboard & Tabelas Responsivas */
         .admin-dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
@@ -771,7 +902,6 @@
         .input-group { flex: 1; min-width: 180px; }
         .input-group label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary); }
 
-        /* Calendário Admin */
         .admin-calendar-wrapper { background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--card-border); padding: 20px; margin-bottom: 2rem; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 12px; }
         .cal-header-title { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; word-break: break-word; }
@@ -803,7 +933,6 @@
             .admin-crud-section { padding: 12px; }
         }
 
-        /* Modais */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
         .modal-overlay.active { display: flex; }
         .auth-modal, .selection-modal { background: var(--bg-primary); border-radius: var(--radius-md); width: 100%; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
@@ -851,7 +980,6 @@
         .toast { position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 400px; margin: 0 auto; background: var(--text-primary); color: var(--bg-primary); padding: 0.9rem 1.2rem; border-radius: var(--radius-lg); display: none; align-items: center; gap: 10px; z-index: 2000; font-weight: 500; font-size: 13px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .toast.show { display: flex; animation: slideIn 0.3s ease-out; }
 
-        /* Animação de Sucesso ao Agendar */
         .success-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
@@ -883,9 +1011,6 @@
         @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes slideUpFade { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
-        /* ==========================================================================
-           RODAPÉ REESTRUTURADO E MODERNO
-           ========================================================================== */
         footer {
             background: linear-gradient(135deg, #0b1329 0%, #172554 100%);
             color: rgba(255, 255, 255, 0.8);
@@ -1876,7 +2001,6 @@
             updateSummary(); 
             closeModal('timeModal'); 
 
-            // Rola automaticamente para o resumo após o cliente terminar de configurar
             setTimeout(() => {
                 const summaryCard = document.getElementById('summaryCardElement');
                 if(summaryCard) {
@@ -1958,39 +2082,6 @@
             }
         }
 
-        function downloadICSFile(appointment) {
-            const [year, month, day] = appointment.date.split('-');
-            const [hour, minute] = appointment.time.split(':');
-            const startDate = `${year}${month}${day}T${hour}${minute}00`;
-            
-            const endHour = String(Number(hour) + 1).padStart(2, '0');
-            const endDate = `${year}${month}${day}T${endHour}${minute}00`;
-
-            const icsContent = [
-                'BEGIN:VCALENDAR',
-                'VERSION:2.0',
-                'BEGIN:VEVENT',
-                `SUMMARY:Corte na Renatu's - ${appointment.serviceName}`,
-                `DESCRIPTION:Agendamento com ${appointment.barberName}. Valor: R$ ${parseFloat(appointment.servicePrice).toFixed(2)}`,
-                `DTSTART:${startDate}`,
-                `DTEND:${endDate}`,
-                `LOCATION:Renatu's Barbearia`,
-                'END:VEVENT',
-                'END:VCALENDAR'
-            ].join('\n');
-
-            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `renatus-agendamento-${appointment.date}.ics`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            showToast('Arquivo de calendário baixado com sucesso!');
-        }
-
         async function handleConfirmBooking() {
             if (!currentUser) { openModal('authModal'); showToast('Faça login para concluir.'); return; }
             
@@ -2021,7 +2112,6 @@
                 const overlay = document.getElementById('successOverlay');
                 const actionsContainer = document.getElementById('successActionsContainer');
                 
-                // A tela de sucesso agora contém apenas o redirecionamento limpo
                 actionsContainer.innerHTML = `
                     <button class="btn-confirm btn-small" style="background:var(--accent-main); color:#fff; width:100%;" onclick="document.getElementById('successOverlay').classList.remove('active'); switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[2]);">
                         Ver Meus Agendamentos
@@ -2134,37 +2224,40 @@
                 const dayNum = dateParts[2];
                 const monthStr = monthNamesShort[parseInt(dateParts[1], 10) - 1] || '';
                 const encodedApp = JSON.stringify(a).replace(/"/g, '&quot;');
+                const isConfirmed = a.status === 'confirmado';
                 
                 return `
-                    <div class="appointment-card" style="flex: 0 0 280px; min-width: 280px;">
-                        <div class="appointment-info">
-                            <div class="appointment-date-badge">
-                                <div class="day">${dayNum}</div>
-                                <div class="month-label">${monthStr}</div>
+                    <div class="wallet-pass-card" style="flex: 0 0 300px; min-width: 300px;">
+                        <div class="wallet-pass-header">
+                            <div class="wallet-pass-brand">
+                                <i class="fa-solid fa-scissors"></i> RENATU'S PASS
                             </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <h3 style="font-size:15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:12px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 10px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                <div style="font-size:12px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 4px;"></i> ${a.time}</div>
-                            </div>
+                            <span class="status-badge-wallet ${isConfirmed ? 'confirmed' : 'canceled'}">${a.status}</span>
                         </div>
                         
-                        <!-- Botões de Calendário no Card de cada Agendamento -->
-                        ${a.status === 'confirmado' ? `
-                        <div style="display: flex; gap: 6px; margin-top: 4px;">
-                            <button class="btn-confirm btn-small" style="background:#4285F4; color:#fff; font-size:10px; padding:6px 8px; margin:0; flex:1;" onclick="addToGoogleCalendar(${encodedApp})">
-                                <i class="fa-solid fa-calendar-plus"></i> Google Agenda
-                            </button>
-                            <button class="btn-confirm btn-small" style="background:var(--accent-main); color:#fff; font-size:10px; padding:6px 8px; margin:0; flex:1;" onclick="downloadICSFile(${encodedApp})">
-                                <i class="fa-solid fa-file-arrow-down"></i> Baixar .ics
-                            </button>
-                        </div>` : ''}
+                        <div class="wallet-pass-body">
+                            <div class="wallet-date-box">
+                                <div class="day">${dayNum}</div>
+                                <div class="month">${monthStr}</div>
+                            </div>
+                            <div class="wallet-info-group">
+                                <div class="wallet-service-title">${a.serviceName}</div>
+                                <div class="wallet-detail-row"><i class="fa-solid fa-user-tie"></i> ${a.barberName}</div>
+                                <div class="wallet-detail-row"><i class="fa-regular fa-clock"></i> ${a.time}</div>
+                            </div>
+                        </div>
 
-                        <div class="appointment-card-footer">
-                            <div style="color:var(--accent-main); font-weight:800; font-size: 14px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
-                                ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
+                        <div class="wallet-pass-footer">
+                            <div class="wallet-price">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div class="wallet-actions">
+                                ${isConfirmed ? `
+                                    <button class="btn-wallet-action btn-wallet-google" onclick="addToGoogleCalendar(${encodedApp})">
+                                        <i class="fa-solid fa-calendar-plus"></i> Agenda
+                                    </button>
+                                    <button class="btn-wallet-action btn-wallet-cancel" onclick="cancelAppointment('${a.id}')">
+                                        Cancelar
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -2198,37 +2291,40 @@
                     const dayNum = dateParts[2];
                     const monthStr = monthNamesShort[m - 1] || '';
                     const encodedApp = JSON.stringify(a).replace(/"/g, '&quot;');
+                    const isConfirmed = a.status === 'confirmado';
 
                     return `
-                    <div class="appointment-card">
-                        <div class="appointment-info">
-                            <div class="appointment-date-badge">
-                                <div class="day">${dayNum}</div>
-                                <div class="month-label">${monthStr}</div>
+                    <div class="wallet-pass-card">
+                        <div class="wallet-pass-header">
+                            <div class="wallet-pass-brand">
+                                <i class="fa-solid fa-scissors"></i> RENATU'S PASS
                             </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <h3 style="font-size:15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${a.serviceName}</h3>
-                                <div style="font-size:12px; color: var(--text-secondary); margin-bottom: 4px; word-break: break-word;"><i class="fa-solid fa-user-tie" style="font-size: 10px; margin-right: 4px;"></i> ${a.barberName}</div>
-                                <div style="font-size:12px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 4px;"></i> ${a.time}</div>
+                            <span class="status-badge-wallet ${isConfirmed ? 'confirmed' : 'canceled'}">${a.status}</span>
+                        </div>
+                        
+                        <div class="wallet-pass-body">
+                            <div class="wallet-date-box">
+                                <div class="day">${dayNum}</div>
+                                <div class="month">${monthStr}</div>
+                            </div>
+                            <div class="wallet-info-group">
+                                <div class="wallet-service-title">${a.serviceName}</div>
+                                <div class="wallet-detail-row"><i class="fa-solid fa-user-tie"></i> ${a.barberName}</div>
+                                <div class="wallet-detail-row"><i class="fa-regular fa-clock"></i> ${a.time}</div>
                             </div>
                         </div>
 
-                        <!-- Botões de Calendário no Card de cada Agendamento -->
-                        ${a.status === 'confirmado' ? `
-                        <div style="display: flex; gap: 8px; margin-top: 4px;">
-                            <button class="btn-confirm btn-small" style="background:#4285F4; color:#fff; font-size:11px; padding:6px 10px; margin:0; flex:1;" onclick="addToGoogleCalendar(${encodedApp})">
-                                <i class="fa-solid fa-calendar-plus"></i> Google Agenda
-                            </button>
-                            <button class="btn-confirm btn-small" style="background:var(--accent-main); color:#fff; font-size:11px; padding:6px 10px; margin:0; flex:1;" onclick="downloadICSFile(${encodedApp})">
-                                <i class="fa-solid fa-file-arrow-down"></i> Baixar .ics
-                            </button>
-                        </div>` : ''}
-
-                        <div class="appointment-card-footer">
-                            <div style="color:var(--accent-main); font-weight:800; font-size: 14px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
-                                ${a.status === 'confirmado' ? `<button class="btn-cancel" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
+                        <div class="wallet-pass-footer">
+                            <div class="wallet-price">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
+                            <div class="wallet-actions">
+                                ${isConfirmed ? `
+                                    <button class="btn-wallet-action btn-wallet-google" onclick="addToGoogleCalendar(${encodedApp})">
+                                        <i class="fa-solid fa-calendar-plus"></i> Agenda
+                                    </button>
+                                    <button class="btn-wallet-action btn-wallet-cancel" onclick="cancelAppointment('${a.id}')">
+                                        Cancelar
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
