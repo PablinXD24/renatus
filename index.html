@@ -34,7 +34,7 @@
             --radius-lg: 30px;
             --radius-md: 20px;
             --radius-sm: 12px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -62,160 +62,214 @@
         }
 
         /* ==========================================================================
-           HEADER & NAVEGAÇÃO (COM EFEITO DE REVELAÇÃO AO ROLAR)
+           ILHA DINÂMICA SUSPENSA (ESTILO IPHONE - PROFISSIONAL E ANIMADA)
            ========================================================================== */
         header {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-140%);
+            width: min(94%, 1150px);
             z-index: 100;
-            background: var(--accent-main);
-            border-bottom-left-radius: var(--radius-lg);
-            border-bottom-right-radius: var(--radius-lg);
-            padding: 1.25rem 2rem 1.25rem 220px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transform: translateY(-100%);
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 1px solid rgba(255, 206, 0, 0.25);
+            border-radius: 60px;
+            padding: 8px 16px 8px 22px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 206, 0, 0.1);
             opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease, background 0.3s ease, box-shadow 0.3s ease;
             pointer-events: none;
         }
 
+        header:hover {
+            background: rgba(15, 23, 42, 0.92);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 206, 0, 0.22);
+            border-color: rgba(255, 206, 0, 0.45);
+        }
+
         header.visible {
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
             opacity: 1;
             pointer-events: auto;
+            animation: islandPulseIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes islandPulseIn {
+            0% { transform: translateX(-50%) translateY(-30px) scale(0.95); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
         }
 
         .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
         }
 
         .logo {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: var(--bg-primary);
-            padding: 18px 25px;
-            border-bottom-right-radius: var(--radius-md);
+            background: transparent;
+            padding: 0;
             display: flex;
             align-items: center;
             gap: 10px;
             font-family: 'Anton', sans-serif;
-            font-size: 22px;
-            letter-spacing: 1px;
-            color: var(--text-primary);
+            font-size: 21px;
+            letter-spacing: 1.2px;
+            color: var(--bg-primary);
             text-decoration: none;
             z-index: 20;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.03);
         }
 
         .logo i {
             color: var(--accent-gold);
-            font-size: 1.4rem;
+            font-size: 1.35rem;
+            filter: drop-shadow(0 2px 6px rgba(255, 206, 0, 0.5));
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .logo::before, .logo::after {
-            content: "";
-            position: absolute;
-            width: 20px; height: 20px;
+        .logo:hover i {
+            transform: rotate(-15deg) scale(1.1);
         }
-        .logo::before {
-            bottom: -20px; left: 0;
-            background: radial-gradient(circle at 100% 100%, transparent 20px, var(--bg-primary) 20.5px);
-        }
-        .logo::after {
-            top: 0; right: -20px;
-            background: radial-gradient(circle at 100% 100%, transparent 20px, var(--bg-primary) 20.5px);
-        }
+
+        .logo::before, .logo::after { display: none; }
 
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 8px;
+            flex-wrap: nowrap;
         }
 
         .nav-link {
-            color: var(--bg-primary);
+            color: rgba(255, 255, 255, 0.75);
             text-decoration: none;
             font-weight: 500;
-            font-size: 15px;
+            font-size: 13.5px;
             padding: 8px 16px;
-            border-radius: var(--radius-sm);
+            border-radius: 30px;
             transition: var(--transition);
             cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: var(--accent-gold);
-            background: rgba(255, 255, 255, 0.1);
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover {
+            color: var(--bg-primary);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            background: var(--accent-gold);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(255, 206, 0, 0.35);
+            transform: translateY(-1px);
         }
 
         .user-auth-btn {
             background-color: var(--accent-gold);
             color: var(--text-primary);
             border: none;
-            padding: 10px 20px;
+            padding: 9px 20px;
             font-weight: 700;
-            font-size: 0.9rem;
-            border-radius: var(--radius-lg);
+            font-size: 0.85rem;
+            border-radius: 30px;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(255, 206, 0, 0.3);
         }
 
-        .user-auth-btn:hover { transform: scale(1.05); }
+        .user-auth-btn:hover { 
+            transform: translateY(-2px) scale(1.03); 
+            background-color: var(--accent-gold-hover);
+            box-shadow: 0 6px 20px rgba(255, 206, 0, 0.45);
+        }
 
         .user-profile-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.15);
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
-            padding: 6px 14px;
+            padding: 4px 14px 4px 6px;
             border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: var(--bg-primary);
-            max-width: 200px;
+            max-width: 190px;
             overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .user-profile-bar:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.35);
         }
 
         .user-profile-bar span {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-size: 12.5px;
+            font-weight: 600;
         }
 
         .user-avatar {
-            width: 32px; height: 32px;
+            width: 30px; height: 30px;
             border-radius: 50%;
             background: var(--accent-gold);
             color: var(--text-primary);
             display: flex; align-items: center; justify-content: center;
             font-weight: 700;
+            font-size: 12px;
             flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         /* Botão do Menu Hambúrguer (Mobile) */
         .mobile-menu-toggle {
             display: none;
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            font-size: 20px;
-            width: 40px;
-            height: 40px;
+            font-size: 18px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 105;
+            transition: var(--transition);
+        }
+
+        .mobile-menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
         }
 
         /* Bottom Navigation Bar Mobile */
@@ -263,7 +317,7 @@
            ========================================================================== */
         main {
             max-width: 1200px; width: 100%;
-            margin: 0 auto; padding: 130px 1.5rem 2rem 1.5rem; flex: 1;
+            margin: 0 auto; padding: 110px 1.5rem 2rem 1.5rem; flex: 1;
         }
 
         /* Faz com que a view da Home escape do limite do main e ocupe 100% da largura */
@@ -278,7 +332,7 @@
             right: 50%;
             margin-left: -50vw;
             margin-right: -50vw;
-            margin-top: -130px; /* Compensando o padding do main na home */
+            margin-top: -110px; /* Compensando o padding do main na home */
         }
 
         .view-section { display: none; animation: fadeIn 0.3s ease-in-out forwards; }
@@ -290,7 +344,7 @@
         .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
 
         /* ==========================================================================
-           HOME VIEW (TELA INTEIRA - ESTILO REFERÊNCIA)
+           HOME VIEW (TELA INTEIRA - ESTILO REFERÊNCIA COM IMAGENS DE BARBEARIA)
            ========================================================================== */
         .home-fullscreen-wrapper {
             display: flex;
@@ -311,7 +365,8 @@
             justify-content: flex-end;
             padding: 6rem 4rem 4rem 4rem;
             box-shadow: none;
-            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.75)), url('image_e194e6.jpg') center/cover no-repeat;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.75)), url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            transition: background-image 1s ease-in-out;
         }
 
         .home-hero-top-nav {
@@ -457,9 +512,10 @@
 
         @media (max-width: 900px) {
             header { 
-                padding: 0.8rem 1rem; 
-                border-bottom-left-radius: var(--radius-md); 
-                border-bottom-right-radius: var(--radius-md); 
+                top: 14px;
+                width: 94%;
+                padding: 0.5rem 1rem; 
+                border-radius: 40px; 
             }
             .nav-container { 
                 flex-direction: row; 
@@ -468,15 +524,8 @@
                 gap: 0.6rem; 
             }
             .logo { 
-                position: relative; 
-                padding: 0; 
-                background: transparent; 
-                color: var(--bg-primary); 
-                font-size: 20px; 
-                justify-content: center; 
-                border-radius: 0; 
+                font-size: 18px; 
             }
-            .logo::before, .logo::after { display: none; }
             
             /* Menu retrátil mobile (Sidebar Drawer) */
             .nav-menu { 
@@ -492,15 +541,18 @@
                 padding: 5rem 2rem 2rem 2rem;
                 gap: 15px;
                 box-shadow: -5px 0 25px rgba(0,0,0,0.2);
-                transition: right 0.3s ease-in-out;
+                transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
                 z-index: 104;
             }
             .nav-menu.mobile-open {
                 right: 0;
             }
-            .nav-link { font-size: 16px; padding: 10px 16px; width: 100%; }
-            .user-auth-btn { padding: 10px 16px; font-size: 0.9rem; width: 100%; justify-content: center; }
-            .user-profile-bar { max-width: 100%; justify-content: flex-start; width: 100%; }
+            .nav-link { font-size: 16px; padding: 10px 16px; width: 100%; border-radius: var(--radius-sm); }
+            .nav-link.active { color: var(--text-primary); }
+            .user-auth-btn { padding: 10px 16px; font-size: 0.9rem; width: 100%; justify-content: center; border-radius: var(--radius-sm); }
+            .user-profile-bar { max-width: 100%; justify-content: flex-start; width: 100%; padding: 6px 14px; }
+            .user-profile-bar span { font-size: 13px; }
+            .user-avatar { width: 32px; height: 32px; font-size: 14px; }
             .mobile-menu-toggle { display: flex; }
             
             /* Ativar barra de navegação inferior no mobile e dar espaçamento */
@@ -509,13 +561,13 @@
 
             /* Ajuste crucial de espaçamento superior no mobile para evitar sobreposição nos títulos */
             main {
-                padding-top: 95px;
+                padding-top: 85px;
                 padding-bottom: 5rem;
                 padding-left: 1rem;
                 padding-right: 1rem;
             }
             #homeView.active {
-                margin-top: -95px;
+                margin-top: -85px;
             }
 
             .home-hero { min-height: 100vh; padding: 5rem 1.2rem 3rem 1.2rem; justify-content: flex-end; }
@@ -852,7 +904,7 @@
                 <span class="nav-link" onclick="switchView('myAppointmentsView', this); closeMobileMenu()">Meus Agendamentos</span>
                 <span class="nav-link" id="navAdminLink" style="display: none;" onclick="switchView('adminView', this); closeMobileMenu()"><i class="fa-solid fa-chart-line"></i> Painel Admin</span>
                 
-                <div id="authContainer" style="width: 100%;">
+                <div id="authContainer" style="width: auto;">
                     <button class="user-auth-btn" onclick="openModal('authModal'); closeMobileMenu()">
                         <i class="fa-solid fa-user"></i> Entrar
                     </button>
@@ -883,13 +935,13 @@
     <main>
         <section id="homeView" class="view-section active">
             <div class="home-fullscreen-wrapper">
-                <div class="home-hero">
+                <div class="home-hero" id="homeHeroBanner">
                     <div class="home-hero-top-nav">
                         <span>E</span><span>Y</span><span>R</span><span>C</span><span>W</span><span>S</span><span>N</span><span>B</span><span>C</span><span><i class="fa-solid fa-magnifying-glass"></i></span>
                     </div>
                     <div class="home-carousel-arrows">
-                        <div class="home-carousel-arrow"><i class="fa-solid fa-chevron-left"></i></div>
-                        <div class="home-carousel-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="home-carousel-arrow" onclick="prevHeroSlide()"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="home-carousel-arrow" onclick="nextHeroSlide()"><i class="fa-solid fa-chevron-right"></i></div>
                     </div>
                     <div class="home-hero-content">
                         <div class="home-hero-subtitle">Bem-vindo à Renatu's</div>
@@ -1274,6 +1326,31 @@
         let localAppointments = [];
         let authorizedAdminEmails = ['pablo11ssousa2@gmail.com'];
 
+        // Carrossel de imagens da barbearia para o banner principal (Home)
+        const heroImages = [
+            'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1920&q=80'
+        ];
+        let currentHeroIndex = 0;
+
+        function nextHeroSlide() {
+            currentHeroIndex = (currentHeroIndex + 1) % heroImages.length;
+            updateHeroBackground();
+        }
+
+        function prevHeroSlide() {
+            currentHeroIndex = (currentHeroIndex - 1 + heroImages.length) % heroImages.length;
+            updateHeroBackground();
+        }
+
+        function updateHeroBackground() {
+            const banner = document.getElementById('homeHeroBanner');
+            if(banner) {
+                banner.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.75)), url('${heroImages[currentHeroIndex]}')`;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             listenAuthChanges();
             initDatabaseListeners();
@@ -1310,7 +1387,7 @@
             icon.className = 'fa-solid fa-bars';
         }
 
-        // === EFEITO DE SCROLL PARA MOSTRAR O HEADER NA HOME ===
+        // === EFEITO DE SCROLL PARA MOSTRAR A ILHA DINÂMICA NA HOME ===
         function initScrollHeaderEffect() {
             const header = document.getElementById('mainHeader');
             window.addEventListener('scroll', () => {
@@ -2054,7 +2131,7 @@
             if (selectedAdminDateFilter) {
                 displayedAppts = tenantAppts.filter(a => a.date === selectedAdminDateFilter);
                 if (titleEl) {
-                    titleEl.innerText = `Agendamentos em ${selectedAdminDateFilter.split('-').reverse().join('/')} (Clique no dia novamente para limpar o filtro)`;
+                    titleEl.innerText = `Agendamentos em ${selectedAdminDateFilter.split('-').reverse().join('/')} (Clique no dia novamente para limpar el filtro)`;
                 }
             } else {
                 if (titleEl) {
@@ -2112,7 +2189,7 @@
             }
 
             if (currentUser) {
-                container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span style="font-size:13px; font-weight:700;">${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:6px;" onclick="logout()"></i></div>`;
+                container.innerHTML = `<div class="user-profile-bar"><div class="user-avatar">${currentUser.name.charAt(0).toUpperCase()}</div><span>${currentUser.name}</span><i class="fa-solid fa-right-from-bracket" style="cursor:pointer; margin-left:4px;" onclick="logout()"></i></div>`;
             } else {
                 container.innerHTML = `<button class="user-auth-btn" onclick="openModal('authModal')"><i class="fa-solid fa-user"></i> Entrar</button>`;
             }
