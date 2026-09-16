@@ -1068,7 +1068,6 @@
         <section id="homeView" class="view-section active">
             <div class="home-fullscreen-wrapper">
                 <div class="home-hero" id="homeHeroBanner">
-                    <!-- Camadas de Fundo Animadas (Slider Automático) -->
                     <div class="home-hero-bg active" style="background-image: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1920&q=80')"></div>
                     <div class="home-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1920&q=80')"></div>
                     <div class="home-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1920&q=80')"></div>
@@ -1132,7 +1131,7 @@
                 </div>
 
                 <div>
-                    <div class="summary-card">
+                    <div class="summary-card" id="summaryCardElement">
                         <div class="section-title" style="font-size: 28px;">RESUMO</div>
                         
                         <div class="summary-row">
@@ -1493,10 +1492,8 @@
         let localAppointments = [];
         let authorizedAdminEmails = ['pablo11ssousa2@gmail.com'];
 
-        // Número da barbearia configurado para receber as confirmações automáticas
         const BARBER_WHATSAPP_NUMBER = "5511933560170";
 
-        // Sistema de Slider Animado do Banner Principal (Home)
         let currentHeroIndex = 0;
         let heroInterval = null;
 
@@ -1878,6 +1875,14 @@
             updateTimeSlots(); 
             updateSummary(); 
             closeModal('timeModal'); 
+
+            // Rola automaticamente para o resumo após o cliente terminar de configurar
+            setTimeout(() => {
+                const summaryCard = document.getElementById('summaryCardElement');
+                if(summaryCard) {
+                    summaryCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 300);
         }
 
         function updateSummary() {
@@ -1889,7 +1894,6 @@
             document.getElementById('btnConfirmBooking').disabled = !(selectedServices.length > 0 && selectedBarber && selectedDate && selectedTime);
         }
 
-        // === NOTIFICAÇÃO AUTOMÁTICA VIA WHATSAPP PARA O NÚMERO DA BARBEARIA ===
         function sendWhatsAppConfirmation(appointment) {
             const formattedDate = appointment.date.split('-').reverse().join('/');
             const formattedPrice = `R$ ${parseFloat(appointment.servicePrice).toFixed(2).replace('.', ',')}`;
@@ -1910,15 +1914,11 @@
             }, 500);
         }
 
-        // === ADICIONAR AO GOOGLE AGENDA DIRETAMENTE (LINK WEB) ===
         function addToGoogleCalendar(appointment) {
             const [year, month, day] = appointment.date.split('-');
             const [hour, minute] = appointment.time.split(':');
-            
-            // Formato UTC/ISO para o Google Agenda: YYYYMMDDTHHmm00Z
             const startDateTime = `${year}${month}${day}T${hour}${minute}00`;
             
-            // Calcula término (adiciona 1 hora padrão ou baseada na duração)
             let endHourNum = Number(hour) + 1;
             const endHour = String(endHourNum).padStart(2, '0');
             const endDateTime = `${year}${month}${day}T${endHour}${minute}00`;
@@ -1933,7 +1933,6 @@
             showToast('Redirecionando para o Google Agenda...');
         }
 
-        // === EMAILJS NOTIFICATIONS & CALENDAR EXPORT (.ICS) ===
         async function sendAutomatedNotifications(appointment) {
             const serviceID = 'service_w57ntvf';
             const templateID = appointment.status === 'cancelado' ? 'template_0f758dm' : 'template_t4vty7l'; 
@@ -1992,7 +1991,6 @@
             showToast('Arquivo de calendário baixado com sucesso!');
         }
 
-        // === AGENDAMENTO E DB ===
         async function handleConfirmBooking() {
             if (!currentUser) { openModal('authModal'); showToast('Faça login para concluir.'); return; }
             
@@ -2023,23 +2021,17 @@
                 const overlay = document.getElementById('successOverlay');
                 const actionsContainer = document.getElementById('successActionsContainer');
                 
+                // A tela de sucesso agora contém apenas o redirecionamento limpo
                 actionsContainer.innerHTML = `
-                    <button class="btn-confirm btn-small" onclick="addToGoogleCalendar(${JSON.stringify(createdAppointment).replace(/"/g, '&quot;')})" style="background:#4285F4; color:#fff;">
-                        <i class="fa-solid fa-calendar-plus"></i> Adicionar ao Google Agenda
-                    </button>
-                    <button class="btn-confirm btn-small" onclick="sendWhatsAppConfirmation(${JSON.stringify(createdAppointment).replace(/"/g, '&quot;')})" style="background:#25D366; color:#fff;">
-                        <i class="fa-brands fa-whatsapp"></i> Reenviar no WhatsApp
-                    </button>
-                    <button class="btn-confirm btn-small" style="background:var(--accent-main); color:#fff;" onclick="document.getElementById('successOverlay').classList.remove('active'); switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[2]);">
+                    <button class="btn-confirm btn-small" style="background:var(--accent-main); color:#fff; width:100%;" onclick="document.getElementById('successOverlay').classList.remove('active'); switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[2]);">
                         Ver Meus Agendamentos
                     </button>
                 `;
 
                 overlay.classList.add('active');
                 
-                // Disparos automáticos solicitados
                 sendAutomatedNotifications(appointmentData);
-                sendWhatsAppConfirmation(appointmentData); // Envia automático para o 11933560170
+                sendWhatsAppConfirmation(appointmentData);
 
                 setTimeout(() => {
                     selectedServices = []; selectedBarber = null; selectedDate = null; selectedTime = null;
@@ -2055,7 +2047,6 @@
             }
         }
 
-        // === ADMIN & CRUDS ===
         async function saveSettings(e) {
             e.preventDefault();
             const val = parseInt(document.getElementById('adminMinAdvance').value) || 0;
@@ -2142,8 +2133,10 @@
                 const dateParts = a.date.split('-');
                 const dayNum = dateParts[2];
                 const monthStr = monthNamesShort[parseInt(dateParts[1], 10) - 1] || '';
+                const encodedApp = JSON.stringify(a).replace(/"/g, '&quot;');
+                
                 return `
-                    <div class="appointment-card" style="flex: 0 0 260px; min-width: 260px;">
+                    <div class="appointment-card" style="flex: 0 0 280px; min-width: 280px;">
                         <div class="appointment-info">
                             <div class="appointment-date-badge">
                                 <div class="day">${dayNum}</div>
@@ -2155,6 +2148,18 @@
                                 <div style="font-size:12px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
+                        
+                        <!-- Botões de Calendário no Card de cada Agendamento -->
+                        ${a.status === 'confirmado' ? `
+                        <div style="display: flex; gap: 6px; margin-top: 4px;">
+                            <button class="btn-confirm btn-small" style="background:#4285F4; color:#fff; font-size:10px; padding:6px 8px; margin:0; flex:1;" onclick="addToGoogleCalendar(${encodedApp})">
+                                <i class="fa-solid fa-calendar-plus"></i> Google Agenda
+                            </button>
+                            <button class="btn-confirm btn-small" style="background:var(--accent-main); color:#fff; font-size:10px; padding:6px 8px; margin:0; flex:1;" onclick="downloadICSFile(${encodedApp})">
+                                <i class="fa-solid fa-file-arrow-down"></i> Baixar .ics
+                            </button>
+                        </div>` : ''}
+
                         <div class="appointment-card-footer">
                             <div style="color:var(--accent-main); font-weight:800; font-size: 14px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
                             <div style="display:flex; align-items:center; gap:6px;">
@@ -2192,6 +2197,7 @@
                     const dateParts = a.date.split('-');
                     const dayNum = dateParts[2];
                     const monthStr = monthNamesShort[m - 1] || '';
+                    const encodedApp = JSON.stringify(a).replace(/"/g, '&quot;');
 
                     return `
                     <div class="appointment-card">
@@ -2206,6 +2212,18 @@
                                 <div style="font-size:12px; color: var(--text-secondary);"><i class="fa-regular fa-clock" style="font-size: 10px; margin-right: 4px;"></i> ${a.time}</div>
                             </div>
                         </div>
+
+                        <!-- Botões de Calendário no Card de cada Agendamento -->
+                        ${a.status === 'confirmado' ? `
+                        <div style="display: flex; gap: 8px; margin-top: 4px;">
+                            <button class="btn-confirm btn-small" style="background:#4285F4; color:#fff; font-size:11px; padding:6px 10px; margin:0; flex:1;" onclick="addToGoogleCalendar(${encodedApp})">
+                                <i class="fa-solid fa-calendar-plus"></i> Google Agenda
+                            </button>
+                            <button class="btn-confirm btn-small" style="background:var(--accent-main); color:#fff; font-size:11px; padding:6px 10px; margin:0; flex:1;" onclick="downloadICSFile(${encodedApp})">
+                                <i class="fa-solid fa-file-arrow-down"></i> Baixar .ics
+                            </button>
+                        </div>` : ''}
+
                         <div class="appointment-card-footer">
                             <div style="color:var(--accent-main); font-weight:800; font-size: 14px; word-break: break-word;">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
                             <div style="display:flex; align-items:center; gap:8px;">
