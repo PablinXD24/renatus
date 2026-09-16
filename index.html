@@ -344,7 +344,7 @@
         .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
 
         /* ==========================================================================
-           HOME VIEW (OTIMIZADA PARA MOBILE E DESKTOP)
+           HOME VIEW & HERO SLIDER ANIMADO
            ========================================================================== */
         .home-fullscreen-wrapper {
             display: flex;
@@ -365,8 +365,36 @@
             justify-content: flex-end;
             padding: 6rem 4rem 4rem 4rem;
             box-shadow: none;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
-            transition: background-image 1s ease-in-out;
+        }
+
+        /* Camadas de fundo animadas para transição fluida */
+        .home-hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out, transform 6s ease-out;
+            transform: scale(1.03);
+            z-index: 1;
+        }
+
+        .home-hero-bg.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Camada escura de sobreposição para legibilidade */
+        .home-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.75));
+            z-index: 2;
+            pointer-events: none;
         }
 
         .home-hero-top-nav {
@@ -382,11 +410,12 @@
             font-size: 14px;
             letter-spacing: 3px;
             text-transform: uppercase;
+            z-index: 3;
         }
 
         .home-hero-content {
             position: relative;
-            z-index: 2;
+            z-index: 3;
             color: #fff;
             max-width: 1200px;
             width: 100%;
@@ -440,7 +469,7 @@
             right: 30px;
             display: flex;
             justify-content: space-between;
-            z-index: 3;
+            z-index: 4;
             pointer-events: none;
         }
 
@@ -482,11 +511,15 @@
             padding: 35px;
             border: 1px solid var(--card-border);
             transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .home-feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-color: var(--accent-main);
         }
 
         .home-feature-icon {
@@ -506,6 +539,18 @@
             color: var(--text-secondary);
             font-size: 15px;
             line-height: 1.6;
+        }
+
+        .home-feature-badge {
+            display: inline-block;
+            background: var(--accent-gold);
+            color: var(--text-primary);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
         }
 
         .booking-grid { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start; }
@@ -574,7 +619,6 @@
                 height: auto;
                 padding: 4rem 1.2rem 3rem 1.2rem; 
                 justify-content: flex-end; 
-                background-position: center;
             }
             .home-hero-top-nav { display: none; }
             .home-carousel-arrows { display: none; }
@@ -1024,6 +1068,11 @@
         <section id="homeView" class="view-section active">
             <div class="home-fullscreen-wrapper">
                 <div class="home-hero" id="homeHeroBanner">
+                    <!-- Camadas de Fundo Animadas (Slider Automático) -->
+                    <div class="home-hero-bg active" style="background-image: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1920&q=80')"></div>
+                    <div class="home-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1920&q=80')"></div>
+                    <div class="home-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1920&q=80')"></div>
+
                     <div class="home-hero-top-nav">
                         <span>R</span><span>E</span><span>N</span><span>A</span><span>T</span><span>U</span><span>'</span><span>S</span><span><i class="fa-solid fa-scissors"></i></span>
                     </div>
@@ -1042,20 +1091,23 @@
 
                 <div class="home-features-container">
                     <div class="home-features-grid">
-                        <div class="home-feature-card">
-                            <div class="home-feature-icon"><i class="fa-solid fa-scissors"></i></div>
-                            <div class="home-feature-title">Cortes Exclusivos</div>
-                            <div class="home-feature-desc">Profissionais altamente capacitados para garantir o corte perfeito alinhado às novas tendências do mercado.</div>
+                        <div class="home-feature-card" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[1])">
+                            <span class="home-feature-badge">Mais Procurado</span>
+                            <div class="home-feature-icon"><i class="fa-solid fa-fire"></i></div>
+                            <div class="home-feature-title">Combo Corte + Barba</div>
+                            <div class="home-feature-desc">O favorito da casa. Tenha um visual completamente alinhado com atendimento especializado e produtos premium.</div>
                         </div>
-                        <div class="home-feature-card">
-                            <div class="home-feature-icon"><i class="fa-solid fa-clock"></i></div>
-                            <div class="home-feature-title">Agendamento Rápido</div>
-                            <div class="home-feature-desc">Marque seu horário em segundos com confirmação imediata e comodidade total diretamente pela plataforma.</div>
+                        <div class="home-feature-card" onclick="switchView('myAppointmentsView', document.querySelectorAll('.nav-link')[2])">
+                            <span class="home-feature-badge">Avaliação 4.9 / 5.0</span>
+                            <div class="home-feature-icon"><i class="fa-solid fa-star"></i></div>
+                            <div class="home-feature-title">Clientes Satisfeitos</div>
+                            <div class="home-feature-desc">Mais de 1.200 atendimentos realizados com excelência, pontualidade e total fidelidade ao seu estilo.</div>
                         </div>
-                        <div class="home-feature-card">
-                            <div class="home-feature-icon"><i class="fa-solid fa-medal"></i></div>
-                            <div class="home-feature-title">Ambiente Premium</div>
-                            <div class="home-feature-desc">Desfrute de um espaço confortável, pensado para proporcionar a melhor experiência de cuidado pessoal.</div>
+                        <div class="home-feature-card" onclick="switchView('bookingView', document.querySelectorAll('.nav-link')[1])">
+                            <span class="home-feature-badge">Atendimento Ágil</span>
+                            <div class="home-feature-icon"><i class="fa-solid fa-bolt"></i></div>
+                            <div class="home-feature-title">Horários Flexíveis</div>
+                            <div class="home-feature-desc">De segunda a sábado das 09:00 às 19:00. Escolha seu profissional favorito e reserve em cliques.</div>
                         </div>
                     </div>
                 </div>
@@ -1441,35 +1493,41 @@
         let localAppointments = [];
         let authorizedAdminEmails = ['pablo11ssousa2@gmail.com'];
 
-        // Carrossel de imagens da barbearia para o banner principal (Home)
-        const heroImages = [
-            'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1920&q=80',
-            'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1920&q=80',
-            'https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1920&q=80'
-        ];
+        // Sistema de Slider Animado do Banner Principal (Home)
         let currentHeroIndex = 0;
+        let heroInterval = null;
+
+        function initHeroSlider() {
+            heroInterval = setInterval(() => {
+                nextHeroSlide();
+            }, 5000); // Troca automática a cada 5 segundos de forma sutil
+        }
 
         function nextHeroSlide() {
-            currentHeroIndex = (currentHeroIndex + 1) % heroImages.length;
-            updateHeroBackground();
+            const bgLayers = document.querySelectorAll('.home-hero-bg');
+            if(bgLayers.length === 0) return;
+            bgLayers[currentHeroIndex].classList.remove('active');
+            currentHeroIndex = (currentHeroIndex + 1) % bgLayers.length;
+            bgLayers[currentHeroIndex].classList.add('active');
         }
 
         function prevHeroSlide() {
-            currentHeroIndex = (currentHeroIndex - 1 + heroImages.length) % heroImages.length;
-            updateHeroBackground();
-        }
-
-        function updateHeroBackground() {
-            const banner = document.getElementById('homeHeroBanner');
-            if(banner) {
-                banner.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('${heroImages[currentHeroIndex]}')`;
-            }
+            const bgLayers = document.querySelectorAll('.home-hero-bg');
+            if(bgLayers.length === 0) return;
+            bgLayers[currentHeroIndex].classList.remove('active');
+            currentHeroIndex = (currentHeroIndex - 1 + bgLayers.length) % bgLayers.length;
+            bgLayers[currentHeroIndex].classList.add('active');
+            
+            // Reinicia o timer automático ao interagir manualmente
+            clearInterval(heroInterval);
+            initHeroSlider();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             listenAuthChanges();
             initDatabaseListeners();
             initScrollHeaderEffect();
+            initHeroSlider();
         });
 
         // === FEEDBACK TÁTIL (VIBRAÇÃO SUTIL) ===
