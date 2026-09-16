@@ -344,6 +344,63 @@
         .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
 
         /* ==========================================================================
+           STEPPER VISUAL (NOVO)
+           ========================================================================== */
+        .stepper-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 14px 20px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow-x: auto;
+            gap: 10px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--card-border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .step-item.active {
+            color: var(--accent-main);
+        }
+        .step-item.active .step-number {
+            background: var(--accent-main);
+            color: #fff;
+        }
+
+        .step-item.completed {
+            color: var(--success);
+        }
+        .step-item.completed .step-number {
+            background: var(--success);
+            color: #fff;
+        }
+
+        /* ==========================================================================
            HOME VIEW & HERO SLIDER ANIMADO
            ========================================================================== */
         .home-fullscreen-wrapper {
@@ -865,6 +922,8 @@
         .btn-cancel-pass:hover { background: var(--danger); }
         .btn-wallet-gcal { background: #4285F4; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); text-decoration: none; }
         .btn-wallet-gcal:hover { background: #3367d6; }
+        .btn-wallet-ics { background: #0f172a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); text-decoration: none; }
+        .btn-wallet-ics:hover { background: #1e293b; }
 
         /* Admin Dashboard & Tabelas Responsivas */
         .admin-dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
@@ -1232,6 +1291,26 @@
                 <p>Siga os passos abaixo para marcar seu estilo em segundos.</p>
             </div>
 
+            <!-- Stepper Visual -->
+            <div class="stepper-container" id="visualStepper">
+                <div class="step-item active" id="stepIndicator1">
+                    <div class="step-number">1</div>
+                    <span>Serviços</span>
+                </div>
+                <div class="step-item" id="stepIndicator2">
+                    <div class="step-number">2</div>
+                    <span>Profissional</span>
+                </div>
+                <div class="step-item" id="stepIndicator3">
+                    <div class="step-number">3</div>
+                    <span>Data</span>
+                </div>
+                <div class="step-item" id="stepIndicator4">
+                    <div class="step-number">4</div>
+                    <span>Horário</span>
+                </div>
+            </div>
+
             <div class="booking-grid">
                 <div>
                     <div class="section-title title-flex">
@@ -1380,7 +1459,7 @@
                         <input type="text" id="crudServiceName" class="form-control" required>
                     </div>
                     <div class="input-group">
-                        <label>Duração (ex: 30 min)</label>
+                        <label>Duração (ex: 30 min ou 1h)</label>
                         <input type="text" id="crudServiceDuration" class="form-control" required>
                     </div>
                     <div class="input-group">
@@ -1502,6 +1581,7 @@
         <div class="success-actions" id="successActionsContainer"></div>
     </div>
 
+    <!-- Modal de Seleção de Barbeiro -->
     <div class="modal-overlay" id="barberModal">
         <div class="selection-modal">
             <button class="modal-close" onclick="closeModal('barberModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -1510,6 +1590,7 @@
         </div>
     </div>
 
+    <!-- Modal de Seleção de Data -->
     <div class="modal-overlay" id="dateModal">
         <div class="selection-modal">
             <button class="modal-close" onclick="closeModal('dateModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -1518,6 +1599,7 @@
         </div>
     </div>
 
+    <!-- Modal de Seleção de Horário -->
     <div class="modal-overlay" id="timeModal">
         <div class="selection-modal">
             <button class="modal-close" onclick="closeModal('timeModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -1531,6 +1613,7 @@
         </div>
     </div>
 
+    <!-- Modal de Autenticação -->
     <div class="modal-overlay" id="authModal">
         <div class="auth-modal">
             <button class="modal-close" onclick="closeModal('authModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -1556,6 +1639,22 @@
                     <input type="password" id="authPassword" class="form-control" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn-confirm" id="authSubmitBtn" style="margin-top:10px;">Entrar na Conta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal / Alerta de Vaga Esgotada para Lista de Espera -->
+    <div class="modal-overlay" id="waitlistModal">
+        <div class="auth-modal">
+            <button class="modal-close" onclick="closeModal('waitlistModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="section-title" style="font-size: 20px; margin-bottom: 10px;">Lista de Espera</div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 15px;">Este horário ou dia está lotado. Deseja ativar o alerta de desistência? Avisaremos se houver vaga!</p>
+            <form onsubmit="handleWaitlistSignup(event)">
+                <div class="input-group" style="margin-bottom: 12px;">
+                    <label>Seu E-mail para notificação</label>
+                    <input type="email" id="waitlistEmailInput" class="form-control" placeholder="seuemail@exemplo.com" required>
+                </div>
+                <button type="submit" class="btn-confirm" style="margin-top: 5px;">Ativar Alerta de Vaga</button>
             </form>
         </div>
     </div>
@@ -1587,7 +1686,7 @@
         let currentAuthMode = 'login'; 
         
         let selectedServices = []; 
-        let selectedBarber = null;
+        let selectedBarber = null; // Se for { id: 'ANY', name: 'Qualquer Profissional Disponível' }
         let selectedDate = null;
         let selectedTime = null;
         let selectedPeriod = 'manha'; 
@@ -1603,6 +1702,7 @@
         let barbersData = [];
         let scheduleBlocks = [];
         let localAppointments = [];
+        let waitlistData = [];
         let authorizedAdminEmails = ['pablo11ssousa2@gmail.com'];
 
         const BARBER_WHATSAPP_NUMBER = "5511933560170";
@@ -1640,6 +1740,7 @@
             initDatabaseListeners();
             initScrollHeaderEffect();
             initHeroSlider();
+            updateStepperVisual();
         });
 
         function triggerHapticFeedback() {
@@ -1743,6 +1844,11 @@
                 }
             });
 
+            db.ref('waitlist').orderByChild('tenantId').equalTo(TENANT_ID).on('value', snap => {
+                waitlistData = [];
+                if(snap.exists()) snap.forEach(child => { waitlistData.push({ id: child.key, ...child.val() }); });
+            });
+
             db.ref('admin_emails').on('value', snap => {
                 authorizedAdminEmails = ['pablo11ssousa2@gmail.com'];
                 if(snap.exists()) {
@@ -1777,6 +1883,58 @@
             });
         }
 
+        // Função utilitária para calcular a duração total somada dos serviços selecionados em minutos
+        function calculateTotalDurationMinutes() {
+            let totalMins = 0;
+            selectedServices.forEach(s => {
+                const durStr = (s.duration || "").toLowerCase();
+                if (durStr.includes('h')) {
+                    const parts = durStr.split('h');
+                    const hours = parseInt(parts[0]) || 1;
+                    const mins = parseInt(parts[1]) || 0;
+                    totalMins += (hours * 60) + mins;
+                } else if (durStr.includes('min')) {
+                    const mins = parseInt(durStr) || 30;
+                    totalMins += mins;
+                } else {
+                    totalMins += 30; // Padrão
+                }
+            });
+            return totalMins > 0 ? totalMins : 30;
+        }
+
+        function updateStepperVisual() {
+            const s1 = document.getElementById('stepIndicator1');
+            const s2 = document.getElementById('stepIndicator2');
+            const s3 = document.getElementById('stepIndicator3');
+            const s4 = document.getElementById('stepIndicator4');
+
+            if (!s1 || !s2 || !s3 || !s4) return;
+
+            s1.className = "step-item";
+            s2.className = "step-item";
+            s3.className = "step-item";
+            s4.className = "step-item";
+
+            if (selectedTime) {
+                s1.classList.add('completed');
+                s2.classList.add('completed');
+                s3.classList.add('completed');
+                s4.classList.add('active');
+            } else if (selectedDate) {
+                s1.classList.add('completed');
+                s2.classList.add('completed');
+                s3.classList.add('active');
+            } else if (selectedBarber) {
+                s1.classList.add('completed');
+                s2.classList.add('active');
+            } else if (selectedServices.length > 0) {
+                s1.classList.add('active');
+            } else {
+                s1.classList.add('active');
+            }
+        }
+
         function renderServices() {
             const container = document.getElementById('servicesContainer');
             if(servicesData.length === 0) { container.innerHTML = "<p>Nenhum serviço cadastrado.</p>"; document.getElementById('adminServicesTable').innerHTML = ''; return; }
@@ -1796,7 +1954,17 @@
             let displayedBarbers = barbersData;
             const hasBarbaService = selectedServices.some(s => s.name.toLowerCase().includes('barba'));
 
-            container.innerHTML = displayedBarbers.map(b => {
+            // Opção inicial "Qualquer Profissional Disponível"
+            let html = `
+                <div class="barber-card ${selectedBarber?.id === 'ANY' ? 'selected' : ''}" onclick="selectBarber('ANY')">
+                    <div class="barber-badge-highlight">Recomendado</div>
+                    <div class="barber-avatar" style="background:var(--accent-gold); color:var(--text-primary);"><i class="fa-solid fa-users"></i></div>
+                    <div class="barber-name">Qualquer Profissional</div>
+                    <div class="barber-role">Primeiro Horário Livre</div>
+                </div>
+            `;
+
+            html += displayedBarbers.map(b => {
                 const isHighlight = hasBarbaService && b.role.toLowerCase().includes('barba');
                 return `
                     <div class="barber-card ${selectedBarber?.id === b.id ? 'selected' : ''}" onclick="selectBarber('${b.id}')">
@@ -1807,6 +1975,8 @@
                     </div>
                 `;
             }).join('');
+
+            container.innerHTML = html;
 
             document.getElementById('adminBarbersTable').innerHTML = barbersData.map(b => `<tr><td>${b.name}</td><td>${b.role}</td><td><button class="btn-cancel" onclick="deleteBarber('${b.id}')">Remover</button></td></tr>`).join('');
             document.getElementById('crudBlockBarber').innerHTML = barbersData.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
@@ -1856,7 +2026,7 @@
             const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
             while(daysAdded < 15) {
                 let wDay = currentDate.getDay(); 
-                if (barber.workingDays && barber.workingDays.includes(wDay)) {
+                if (barber.id === 'ANY' || (barber.workingDays && barber.workingDays.includes(wDay))) {
                     dates.push({ fullDate: currentDate.toISOString().split('T')[0], dayNum: currentDate.getDate().toString().padStart(2, '0'), monthStr: monthNames[currentDate.getMonth()], weekDayStr: weekDays[wDay] });
                     daysAdded++;
                 }
@@ -1907,19 +2077,28 @@
                 if (selectedPeriod === 'noite') return hour >= 18;
             });
 
-            const barberBlocks = scheduleBlocks.filter(b => b.barberId === selectedBarber.id && b.date === selectedDate);
-            const isFullDayBlocked = barberBlocks.some(b => b.time === 'ALL');
-            
-            if (isFullDayBlocked) {
-                container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--danger); font-weight:bold;">Profissional indisponível nesta data.</div>`;
-                return;
-            }
+            const totalServiceDuration = calculateTotalDurationMinutes();
+            const slotsNeeded = Math.ceil(totalServiceDuration / interval);
 
-            const blockedSpecificTimes = barberBlocks.map(b => b.time);
-            const bookedAppointments = localAppointments.filter(a => a.barberId === selectedBarber.id && a.date === selectedDate && a.status === 'confirmado');
-            const bookedTimes = bookedAppointments.map(a => a.time);
-            
-            let finalTimes = periodTimes.filter(t => !blockedSpecificTimes.includes(t) && !bookedTimes.includes(t));
+            let finalTimes = [];
+
+            if (selectedBarber.id === 'ANY') {
+                // Qualquer Profissional: combina horários livres de toda a equipe considerando a duração exata
+                periodTimes.forEach(t => {
+                    let availableInAnyTeam = barbersData.some(b => {
+                        return isBarberAvailableAtSlot(b.id, selectedDate, t, slotsNeeded);
+                    });
+                    if (availableInAnyTeam) {
+                        finalTimes.push(t);
+                    }
+                });
+            } else {
+                periodTimes.forEach(t => {
+                    if (isBarberAvailableAtSlot(selectedBarber.id, selectedDate, t, slotsNeeded)) {
+                        finalTimes.push(t);
+                    }
+                });
+            }
 
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
@@ -1938,8 +2117,106 @@
                     <div class="time-slot ${selectedTime === t ? 'selected' : ''}" onclick="selectTime('${t}')">${t}</div>
                 `).join('') + `</div>`;
             } else {
-                container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-secondary);">Nenhum horário disponível neste período.</div>`;
+                container.innerHTML = `
+                    <div style="text-align:center; padding: 20px; color: var(--text-secondary);">
+                        <p style="margin-bottom:12px;">Nenhum horário disponível neste período para a duração necessária (${totalServiceDuration} min).</p>
+                        <button class="btn-confirm btn-small" style="margin: 0 auto; background:var(--accent-main); color:#fff;" onclick="openWaitlistModal()">
+                            <i class="fa-solid fa-bell"></i> Ativar Lista de Espera
+                        </button>
+                    </div>`;
             }
+        }
+
+        function isBarberAvailableAtSlot(barberId, dateStr, timeStr, slotsCount) {
+            const interval = parseInt(slotIntervalMinutes) || 60;
+            const [baseH, baseM] = timeStr.split(':').map(Number);
+            const baseTotalMins = baseH * 60 + baseM;
+
+            const barberBlocks = scheduleBlocks.filter(b => b.barberId === barberId && b.date === dateStr);
+            if (barberBlocks.some(b => b.time === 'ALL')) return false;
+
+            const bookedAppointments = localAppointments.filter(a => a.barberId === barberId && a.date === dateStr && a.status === 'confirmado');
+
+            for (let i = 0; i < slotsCount; i++) {
+                const checkMins = baseTotalMins + (i * interval);
+                let h = Math.floor(checkMins / 60);
+                let m = checkMins % 60;
+                let checkTimeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+                if (barberBlocks.some(b => b.time === checkTimeStr)) return false;
+                if (bookedAppointments.some(a => a.time === checkTimeStr)) return false;
+            }
+            return true;
+        }
+
+        function openWaitlistModal() {
+            if (currentUser && currentUser.email) {
+                document.getElementById('waitlistEmailInput').value = currentUser.email;
+            }
+            openModal('waitlistModal');
+        }
+
+        async function handleWaitlistSignup(e) {
+            e.preventDefault();
+            const email = document.getElementById('waitlistEmailInput').value.trim();
+            if (!email || !selectedDate) return;
+
+            const waitlistItem = {
+                tenantId: TENANT_ID,
+                email: email,
+                date: selectedDate,
+                barberId: selectedBarber ? selectedBarber.id : 'ANY',
+                serviceName: selectedServices.map(s => s.name).join(' + '),
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await db.ref('waitlist').push(waitlistItem);
+                closeModal('waitlistModal');
+                showToast('Alerta de lista de espera ativado com sucesso!');
+            } catch (err) {
+                showToast('Erro ao entrar na lista de espera.');
+            }
+        }
+
+        async function checkAndNotifyWaitlist(dateStr, barberId) {
+            try {
+                const snap = await db.ref('waitlist').orderByChild('tenantId').equalTo(TENANT_ID).once('value');
+                if (!snap.exists()) return;
+
+                snap.forEach(child => {
+                    const item = child.val();
+                    if (item.date === dateStr && (item.barberId === 'ANY' || item.barberId === barberId)) {
+                        // Envia notificação por e-mail informando que há vaga desistente
+                        sendWaitlistEmailNotification(item.email, dateStr, item.serviceName);
+                        // Remove da lista após notificar
+                        db.ref('waitlist/' + child.key).remove();
+                    }
+                });
+            } catch (e) {
+                console.error("Erro na lista de espera:", e);
+            }
+        }
+
+        async function sendWaitlistEmailNotification(toEmail, dateStr, serviceName) {
+            const serviceID = 'service_w57ntvf';
+            const templateID = 'template_t4vty7l'; 
+            const publicKey = 'K8OklB-cs_yul_jNN';
+
+            emailjs.init(publicKey);
+            const templateParams = {
+                to_email: toEmail,
+                to_name: toEmail.split('@')[0],
+                service_name: serviceName + " (Vaga Desistente Disponível!)",
+                barber_name: "Equipe Renatu's",
+                date: dateStr.split('-').reverse().join('/'),
+                time: "Horário Livre",
+                status: "Vaga Liberada!",
+                price: "Consulte no site"
+            };
+            try {
+                await emailjs.send(serviceID, templateID, templateParams);
+            } catch(err) {}
         }
 
         function selectService(id) {
@@ -1949,18 +2226,25 @@
             if (index > -1) selectedServices.splice(index, 1);
             else selectedServices.push(service);
             
-            renderServices(); updateSummary();
+            renderServices(); 
+            updateSummary();
+            updateStepperVisual();
             document.getElementById('btnContinueFromServices').style.display = selectedServices.length > 0 ? 'inline-flex' : 'none';
         }
 
         function selectBarber(id) { 
             triggerHapticFeedback();
-            selectedBarber = barbersData.find(b => b.id === id); 
+            if (id === 'ANY') {
+                selectedBarber = { id: 'ANY', name: 'Qualquer Profissional Disponível', workingDays: [0,1,2,3,4,5,6] };
+            } else {
+                selectedBarber = barbersData.find(b => b.id === id);
+            }
             selectedDate = null; 
             selectedTime = null; 
             renderBarbers(); 
             renderDates(); 
             updateSummary(); 
+            updateStepperVisual();
             closeModal('barberModal'); 
             openModal('dateModal'); 
         }
@@ -1972,21 +2256,42 @@
             renderDates(); 
             updateTimeSlots(); 
             updateSummary(); 
+            updateStepperVisual();
             closeModal('dateModal'); 
             openModal('timeModal'); 
         }
 
         function selectTime(time) { 
             triggerHapticFeedback();
-            const isAlreadyBooked = localAppointments.some(a => a.barberId === selectedBarber.id && a.date === selectedDate && a.time === time && a.status === 'confirmado');
+            
+            // Se for "Qualquer Profissional", ao selecionar o horário definimos automaticamente o primeiro barbeiro livre que atende neste horário
+            let targetBarber = selectedBarber;
+            if (selectedBarber.id === 'ANY') {
+                const totalServiceDuration = calculateTotalDurationMinutes();
+                const slotsNeeded = Math.ceil(totalServiceDuration / (parseInt(slotIntervalMinutes) || 60));
+                
+                const availableBarber = barbersData.find(b => isBarberAvailableAtSlot(b.id, selectedDate, time, slotsNeeded));
+                if (availableBarber) {
+                    targetBarber = availableBarber;
+                } else {
+                    showToast('Este horário não está mais disponível.');
+                    updateTimeSlots();
+                    return;
+                }
+            }
+
+            const isAlreadyBooked = localAppointments.some(a => a.barberId === targetBarber.id && a.date === selectedDate && a.time === time && a.status === 'confirmado');
             if (isAlreadyBooked) {
                 showToast('Este horário acabou de ser reservado por outro cliente. Escolha outro.');
                 updateTimeSlots();
                 return;
             }
+
+            selectedBarber = targetBarber; // Atribui o barbeiro efetivo
             selectedTime = time; 
             updateTimeSlots(); 
             updateSummary(); 
+            updateStepperVisual();
             closeModal('timeModal'); 
 
             setTimeout(() => {
@@ -2043,6 +2348,42 @@
             
             window.open(googleUrl, '_blank');
             showToast('Redirecionando para o Google Agenda...');
+        }
+
+        // Função para baixar arquivo .ics (Calendário Nativo iPhone/Android)
+        function downloadICSFile(appointment) {
+            const [year, month, day] = appointment.date.split('-');
+            const [hour, minute] = appointment.time.split(':');
+            
+            const dtStart = `${year}${month}${day}T${hour}${minute}00`;
+            let endHourNum = Number(hour) + 1;
+            const endHour = String(endHourNum).padStart(2, '0');
+            const dtEnd = `${year}${month}${day}T${endHour}${minute}00`;
+
+            const icsContent = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//Renatus Barbearia//Agendamento//PT",
+                "BEGIN:VEVENT",
+                `UID:appointment-${appointment.id || Date.now()}@renatus.com`,
+                `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+                `DTSTART:${dtStart}`,
+                `DTEND:${dtEnd}`,
+                `SUMMARY:Renatu's - ${appointment.serviceName} com ${appointment.barberName}`,
+                `DESCRIPTION:Agendamento confirmado na Renatu's Barbearia.\\nProfissional: ${appointment.barberName}\\nServiço: ${appointment.serviceName}`,
+                `LOCATION:Renatu's Barbearia`,
+                "END:VEVENT",
+                "END:VCALENDAR"
+            ].join("\r\n");
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', `agendamento-renatus-${appointment.date}.ics`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Arquivo de calendário (.ics) gerado!');
         }
 
         async function sendAutomatedNotifications(appointment) {
@@ -2114,7 +2455,9 @@
                 setTimeout(() => {
                     selectedServices = []; selectedBarber = null; selectedDate = null; selectedTime = null;
                     document.getElementById('btnContinueFromServices').style.display = 'none';
-                    renderServices(); updateSummary();
+                    renderServices(); 
+                    updateSummary();
+                    updateStepperVisual();
                     btn.innerHTML = 'Confirmar Agendamento <i class="fa-solid fa-arrow-right"></i>';
                 }, 1000);
 
@@ -2234,8 +2577,11 @@
                             <div class="wallet-price">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
                             <div class="wallet-actions">
                                 ${a.status === 'confirmado' ? `
-                                    <button class="btn-wallet-gcal" onclick="addToGoogleCalendar(${encodedApp})">
-                                        <i class="fa-solid fa-calendar-plus"></i> Google Agenda
+                                    <button class="btn-wallet-gcal" onclick="addToGoogleCalendar(${encodedApp})" title="Adicionar ao Google Agenda">
+                                        <i class="fa-solid fa-calendar-plus"></i> G-Agenda
+                                    </button>
+                                    <button class="btn-wallet-ics" onclick="downloadICSFile(${encodedApp})" title="Baixar Lembrete .ics para Celular">
+                                        <i class="fa-solid fa-file-arrow-down"></i> .ics
                                     </button>
                                     <button class="btn-cancel-pass" onclick="cancelAppointment('${a.id}')">Cancelar</button>
                                 ` : ''}
@@ -2294,8 +2640,11 @@
                             <div class="wallet-price">R$ ${parseFloat(a.servicePrice).toFixed(2).replace('.', ',')}</div>
                             <div class="wallet-actions">
                                 ${a.status === 'confirmado' ? `
-                                    <button class="btn-wallet-gcal" onclick="addToGoogleCalendar(${encodedApp})">
-                                        <i class="fa-solid fa-calendar-plus"></i> Google Agenda
+                                    <button class="btn-wallet-gcal" onclick="addToGoogleCalendar(${encodedApp})" title="Adicionar ao Google Agenda">
+                                        <i class="fa-solid fa-calendar-plus"></i> G-Agenda
+                                    </button>
+                                    <button class="btn-wallet-ics" onclick="downloadICSFile(${encodedApp})" title="Baixar Lembrete .ics para Celular">
+                                        <i class="fa-solid fa-file-arrow-down"></i> .ics
                                     </button>
                                     <button class="btn-cancel-pass" onclick="cancelAppointment('${a.id}')">Cancelar</button>
                                 ` : ''}
@@ -2326,6 +2675,9 @@
                     showToast('Cancelado.');
                     if (selectedDate && selectedBarber) updateTimeSlots(); 
                     
+                    // Dispara notificação de vaga liberada para quem estiver na lista de espera
+                    checkAndNotifyWaitlist(appointmentData.date, appointmentData.barberId);
+
                     sendAutomatedNotifications({ ...appointmentData, status: 'cancelado' });
                 }
             } catch (error) { showToast('Erro ao cancelar.'); }
