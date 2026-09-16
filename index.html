@@ -367,7 +367,6 @@
             box-shadow: none;
         }
 
-        /* Camadas de fundo animadas para transição fluida */
         .home-hero-bg {
             position: absolute;
             top: 0;
@@ -387,7 +386,6 @@
             transform: scale(1);
         }
 
-        /* Camada escura de sobreposição para legibilidade */
         .home-hero::after {
             content: '';
             position: absolute;
@@ -572,7 +570,6 @@
                 font-size: 17px; 
             }
             
-            /* Menu retrátil mobile (Sidebar Drawer) */
             .nav-menu { 
                 position: fixed;
                 top: 0;
@@ -613,7 +610,6 @@
                 margin-top: -80px;
             }
 
-            /* Otimização Mobile Específica para a Home Hero */
             .home-hero { 
                 min-height: 88vh; 
                 height: auto;
@@ -723,67 +719,81 @@
         .btn-danger { background: var(--danger); color: white; }
 
         /* ==========================================================================
-           ESTILO GOOGLE CARTEIRA (CARTÕES EMPILHADOS / UM SOB O OUTRO)
+           ESTILO GOOGLE CARTEIRA (GOOGLE WALLET) - PILHA DE PASSES COM SOBREPOSIÇÃO
            ========================================================================== */
         .appointments-container { display: flex; flex-direction: column; gap: 20px; }
         .recent-section-header { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--text-primary); margin-bottom: 12px; letter-spacing: 0.5px; border-bottom: 2px solid var(--bg-secondary); padding-bottom: 8px; }
         
-        /* Contêiner de Cartões Empilhados Estilo Carteira do Google */
-        .wallet-stack-container {
-            display: flex;
-            flex-direction: column;
-            /* Cada cartão subsequente puxa para cima criando o efeito de "cartão empilhado/sobreposto" */
-            gap: -110px; 
-            padding-bottom: 20px;
+        /* Contêiner de rolagem com comportamento de pilha estilo Wallet */
+        .recent-appointments-scroll { 
+            display: flex; 
+            gap: 0; /* Remove espaço estático para permitir a sobreposição precisa */
+            overflow-x: auto; 
+            padding: 20px 10px 25px 10px; 
+            scrollbar-width: thin; 
+            scrollbar-color: var(--card-border) transparent; 
         }
+        .recent-appointments-scroll::-webkit-scrollbar { height: 8px; }
+        .recent-appointments-scroll::-webkit-scrollbar-track { background: transparent; }
+        .recent-appointments-scroll::-webkit-scrollbar-thumb { background-color: var(--card-border); border-radius: 20px; }
 
+        .month-group-container { background: var(--bg-secondary); border-radius: var(--radius-lg); border: 1px solid var(--card-border); overflow: hidden; transition: var(--transition); }
+        .month-group-header { padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--bg-secondary); }
+        .month-group-header:hover { background: #eceff5; }
+        .month-group-title { font-family: 'Anton', sans-serif; font-size: 20px; color: var(--accent-main); text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin: 0; word-break: break-word; }
+        .month-group-toggle-icon { font-size: 15px; color: var(--text-secondary); transition: transform 0.3s ease; flex-shrink: 0; }
+        .month-group-container.expanded .month-group-toggle-icon { transform: rotate(180deg); }
+        .month-group-content { display: none; padding: 0 20px 20px 20px; border-top: 1px solid var(--card-border); background: var(--bg-primary); }
+        .month-group-container.expanded .month-group-content { display: block; }
+        .month-apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
+
+        /* Cartão de Passe (Google Wallet Stack Effect) */
         .wallet-pass-card {
-            background: linear-gradient(135deg, #0d1b3e 0%, #172554 100%);
+            background: linear-gradient(135deg, #121d3f 0%, #1e3a8a 100%);
             color: #ffffff;
-            border-radius: 26px;
+            border-radius: 24px;
             padding: 22px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             gap: 16px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+            box-shadow: -10px 0 25px rgba(0, 0, 0, 0.25);
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            width: 100%;
-            max-width: 600px;
-            margin-bottom: -105px; /* Empilhamento visual de carteira */
+            flex: 0 0 310px;
+            min-width: 310px;
+            margin-left: -55px; /* Efeito de sobreposição em leque/pilha estilo Google Carteira */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, margin 0.4s ease;
             z-index: 1;
         }
 
-        /* Efeito de expansão interativa em cascata ao passar o mouse ou focar */
-        .wallet-pass-card:hover {
-            transform: translateY(-25px) scale(1.02);
-            box-shadow: 0 20px 45px rgba(35, 75, 186, 0.4);
-            z-index: 10 !important;
-            margin-bottom: 15px;
+        /* O primeiro item da pilha não puxa para a esquerda */
+        .recent-appointments-scroll .wallet-pass-card:first-child {
+            margin-left: 0;
         }
 
-        /* Atribuição de índices de camada para o empilhamento correto */
-        .wallet-stack-card-0 { z-index: 5; }
-        .wallet-stack-card-1 { z-index: 4; }
-        .wallet-stack-card-2 { z-index: 3; }
-        .wallet-stack-card-3 { z-index: 2; }
-        .wallet-stack-card-4 { z-index: 1; }
+        /* Animação e comportamento interativo ao passar o mouse ou focar na pilha estilo Google Wallet */
+        .recent-appointments-scroll .wallet-pass-card:hover,
+        .recent-appointments-scroll .wallet-pass-card:focus-within {
+            transform: translateY(-12px) scale(1.03);
+            margin-left: 10px;
+            margin-right: 25px;
+            box-shadow: 0 20px 40px rgba(35, 75, 186, 0.45);
+            z-index: 10;
+        }
 
         .wallet-pass-card::before {
             content: '';
             position: absolute;
-            top: -60px;
-            right: -60px;
-            width: 140px;
-            height: 140px;
-            background: radial-gradient(circle, rgba(255,206,0,0.22) 0%, transparent 70%);
+            top: -50px;
+            right: -50px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255,206,0,0.2) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
         }
-
         .wallet-pass-header {
             display: flex;
             justify-content: space-between;
@@ -791,7 +801,6 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             padding-bottom: 10px;
         }
-
         .wallet-brand {
             font-family: 'Anton', sans-serif;
             font-size: 15px;
@@ -801,13 +810,11 @@
             align-items: center;
             gap: 6px;
         }
-
         .wallet-pass-body {
             display: flex;
             gap: 16px;
             align-items: center;
         }
-
         .wallet-date-badge {
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(8px);
@@ -817,14 +824,12 @@
             text-align: center;
             flex-shrink: 0;
         }
-
         .wallet-date-badge .day {
             font-size: 24px;
             font-family: 'Anton', sans-serif;
             line-height: 1;
             color: #fff;
         }
-
         .wallet-date-badge .month-label {
             font-size: 10px;
             text-transform: uppercase;
@@ -832,12 +837,10 @@
             margin-top: 3px;
             color: var(--accent-gold);
         }
-
         .wallet-details {
             flex: 1;
             min-width: 0;
         }
-
         .wallet-service-title {
             font-size: 16px;
             font-weight: 700;
@@ -847,7 +850,6 @@
             text-overflow: ellipsis;
             color: #fff;
         }
-
         .wallet-info-row {
             font-size: 12.5px;
             color: rgba(255, 255, 255, 0.8);
@@ -856,7 +858,6 @@
             align-items: center;
             gap: 6px;
         }
-
         .wallet-pass-footer {
             display: flex;
             justify-content: space-between;
@@ -866,21 +867,18 @@
             gap: 8px;
             flex-wrap: wrap;
         }
-
         .wallet-price {
             font-size: 18px;
             font-weight: 800;
             font-family: 'Anton', sans-serif;
             color: var(--accent-gold);
         }
-
         .wallet-actions {
             display: flex;
             gap: 6px;
             align-items: center;
             flex-wrap: wrap;
         }
-
         .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
         .status-confirmed { background: rgba(16, 185, 129, 0.2); color: #34d399; }
         .status-canceled { background: rgba(239, 68, 68, 0.2); color: #f87171; text-decoration: line-through; }
@@ -888,8 +886,6 @@
         .btn-cancel-pass:hover { background: var(--danger); }
         .btn-wallet-gcal { background: #4285F4; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: var(--transition); text-decoration: none; }
         .btn-wallet-gcal:hover { background: #3367d6; }
-
-        .month-apps-grid { display: flex; flex-direction: column; gap: 0px; margin-top: 25px; padding-bottom: 30px; }
 
         /* Admin Dashboard & Tabelas Responsivas */
         .admin-dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
@@ -2225,22 +2221,22 @@
 
             let htmlContent = '';
 
+            // Seção de Recém Agendados com efeito de Pilha (Stack) em leque estilo Google Wallet
             htmlContent += `
                 <div>
                     <div class="recent-section-header">Recém agendados</div>
-                    <div class="wallet-stack-container">
+                    <div class="recent-appointments-scroll">
             `;
 
             let recentList = [...currentYearApps].slice(0, 5);
-            htmlContent += recentList.map((a, idx) => {
+            htmlContent += recentList.map(a => {
                 const dateParts = a.date.split('-');
                 const dayNum = dateParts[2];
                 const monthStr = monthNamesShort[parseInt(dateParts[1], 10) - 1] || '';
                 const encodedApp = JSON.stringify(a).replace(/"/g, '&quot;');
-                const layerClass = `wallet-stack-card-${idx}`;
                 
                 return `
-                    <div class="wallet-pass-card ${layerClass}">
+                    <div class="wallet-pass-card">
                         <div class="wallet-pass-header">
                             <div class="wallet-brand"><i class="fa-solid fa-scissors"></i> RENATU'S PASS</div>
                             <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
@@ -2290,18 +2286,17 @@
                             <i class="fa-solid fa-chevron-down month-group-toggle-icon"></i>
                         </div>
                         <div class="month-group-content">
-                            <div class="month-apps-grid wallet-stack-container">
+                            <div class="month-apps-grid">
                 `;
 
-                htmlContent += monthApps.map((a, idx) => {
+                htmlContent += monthApps.map(a => {
                     const dateParts = a.date.split('-');
                     const dayNum = dateParts[2];
                     const monthStr = monthNamesShort[m - 1] || '';
                     const encodedApp = JSON.stringify(a).replace(/"/g, '&quot;');
-                    const layerClass = `wallet-stack-card-${idx}`;
 
                     return `
-                    <div class="wallet-pass-card ${layerClass}">
+                    <div class="wallet-pass-card" style="margin-left: 0;">
                         <div class="wallet-pass-header">
                             <div class="wallet-brand"><i class="fa-solid fa-scissors"></i> RENATU'S PASS</div>
                             <span class="status-badge ${a.status === 'confirmado' ? 'status-confirmed' : 'status-canceled'}">${a.status}</span>
